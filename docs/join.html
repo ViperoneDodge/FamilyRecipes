@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FamilyRecipes</title>
+<link rel="icon" href="icon.png">
+<style>
+:root { --bg:#f3e6d0; --card:#fff7e4; --ink:#3b2a1e; --muted:#5b6575; --accent:#b4532a; --line:#d9d2c3; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171c; --card:#1d2129; --ink:#eef1f5; --muted:#a3abb8; --accent:#e08a5f; --line:#323846; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+main { max-width:460px; margin:0 auto; padding:28px 16px 40px; }
+header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+header img { width:52px; height:52px; border-radius:12px; }
+h1 { font-size:22px; margin:0; }
+.sub { color:var(--muted); margin:2px 0 0; font-size:14px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:14px; }
+.step { display:flex; gap:12px; }
+.n { flex:none; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.step p { margin:2px 0 10px; }
+.btn { display:inline-block; background:var(--accent); color:#fff; text-decoration:none; padding:10px 16px; border-radius:999px; font-weight:600; border:0; font-size:15px; cursor:pointer; }
+.code { font:700 28px/1.2 ui-monospace,Menlo,Consolas,monospace; letter-spacing:4px; word-break:break-all; margin:4px 0 10px; }
+.btn.alt { background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
+footer { display:flex; align-items:center; gap:10px; justify-content:center; color:var(--muted); font-size:13px; margin-top:24px; }
+footer img { width:36px; height:36px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icon.png" alt="">
+    <div><h1>FamilyRecipes</h1><p class="sub" id="t_sub"></p></div>
+  </header>
+  <div class="card step"><div class="n">1</div><div><p id="t_s1"></p>
+    <a class="btn" href="https://play.google.com/store/apps/details?id=it.familyrecipes.familyrecipes" id="t_play"></a></div></div>
+  <div class="card step"><div class="n">2</div><div><p id="t_s2"></p></div></div>
+  <div class="card step"><div class="n">3</div><div><p id="t_s3"></p>
+    <div class="code" id="code">—</div>
+    <button class="btn alt" id="copy" type="button"></button></div></div>
+  <footer><img src="gian_trip_logo.png" alt=""><span>© 2026 Gian Trip Apps</span></footer>
+</main>
+<script>
+var T = {
+  it: { sub:'Ti hanno invitato in un ricettario di famiglia', s1:'Installa FamilyRecipes sul telefono Android.', play:'Scarica da Google Play', s2:'Apri l’app e accedi con un account online (Google o email).', s3:'Vai nella scheda Gruppi → “Entra con un codice” e inserisci questo codice, oppure inquadra di nuovo il QR con “Inquadra QR”.', copy:'Copia codice', copied:'Copiato!' },
+  en: { sub:'You have been invited to a family cookbook', s1:'Install FamilyRecipes on your Android phone.', play:'Get it on Google Play', s2:'Open the app and sign in with an online account (Google or email).', s3:'Go to the Groups tab → “Join with a code” and enter this code, or scan the QR again with “Scan QR”.', copy:'Copy code', copied:'Copied!' },
+  fr: { sub:'Vous avez été invité dans un groupe', s1:'Installez FamilyRecipes sur votre téléphone Android.', play:'Disponible sur Google Play', s2:'Ouvrez l’app et connectez-vous avec un compte en ligne (Google ou e-mail).', s3:'Allez dans l’onglet Groupes → « Rejoindre avec un code » et saisissez ce code, ou scannez à nouveau le QR avec « Scanner le QR ».', copy:'Copier le code', copied:'Copié !' },
+  de: { sub:'Du wurdest in eine Gruppe eingeladen', s1:'Installiere FamilyRecipes auf deinem Android-Handy.', play:'Bei Google Play laden', s2:'Öffne die App und melde dich mit einem Online-Konto an (Google oder E-Mail).', s3:'Gehe zum Tab Gruppen → „Mit Code beitreten“ und gib diesen Code ein oder scanne den QR erneut mit „QR scannen“.', copy:'Code kopieren', copied:'Kopiert!' },
+  es: { sub:'Te han invitado a un grupo', s1:'Instala FamilyRecipes en tu móvil Android.', play:'Disponible en Google Play', s2:'Abre la app e inicia sesión con una cuenta online (Google o email).', s3:'Ve a la pestaña Grupos → «Unirse con un código» e introduce este código, o vuelve a escanear el QR con «Escanear QR».', copy:'Copiar código', copied:'¡Copiado!' },
+  pt: { sub:'Foste convidado para um grupo', s1:'Instala o FamilyRecipes no teu telemóvel Android.', play:'Disponível no Google Play', s2:'Abre a app e inicia sessão com uma conta online (Google ou email).', s3:'Vai ao separador Grupos → «Entrar com um código» e introduz este código, ou lê de novo o QR com «Ler QR».', copy:'Copiar código', copied:'Copiado!' }
+};
+var lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+var t = T[lang] || T.en;
+document.documentElement.lang = T[lang] ? lang : 'en';
+['sub','s1','play','s2','s3','copy'].forEach(function (k) { document.getElementById('t_' + k) ? document.getElementById('t_' + k).textContent = t[k] : null; });
+document.getElementById('copy').textContent = t.copy;
+var code = (new URLSearchParams(location.search).get('code') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+if (code) document.getElementById('code').textContent = code;
+document.getElementById('copy').onclick = function () {
+  if (!code) return;
+  var b = this;
+  var done = function () { b.textContent = t.copied; setTimeout(function () { b.textContent = t.copy; }, 1500); };
+  if (navigator.clipboard) navigator.clipboard.writeText(code).then(done, function () {}); else done();
+};
+</script>
+</body>
+</html>

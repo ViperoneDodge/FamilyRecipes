@@ -1,0 +1,51 @@
+name: familyrecipes
+description: Il ricettario di famiglia, da compilare insieme nei gruppi.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  path_provider: ^2.1.5
+  image_picker: ^1.1.2
+  crypto: ^3.0.3
+  flutter_local_notifications: ^18.0.1
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.0
+  cloud_firestore: ^5.4.0
+  firebase_messaging: ^15.1.3
+  google_sign_in: ^6.2.1
+  image: ^4.2.0
+  workmanager: ^0.10.0
+  url_launcher: ^6.3.1
+  device_info_plus: ^11.3.0
+  in_app_update: ^4.2.3
+  pdf: ^3.11.0
+  printing: ^5.13.0
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.4.2
+  share_plus: ^12.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon.png
+    - assets/gian_trip_logo.png
+    - assets/l10n/
+    - assets/fonts/NotoSans-Regular.ttf
+    - assets/fonts/NotoSans-Bold.ttf
+    - assets/fonts/PatrickHand-Regular.ttf
+  fonts:
+    - family: PatrickHand
+      fonts:
+        - asset: assets/fonts/PatrickHand-Regular.ttf

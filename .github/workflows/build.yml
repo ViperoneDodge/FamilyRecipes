@@ -1,0 +1,125 @@
+name: Compila APK Android
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.x'
+          channel: stable
+          cache: true
+
+      # Chiave di caricamento Play Store: arriva dai Secrets del repository
+      # (Settings → Secrets and variables → Actions). Senza, si usa la chiave di prova.
+      - name: Chiave di firma
+        shell: bash
+        env:
+          UPLOAD_KEYSTORE_B64: ${{ secrets.UPLOAD_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$UPLOAD_KEYSTORE_B64" ]; then
+            echo "$UPLOAD_KEYSTORE_B64" | base64 -d > keystore/upload.jks
+            echo "Chiave di caricamento presente"
+          else
+            echo "Nessuna chiave di caricamento: firma di prova"
+          fi
+
+      # APK (installazione diretta): firmato SEMPRE con keystore/debug.keystore,
+      # così si aggiorna sopra le versioni già installate.
+      # AAB (Play Store): firmato con la chiave di caricamento, solo se presente nei Secrets.
+      - name: Prepara progetto e compila
+        id: build
+        shell: bash
+        env:
+          RECIPES_KEYSTORE: keystore/upload.jks
+          RECIPES_STORE_PASS: ${{ secrets.UPLOAD_STORE_PASSWORD }}
+          RECIPES_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          RECIPES_KEY_PASS: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          set -o pipefail
+          {
+            echo "=== flutter create ==="
+            flutter create --org it.familyrecipes --project-name familyrecipes --platforms android,ios . &&
+            rm -f test/widget_test.dart &&
+            echo "=== patch ===" &&
+            python3 tool/patch_android.py &&
+            mkdir -p ~/.android && cp keystore/debug.keystore ~/.android/debug.keystore &&
+            echo "=== pub get ===" &&
+            flutter pub get &&
+            echo "=== analyze ===" &&
+            flutter analyze --no-fatal-infos --no-fatal-warnings &&
+            echo "=== test ===" &&
+            flutter test &&
+            echo "=== build apk ===" &&
+            flutter build apk --release &&
+            if [ -f keystore/upload.jks ] && [ -n "$RECIPES_STORE_PASS" ]; then
+              echo "=== build appbundle (Play Store, chiave di caricamento) ===" &&
+              RECIPES_SIGN=upload flutter build appbundle --release
+            else
+              echo "=== appbundle saltato: chiave di caricamento non configurata ==="
+            fi
+          } 2>&1 | tee build.log
+          VER=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          APK="FamilyRecipes-v${VER}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "$APK"
+          FILES="$APK"
+          if [ -f build/app/outputs/bundle/release/app-release.aab ]; then
+            AAB="FamilyRecipes-v${VER}.aab"
+            cp build/app/outputs/bundle/release/app-release.aab "$AAB"
+            FILES="$APK"$'\n'"$AAB"
+          fi
+          {
+            echo "files<<EOF"
+            echo "$FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "apk=$APK" >> "$GITHUB_OUTPUT"
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+          echo "=== firma ===" >> build.log
+          $(ls -d $ANDROID_HOME/build-tools/*/ | sort -V | tail -1)apksigner verify --print-certs "$APK" | grep -i "SHA-1" >> build.log || true
+
+      - name: Pubblica APK nella pagina Releases
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.build.outputs.ver }}-build${{ github.run_number }}
+          name: FamilyRecipes ${{ steps.build.outputs.ver }} (build ${{ github.run_number }})
+          body: |
+            Scarica **${{ steps.build.outputs.apk }}** qui sotto e aprilo sul telefono Android per installarlo (si aggiorna sopra la versione precedente).
+            Il file **.aab**, se presente, serve per caricare l'app nella Play Console.
+          files: ${{ steps.build.outputs.files }}
+
+      - name: Carica APK come artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FamilyRecipes-v${{ steps.build.outputs.ver }}
+          path: ${{ steps.build.outputs.files }}
+
+      - name: Salva log di compilazione (branch build-log)
+        if: always()
+        shell: bash
+        run: |
+          echo "result=${{ steps.build.outcome }} run=${{ github.run_number }} sha=${{ github.sha }}" > status.txt
+          mkdir -p /tmp/logout && cp status.txt /tmp/logout/ && cp build.log /tmp/logout/ 2>/dev/null || true
+          cd /tmp/logout
+          git init -q -b build-log
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A && git commit -qm "log run ${{ github.run_number }}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" build-log
