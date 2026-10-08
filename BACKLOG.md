@@ -2,9 +2,9 @@
 
 Cose da sistemare nelle prossime release.
 
-## Prossima release
+## Versione 1.1.0
 
-Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
+Pubblicata l'8 ottobre 2026:
 
 - [x] Tolta la scheda **Indice** (doppione di "Le mie"): restano "Le mie" e "Gruppi".
 - [x] **Linguette per categoria in stile rubrica**, su due righe, in cima alle ricette (anche nel
@@ -28,6 +28,8 @@ Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
   `crossAxisAlignment: CrossAxisAlignment.center` su tutta la larghezza. Da ricontrollare anche
   il contrasto di titolo e sottotitolo e la visibilità del vapore sopra la pentola.
   → Risolto con la nuova schermata di avvio a tutto schermo.
+
+## Prossima release
 
 - [ ] **Importazione ricette da file** (per caricare il primo ricettario, ad esempio da OneNote):
   - Impostazioni → *Importa ricette*: si sceglie un file (`.json` o `.zip`) e la destinazione
