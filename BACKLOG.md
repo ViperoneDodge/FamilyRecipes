@@ -16,6 +16,9 @@ Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
 - [x] **Impostazione linguette** (Impostazioni → Aspetto → Linguette delle categorie): *In alto* (due
   righe), *A destra* (verticali sul bordo del foglio, testo ruotato: comodo su tablet e schermi larghi)
   oppure *Nessuna* (la categoria si sceglie da un menu sopra l'elenco).
+- [x] **Rotazione bloccata sui telefoni**: su schermi con lato corto sotto i 600 dp l'app resta sempre
+  verticale; tablet e pieghevoli aperti continuano a ruotare (si ricontrolla quando il pieghevole si
+  apre o si chiude).
 
 - [x] **Schermata di avvio impaginata male** (segnalato su 1.0.2, Android): lo sfondo sfumato
   e il contenuto occupano solo la parte sinistra dello schermo (circa 3/4); a destra resta il

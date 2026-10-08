@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'firebase_config.dart';
@@ -32,9 +33,28 @@ Future<void> main() async {
     }
   }
   await initGroupWatch();
+  await applyOrientationLock();
   appState = AppState();
   runApp(const FamilyRecipesApp());
   appState.init();
+}
+
+/// Sotto questo lato minimo (in dp) lo schermo è un telefono.
+const double phoneMaxShortestSide = 600;
+
+bool? _portraitLocked;
+
+/// Sui telefoni l'app resta sempre verticale; su tablet e pieghevoli aperti ruota liberamente.
+Future<void> applyOrientationLock() async {
+  final views = WidgetsBinding.instance.platformDispatcher.views;
+  if (views.isEmpty) return;
+  final v = views.first;
+  if (v.physicalSize.isEmpty) return;
+  final phone = (v.physicalSize / v.devicePixelRatio).shortestSide < phoneMaxShortestSide;
+  if (_portraitLocked == phone) return;
+  _portraitLocked = phone;
+  await SystemChrome.setPreferredOrientations(
+      phone ? const [DeviceOrientation.portraitUp] : const <DeviceOrientation>[]);
 }
 
 class FamilyRecipesApp extends StatefulWidget {
@@ -61,6 +81,10 @@ class _FamilyRecipesAppState extends State<FamilyRecipesApp> with WidgetsBinding
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
+
+  /// Un pieghevole che si apre o si chiude cambia dimensione: si ricontrolla il blocco.
+  @override
+  void didChangeMetrics() => applyOrientationLock();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
