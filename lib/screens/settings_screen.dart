@@ -43,8 +43,8 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(tr('upgrade.button')),
                     subtitle: Text(tr('upgrade.settingsInfo')),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
+                    onTap: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
                   ),
                 _header(context, tr('settings.language')),
                 ListTile(
@@ -102,7 +102,8 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child: Text(tr('settings.batteryHint'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                  child:
+                      Text(tr('settings.batteryHint'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                 ),
                 _header(context, tr('settings.groups')),
                 if (!appState.isCloud)
@@ -122,8 +123,7 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(tr('admin.title')),
                     subtitle: Text(tr('admin.subtitle')),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminScreen())),
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminScreen())),
                   ),
                 ListTile(
                   leading: const Icon(Icons.bug_report_outlined),
@@ -261,8 +261,9 @@ class SettingsScreen extends StatelessWidget {
 
   List<Widget> _appearance(BuildContext context) {
     final t = appState.theme;
-    void save({ThemeMode? mode, int? palette, PaperStyle? paper, bool? tablecloth}) {
+    void save({ThemeMode? mode, int? palette, PaperStyle? paper, bool? tablecloth, TabsStyle? tabs}) {
       appState.updateTheme(ThemeSettings(
+        tabs: tabs ?? t.tabs,
         mode: mode ?? t.mode,
         palette: palette ?? t.palette,
         paper: paper ?? t.paper,
@@ -338,6 +339,35 @@ class SettingsScreen extends StatelessWidget {
               .toList(),
         ),
       ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        child: Text(tr('tabs.title')),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: SegmentedButton<TabsStyle>(
+          showSelectedIcon: false,
+          segments: [
+            ButtonSegment(
+                value: TabsStyle.top, icon: const Icon(Icons.border_top), label: Text(tabsStyleLabel(TabsStyle.top))),
+            ButtonSegment(
+                value: TabsStyle.right,
+                icon: const Icon(Icons.border_right),
+                label: Text(tabsStyleLabel(TabsStyle.right))),
+            ButtonSegment(
+                value: TabsStyle.none,
+                icon: const Icon(Icons.filter_list),
+                label: Text(tabsStyleLabel(TabsStyle.none))),
+          ],
+          selected: {t.tabs},
+          onSelectionChanged: (sel) => save(tabs: sel.first),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+        child: Text(tr('tabs.info'),
+            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      ),
       SwitchListTile(
         secondary: const Icon(Icons.grid_on),
         title: Text(tr('theme.tablecloth')),
@@ -403,8 +433,7 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _header(BuildContext context, String t) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
-        child: Text(t,
-            style: TextStyle(fontFamily: handFont, fontSize: 24, color: NotebookColors.of(context).accent)),
+        child: Text(t, style: TextStyle(fontFamily: handFont, fontSize: 24, color: NotebookColors.of(context).accent)),
       );
 }
 

@@ -95,8 +95,8 @@ class _RecipePhotoState extends State<RecipePhoto> {
   Widget build(BuildContext context) {
     final cached = appState.photos.cached(widget.photoId);
     final scheme = Theme.of(context).colorScheme;
-    Widget img(Uint8List b) => Image.memory(b,
-        fit: widget.fit, width: widget.width, height: widget.height, gaplessPlayback: true);
+    Widget img(Uint8List b) =>
+        Image.memory(b, fit: widget.fit, width: widget.width, height: widget.height, gaplessPlayback: true);
     if (cached != null) return img(cached);
     return FutureBuilder<Uint8List?>(
       future: _f,
@@ -204,7 +204,8 @@ class RecipeCard extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if (showCategory)
                   Text(categoryLabel(r.category).toUpperCase(),
-                      style: TextStyle(fontSize: 10.5, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
+                      style:
+                          TextStyle(fontSize: 10.5, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
                 Text(r.displayTitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

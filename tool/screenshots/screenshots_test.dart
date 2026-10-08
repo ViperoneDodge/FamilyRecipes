@@ -204,6 +204,18 @@ void main() {
         await shot(tester, const RecipeDetailScreen(recipeId: 'r9'), '09_menu');
         appState.theme = ThemeSettings(mode: ThemeMode.dark, palette: 3, paper: PaperStyle.quadretti);
         await shot(tester, const RecipeDetailScreen(recipeId: 'r1'), '10_dark');
+        appState.theme = ThemeSettings(tabs: TabsStyle.right);
+        await shot(tester, const HomeScreen(), '11_tabs_right');
+        appState.theme = ThemeSettings(tabs: TabsStyle.none);
+        await shot(tester, const HomeScreen(), '12_tabs_none');
+        appState.theme = ThemeSettings(tabs: TabsStyle.right);
+        tester.view.physicalSize = const Size(2560, 1600);
+        tester.view.devicePixelRatio = 2;
+        await shot(tester, const HomeScreen(), '13_tablet_right', then: () async {
+          await tester.tap(find.text('Arrosto di vitello al latte').first);
+        });
+        tester.view.physicalSize = const Size(1080, 1920);
+        tester.view.devicePixelRatio = 2.625;
         appState.theme = ThemeSettings();
         await tester.runAsync(() async {
           Future<Uint8List?> photo(Recipe r, String p) => appState.photos.load(p);

@@ -10,7 +10,12 @@ Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
 - [x] **Linguette per categoria in stile rubrica**, su due righe, in cima alle ricette (anche nel
   ricettario dei gruppi), con il numero di ricette per categoria.
 - [x] **Nuova icona dell'app** (pentola con la famiglia) e **nuova schermata di avvio** su fondo crema
-  con il logo; icona delle notifiche e splash Android aggiornati. Nota: nel logo c'è scritto "recips".
+  con il logo; icona delle notifiche e splash Android aggiornati.
+- [x] **Logo corretto**: "recipes" al posto di "recips" (stesse lettere del disegno). Il logo sorgente è
+  `tool/branding/logo_source.png`; icone e logo si rigenerano con `python3 tool/make_icons.py tool/branding/logo_source.png .`
+- [x] **Impostazione linguette** (Impostazioni → Aspetto → Linguette delle categorie): *In alto* (due
+  righe), *A destra* (verticali sul bordo del foglio, testo ruotato: comodo su tablet e schermi larghi)
+  oppure *Nessuna* (la categoria si sceglie da un menu sopra l'elenco).
 
 - [x] **Schermata di avvio impaginata male** (segnalato su 1.0.2, Android): lo sfondo sfumato
   e il contenuto occupano solo la parte sinistra dello schermo (circa 3/4); a destra resta il

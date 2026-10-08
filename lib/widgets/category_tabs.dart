@@ -130,3 +130,104 @@ class CategoryTabs extends StatelessWidget {
 
 /// Nome breve per le linguette ("Menù" invece di "Menù completi").
 String categoryShortLabel(RecipeCategory c) => c == RecipeCategory.menu ? tr('cat.menuShort') : categoryLabel(c);
+
+/// Linguette verticali sul bordo destro del foglio, con il testo ruotato.
+class VerticalCategoryTabs extends StatelessWidget {
+  final RecipeCategory? selected;
+  final ValueChanged<RecipeCategory?> onSelected;
+  final int Function(RecipeCategory? c) count;
+
+  const VerticalCategoryTabs({super.key, required this.selected, required this.onSelected, required this.count});
+
+  static const double width = 40;
+
+  @override
+  Widget build(BuildContext context) {
+    final nb = NotebookColors.of(context);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      width: width,
+      child: Stack(children: [
+        Positioned(left: 0, top: 0, bottom: 0, child: Container(width: 1.5, color: nb.line)),
+        Column(children: [
+          for (final c in <RecipeCategory?>[null, ...RecipeCategory.values])
+            Expanded(child: _tab(context, c, nb, dark)),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _tab(BuildContext context, RecipeCategory? c, NotebookColors nb, bool dark) {
+    final sel = selected == c;
+    final base = categoryTabColor(c);
+    final color = sel ? nb.paper : (dark ? Color.lerp(base, nb.paper, 0.72)! : base);
+    final n = count(c);
+    final label = c == null ? tr('filter.allShort') : categoryShortLabel(c);
+    final ink = sel ? nb.accent : nb.ink.withValues(alpha: n == 0 && c != null ? 0.45 : 0.85);
+    return Semantics(
+      button: true,
+      selected: sel,
+      label: '${c == null ? label : categoryLabel(c)} ($n)',
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () => onSelected(c),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: sel ? VerticalCategoryTabs.width : VerticalCategoryTabs.width - 5,
+            margin: const EdgeInsets.symmetric(vertical: 1.2),
+            padding: const EdgeInsets.fromLTRB(2, 4, 3, 4),
+            decoration: ShapeDecoration(
+              color: color,
+              shape: RoundedRectangleBorder(
+                borderRadius: const BorderRadius.horizontal(right: Radius.circular(11)),
+                side: BorderSide(color: nb.line, width: 1.2),
+              ),
+            ),
+            foregroundDecoration: sel ? _LeftEdgeCover(nb.paper) : null,
+            child: LayoutBuilder(builder: (context, box) {
+              final showIcon = box.maxHeight >= 64;
+              return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                if (showIcon) ...[
+                  Icon(c == null ? Icons.menu_book_outlined : categoryIcon(c), size: 15, color: ink),
+                  const SizedBox(height: 2),
+                ],
+                Flexible(
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text('$label · $n',
+                          maxLines: 1, style: TextStyle(fontFamily: handFont, fontSize: 16, height: 1.0, color: ink)),
+                    ),
+                  ),
+                ),
+              ]);
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Copre il bordo sinistro della linguetta scelta, che così sembra unita al foglio.
+class _LeftEdgeCover extends Decoration {
+  final Color color;
+  const _LeftEdgeCover(this.color);
+
+  @override
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) => _LeftEdgePainter(color);
+}
+
+class _LeftEdgePainter extends BoxPainter {
+  final Color color;
+  _LeftEdgePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    final size = configuration.size!;
+    canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy + 1.2, 2.5, size.height - 2.4), Paint()..color = color);
+  }
+}

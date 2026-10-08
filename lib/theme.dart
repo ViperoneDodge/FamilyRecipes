@@ -18,6 +18,11 @@ String paperStyleLabel(PaperStyle p) {
   }
 }
 
+/// Dove stanno le linguette delle categorie.
+enum TabsStyle { top, right, none }
+
+String tabsStyleLabel(TabsStyle t) => tr('tabs.${t.name}');
+
 class AppPalette {
   final String key;
   final Color seed;
@@ -43,12 +48,14 @@ class ThemeSettings {
   int palette;
   PaperStyle paper;
   bool tablecloth;
+  TabsStyle tabs;
 
   ThemeSettings({
     this.mode = ThemeMode.system,
     this.palette = 0,
     this.paper = PaperStyle.righe,
     this.tablecloth = true,
+    this.tabs = TabsStyle.top,
   });
 
   AppPalette get pal => palettes[palette.clamp(0, palettes.length - 1).toInt()];
@@ -58,6 +65,7 @@ class ThemeSettings {
         'palette': palette,
         'paper': paper.name,
         'tablecloth': tablecloth,
+        'tabs': tabs.name,
       };
 
   factory ThemeSettings.fromJson(Map<String, dynamic>? j) {
@@ -70,7 +78,12 @@ class ThemeSettings {
     for (final p in PaperStyle.values) {
       if (p.name == j['paper']) paper = p;
     }
+    TabsStyle tabs = TabsStyle.top;
+    for (final t in TabsStyle.values) {
+      if (t.name == j['tabs']) tabs = t;
+    }
     return ThemeSettings(
+      tabs: tabs,
       mode: mode,
       palette: (j['palette'] as num?)?.toInt() ?? 0,
       paper: paper,
@@ -108,8 +121,7 @@ class NotebookColors extends ThemeExtension<NotebookColors> {
     required this.tablecloth,
   });
 
-  static NotebookColors of(BuildContext context) =>
-      Theme.of(context).extension<NotebookColors>()!;
+  static NotebookColors of(BuildContext context) => Theme.of(context).extension<NotebookColors>()!;
 
   @override
   NotebookColors copyWith({

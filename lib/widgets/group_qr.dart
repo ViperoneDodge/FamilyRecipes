@@ -52,8 +52,7 @@ class GroupQr extends StatelessWidget {
             backgroundColor: Colors.white,
             errorCorrectionLevel: QrErrorCorrectLevel.H,
             eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: Colors.black),
-            dataModuleStyle:
-                const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Colors.black),
+            dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Colors.black),
           ),
           Container(
             width: logo + 8,
@@ -152,8 +151,7 @@ class _QrScanScreen extends StatefulWidget {
 }
 
 class _QrScanScreenState extends State<_QrScanScreen> {
-  final MobileScannerController _controller =
-      MobileScannerController(formats: const [BarcodeFormat.qrCode]);
+  final MobileScannerController _controller = MobileScannerController(formats: const [BarcodeFormat.qrCode]);
   bool _done = false;
 
   @override

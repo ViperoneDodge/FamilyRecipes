@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
+import '../theme.dart';
 import 'category_tabs.dart';
 import 'common.dart';
 
@@ -92,7 +93,11 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
             ),
             const SizedBox(height: 8),
           ],
-          if (list.length > 1) sortOrderButton(context) else const SizedBox(height: 8),
+          Row(children: [
+            if (widget.showCategoryChips && appState.theme.tabs == TabsStyle.none) _categoryMenu(context, all),
+            const Spacer(),
+            if (list.length > 1) sortOrderButton(context) else const SizedBox(height: 40),
+          ]),
           if (list.isEmpty)
             all.isEmpty
                 ? EmptyState(
@@ -122,17 +127,56 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
       ),
     );
     if (!widget.showCategoryChips) return listView;
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.only(top: 6, right: 4),
-        child: CategoryTabs(
-          selected: _cat,
-          onSelected: _setCat,
-          count: (c) => c == null ? all.length : all.where((r) => r.category == c).length,
-        ),
+    int count(RecipeCategory? c) => c == null ? all.length : all.where((r) => r.category == c).length;
+    switch (appState.theme.tabs) {
+      case TabsStyle.top:
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 6, right: 4),
+            child: CategoryTabs(selected: _cat, onSelected: _setCat, count: count),
+          ),
+          Expanded(child: listView),
+        ]);
+      case TabsStyle.right:
+        return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Expanded(child: listView),
+          Padding(
+            // in basso resta posto per il pulsante "Nuova ricetta"
+            padding: const EdgeInsets.only(top: 6, bottom: 80),
+            child: VerticalCategoryTabs(selected: _cat, onSelected: _setCat, count: count),
+          ),
+        ]);
+      case TabsStyle.none:
+        return listView;
+    }
+  }
+
+  Widget _categoryMenu(BuildContext context, List<Recipe> all) {
+    final nb = NotebookColors.of(context);
+    String label(RecipeCategory? c) =>
+        '${c == null ? tr('filter.allShort') : categoryLabel(c)} (${c == null ? all.length : all.where((r) => r.category == c).length})';
+    return PopupMenuButton<RecipeCategory?>(
+      tooltip: tr('filter.category'),
+      initialValue: _cat,
+      onSelected: _setCat,
+      itemBuilder: (ctx) => [
+        PopupMenuItem<RecipeCategory?>(value: null, child: Text(label(null))),
+        for (final c in RecipeCategory.values)
+          PopupMenuItem<RecipeCategory?>(
+            value: c,
+            child: Row(children: [Icon(categoryIcon(c), size: 18), const SizedBox(width: 8), Text(label(c))]),
+          ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(_cat == null ? Icons.filter_list : categoryIcon(_cat!), size: 18, color: nb.accent),
+          const SizedBox(width: 6),
+          Text(label(_cat), style: TextStyle(color: nb.accent, fontWeight: FontWeight.w600)),
+          Icon(Icons.arrow_drop_down, color: nb.accent),
+        ]),
       ),
-      Expanded(child: listView),
-    ]);
+    );
   }
 }
 
