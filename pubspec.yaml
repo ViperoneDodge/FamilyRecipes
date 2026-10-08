@@ -40,6 +40,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon.png
+    - assets/logo.png
     - assets/gian_trip_logo.png
     - assets/l10n/
     - assets/fonts/NotoSans-Regular.ttf

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
+import 'category_tabs.dart';
 import 'common.dart';
 
-/// Elenco di ricette con ricerca e filtro per categoria.
+/// Elenco di ricette con linguette per categoria (stile rubrica) e ricerca.
 class RecipeBrowser extends StatefulWidget {
   final List<Recipe> recipes;
   final void Function(Recipe r) onOpen;
@@ -65,11 +66,11 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         .where((r) => _cat == null || r.category == _cat)
         .where((r) => q.isEmpty || r.searchText.contains(q))
         .toList();
-    return RefreshIndicator(
+    final listView = RefreshIndicator(
       onRefresh: appState.retrySync,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(4, 8, 10, 96),
+        padding: const EdgeInsets.fromLTRB(4, 10, 10, 96),
         children: [
           ...widget.header,
           if (all.isNotEmpty) ...[
@@ -91,41 +92,22 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
             ),
             const SizedBox(height: 8),
           ],
-          if (widget.showCategoryChips && all.isNotEmpty)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: ChoiceChip(
-                    label: Text(tr('filter.all', {'n': all.length})),
-                    selected: _cat == null,
-                    onSelected: (_) => _setCat(null),
-                  ),
-                ),
-                for (final c in RecipeCategory.values)
-                  if (all.any((r) => r.category == c) || _cat == c)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: ChoiceChip(
-                        avatar: Icon(categoryIcon(c), size: 18),
-                        label: Text('${categoryLabel(c)} (${all.where((r) => r.category == c).length})'),
-                        selected: _cat == c,
-                        onSelected: (_) => _setCat(c),
-                      ),
-                    ),
-              ]),
-            ),
           if (list.length > 1) sortOrderButton(context) else const SizedBox(height: 8),
           if (list.isEmpty)
-            all.isEmpty || (q.isEmpty && _cat != null)
+            all.isEmpty
                 ? EmptyState(
                     icon: _cat == null ? Icons.menu_book_outlined : categoryIcon(_cat!),
                     title: widget.emptyTitle,
                     hint: widget.emptyHint,
                     action: widget.emptyAction,
                   )
-                : EmptyState(icon: Icons.search_off, title: tr('search.none')),
+                : q.isEmpty && _cat != null
+                    ? EmptyState(
+                        icon: categoryIcon(_cat!),
+                        title: tr('category.empty'),
+                        hint: widget.emptyHint == null ? null : tr('category.emptyHint'),
+                      )
+                    : EmptyState(icon: Icons.search_off, title: tr('search.none')),
           for (final r in list)
             RecipeCard(
               recipe: r,
@@ -139,6 +121,18 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         ],
       ),
     );
+    if (!widget.showCategoryChips) return listView;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 6, right: 4),
+        child: CategoryTabs(
+          selected: _cat,
+          onSelected: _setCat,
+          count: (c) => c == null ? all.length : all.where((r) => r.category == c).length,
+        ),
+      ),
+      Expanded(child: listView),
+    ]);
   }
 }
 

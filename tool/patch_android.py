@@ -190,7 +190,7 @@ if icons.exists():
     print("Icons copied")
 launch = '''<?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item><color android:color="#B4532A"/></item>
+    <item><color android:color="#FEF6E8"/></item>
 </layer-list>
 '''
 for d in ("drawable", "drawable-v21"):
@@ -214,7 +214,7 @@ styles31 = '''<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <item name="android:windowSplashScreenBackground">#B4532A</item>
+        <item name="android:windowSplashScreenBackground">#FEF6E8</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_empty</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">

@@ -4,13 +4,22 @@ Cose da sistemare nelle prossime release.
 
 ## Prossima release
 
-- [ ] **Schermata di avvio impaginata male** (segnalato su 1.0.2, Android): lo sfondo sfumato
+Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
+
+- [x] Tolta la scheda **Indice** (doppione di "Le mie"): restano "Le mie" e "Gruppi".
+- [x] **Linguette per categoria in stile rubrica**, su due righe, in cima alle ricette (anche nel
+  ricettario dei gruppi), con il numero di ricette per categoria.
+- [x] **Nuova icona dell'app** (pentola con la famiglia) e **nuova schermata di avvio** su fondo crema
+  con il logo; icona delle notifiche e splash Android aggiornati. Nota: nel logo c'è scritto "recips".
+
+- [x] **Schermata di avvio impaginata male** (segnalato su 1.0.2, Android): lo sfondo sfumato
   e il contenuto occupano solo la parte sinistra dello schermo (circa 3/4); a destra resta il
   colore pieno. Causa: in `lib/screens/intro_screen.dart` il `Container` con la sfumatura non ha
   larghezza, quindi prende quella della `Column` (il testo più largo) invece di tutto lo schermo.
   Correzione: dare al `Container` `width: double.infinity` (o `SizedBox.expand`) e alla `Column`
   `crossAxisAlignment: CrossAxisAlignment.center` su tutta la larghezza. Da ricontrollare anche
   il contrasto di titolo e sottotitolo e la visibilità del vapore sopra la pentola.
+  → Risolto con la nuova schermata di avvio a tutto schermo.
 
 - [ ] **Importazione ricette da file** (per caricare il primo ricettario, ad esempio da OneNote):
   - Impostazioni → *Importa ricette*: si sceglie un file (`.json` o `.zip`) e la destinazione

@@ -7,6 +7,7 @@ import 'package:familyrecipes/main.dart';
 import 'package:familyrecipes/models.dart';
 import 'package:familyrecipes/screens/family_screen.dart';
 import 'package:familyrecipes/screens/home_screen.dart';
+import 'package:familyrecipes/screens/intro_screen.dart';
 import 'package:familyrecipes/screens/recipe_detail_screen.dart';
 import 'package:familyrecipes/screens/recipe_edit_screen.dart';
 import 'package:familyrecipes/screens/settings_screen.dart';
@@ -179,13 +180,14 @@ void main() {
         addTearDown(tester.view.reset);
         debugDisableShadows = false;
 
+        await shot(tester, const IntroScreen(), '00_intro');
         await shot(tester, const HomeScreen(), '01_mine');
         await shot(tester, const RecipeDetailScreen(recipeId: 'r1'), '02_recipe');
         await shot(tester, const RecipeDetailScreen(recipeId: 'r1'), '03_steps', then: () async {
           await tester.drag(find.byType(ListView).first, const Offset(0, -900));
         });
-        await shot(tester, const HomeScreen(), '04_index', then: () async {
-          await tester.tap(find.text(tr('tab.index')).last);
+        await shot(tester, const HomeScreen(), '04_category', then: () async {
+          await tester.tap(find.text(tr('cat.antipasti')).first);
         });
         await shot(tester, const HomeScreen(), '05_groups', then: () async {
           await tester.tap(find.text(tr('tab.family')).last);
