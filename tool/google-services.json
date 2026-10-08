@@ -12,7 +12,20 @@
           "package_name": "it.familyrecipes.familyrecipes"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "524842949858-o3jf8trghs64f9jrajo48pf5saskqe5d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.familyrecipes.familyrecipes",
+            "certificate_hash": "3a89119487cf4323d839385638f2b811105fe114"
+          }
+        },
+        {
+          "client_id": "524842949858-l83kjtgbi8kt1sukjjclacuk78v5q722.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDZX2_c3Ec48MTLzE9O-60Ygu0yKSyfPr4"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "524842949858-l83kjtgbi8kt1sukjjclacuk78v5q722.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -10,7 +10,8 @@ class FirebaseConfig {
   static const String storageBucket = 'familyrecipes-46e1a.firebasestorage.app';
 
   /// "Web client ID" (OAuth client di tipo 3) per l'accesso con Google.
-  static const String googleWebClientId = '';
+  static const String googleWebClientId =
+      '524842949858-l83kjtgbi8kt1sukjjclacuk78v5q722.apps.googleusercontent.com';
 
   static bool get isConfigured =>
       apiKey.isNotEmpty && appId.isNotEmpty && projectId.isNotEmpty;
