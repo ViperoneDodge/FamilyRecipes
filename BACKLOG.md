@@ -31,6 +31,20 @@ Pubblicata l'8 ottobre 2026:
 
 ## Prossima release
 
+Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
+
+- [x] **Linguette leggibili in modalità scura**: colori più profondi e testo chiaro (prima quasi invisibili).
+- [x] **Nuova scheda "Cosa mangio stasera?"** (in basso, "Stasera"), con tre modi:
+  - *Ricettario*: si scelgono le portate (categorie) e qualche filtro (tempo massimo, solo facili,
+    da quale ricettario); l'app pesca una ricetta a caso per ogni portata, con "Un'altra" per cambiarla.
+  - *Ingredienti*: fino a 3 ingredienti (con suggerimenti da quelli già nel ricettario); ricette del
+    ricettario che li usano tutti o in parte, e ricerca anche su internet.
+  - *Internet*: una ricetta a sorpresa da TheMealDB (gratuito, in inglese); si legge e si può salvare
+    nel ricettario passando dall'editor, con la foto. Ingredienti italiani comuni tradotti in inglese
+    per la ricerca. Privacy aggiornata.
+
+Da fare:
+
 - [ ] **Importazione ricette da file** (per caricare il primo ricettario, ad esempio da OneNote):
   - Impostazioni → *Importa ricette*: si sceglie un file (`.json` o `.zip`) e la destinazione
     (Le mie ricette o un gruppo dove si può modificare); anteprima con l'elenco delle ricette

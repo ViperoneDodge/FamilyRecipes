@@ -9,6 +9,7 @@ import '../services/app_state.dart';
 import '../theme.dart';
 import '../widgets/recipe_browser.dart';
 import 'family_screen.dart';
+import 'suggest_screen.dart';
 import 'recipe_detail_screen.dart';
 import 'recipe_edit_screen.dart';
 import 'settings_screen.dart';
@@ -126,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListenableBuilder(
       listenable: appState,
       builder: (context, _) {
-        final titles = [tr('book.mine'), tr('tab.family')];
+        final titles = [tr('book.mine'), tr('tab.family'), tr('tab.suggest')];
         Widget body;
         switch (_tab) {
           case 1:
@@ -135,6 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onAdd: (g) => _openAdd(bookId: g),
               selectedId: _twoPane ? _selectedId : null,
             );
+            break;
+          case 2:
+            body = SuggestTab(onOpen: _openDetail);
             break;
           default:
             body = _myTab();
@@ -231,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(children: [
           item(0, Icons.edit_note_outlined, Icons.edit_note, tr('tab.mine')),
           item(1, Icons.groups_outlined, Icons.groups, tr('tab.family')),
+          item(2, Icons.lightbulb_outline, Icons.lightbulb, tr('tab.tonight')),
         ]),
       ),
     );

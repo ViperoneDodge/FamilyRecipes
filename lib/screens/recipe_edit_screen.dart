@@ -39,7 +39,10 @@ class _StepRow {
 class RecipeEditScreen extends StatefulWidget {
   /// Copia di lavoro: viene salvata solo con "Salva".
   final Recipe recipe;
-  const RecipeEditScreen({super.key, required this.recipe});
+
+  /// Foto già salvate sul telefono per questa bozza (es. ricetta da internet): si cancellano se non si salva.
+  final Set<String> newPhotos;
+  const RecipeEditScreen({super.key, required this.recipe, this.newPhotos = const {}});
 
   @override
   State<RecipeEditScreen> createState() => _RecipeEditScreenState();
@@ -59,7 +62,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   late final List<_StepRow> _steps = [for (final s in r.steps) _StepRow(s)];
 
   /// Foto aggiunte in questa sessione: si cancellano se non vengono salvate.
-  final Set<String> _added = {};
+  late final Set<String> _added = {...widget.newPhotos};
   bool _saving = false;
   bool _busyPhoto = false;
 

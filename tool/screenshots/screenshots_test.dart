@@ -204,7 +204,37 @@ void main() {
         await shot(tester, const RecipeDetailScreen(recipeId: 'r9'), '09_menu');
         appState.theme = ThemeSettings(mode: ThemeMode.dark, palette: 3, paper: PaperStyle.quadretti);
         await shot(tester, const RecipeDetailScreen(recipeId: 'r1'), '10_dark');
+        appState.theme = ThemeSettings(mode: ThemeMode.dark);
+        await shot(tester, const HomeScreen(), '15_dark_tabs');
+        appState.theme = ThemeSettings();
+        await shot(tester, const HomeScreen(), '14_suggest', then: () async {
+          await tester.tap(find.text(tr('tab.tonight')).last);
+          await tester.pumpAndSettle();
+          await tester.scrollUntilVisible(find.byIcon(Icons.casino_outlined), 200, scrollable: find.byType(Scrollable).last);
+          await tester.tap(find.byIcon(Icons.casino_outlined));
+          await tester.pumpAndSettle();
+          await tester.drag(find.byType(ListView).first, const Offset(0, -700));
+        });
         appState.theme = ThemeSettings(tabs: TabsStyle.right);
+        await shot(tester, const HomeScreen(), '16_ingredients', then: () async {
+          await tester.tap(find.text(tr('tab.tonight')).last);
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(tr('suggest.modeIng')));
+          await tester.pumpAndSettle();
+          for (final i in ['guanciale', 'pecorino']) {
+            await tester.enterText(find.byType(TextField).last, i);
+            await tester.testTextInput.receiveAction(TextInputAction.done);
+            await tester.pumpAndSettle();
+          }
+          await tester.tap(find.text(tr('suggest.ingSearch')));
+          await tester.pumpAndSettle();
+          await tester.drag(find.byType(ListView).first, const Offset(0, -260));
+        });
+        await shot(tester, const HomeScreen(), '17_web', then: () async {
+          await tester.tap(find.text(tr('tab.tonight')).last);
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(tr('suggest.modeWeb')));
+        });
         await shot(tester, const HomeScreen(), '11_tabs_right');
         appState.theme = ThemeSettings(tabs: TabsStyle.none);
         await shot(tester, const HomeScreen(), '12_tabs_none');

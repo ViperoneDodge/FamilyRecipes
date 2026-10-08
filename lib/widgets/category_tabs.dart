@@ -31,6 +31,13 @@ Color categoryTabColor(RecipeCategory? c) {
   }
 }
 
+/// In modalità scura: stesso colore ma più profondo, così la linguetta si stacca dal foglio scuro
+/// e il testo chiaro resta leggibile.
+Color categoryTabColorDark(Color base) {
+  final h = HSLColor.fromColor(base);
+  return h.withLightness(0.34).withSaturation((h.saturation * 0.75).clamp(0.3, 0.6).toDouble()).toColor();
+}
+
 /// Linguette in stile rubrica, su due righe: "Tutte" più una per categoria.
 /// La linguetta scelta ha il colore del foglio; quelle della seconda riga
 /// poggiano sul foglio, quelle della prima stanno "dietro".
@@ -80,11 +87,11 @@ class CategoryTabs extends StatelessWidget {
   Widget _tab(BuildContext context, RecipeCategory? c, NotebookColors nb, bool dark, {required bool back}) {
     final sel = selected == c;
     final base = categoryTabColor(c);
-    var color = sel ? nb.paper : (dark ? Color.lerp(base, nb.paper, 0.72)! : base);
+    var color = sel ? nb.paper : (dark ? categoryTabColorDark(base) : base);
     if (back && !sel) color = Color.lerp(color, Colors.black, dark ? 0.0 : 0.05)!;
     final n = count(c);
     final label = c == null ? tr('filter.allShort') : categoryShortLabel(c);
-    final ink = sel ? nb.accent : nb.ink.withValues(alpha: n == 0 && c != null ? 0.45 : 0.85);
+    final ink = sel ? nb.accent : (dark ? Colors.white : nb.ink).withValues(alpha: n == 0 && c != null ? 0.5 : 0.92);
     final h = back ? 44.0 : 48.0;
     return Semantics(
       button: true,
@@ -160,10 +167,10 @@ class VerticalCategoryTabs extends StatelessWidget {
   Widget _tab(BuildContext context, RecipeCategory? c, NotebookColors nb, bool dark) {
     final sel = selected == c;
     final base = categoryTabColor(c);
-    final color = sel ? nb.paper : (dark ? Color.lerp(base, nb.paper, 0.72)! : base);
+    final color = sel ? nb.paper : (dark ? categoryTabColorDark(base) : base);
     final n = count(c);
     final label = c == null ? tr('filter.allShort') : categoryShortLabel(c);
-    final ink = sel ? nb.accent : nb.ink.withValues(alpha: n == 0 && c != null ? 0.45 : 0.85);
+    final ink = sel ? nb.accent : (dark ? Colors.white : nb.ink).withValues(alpha: n == 0 && c != null ? 0.5 : 0.92);
     return Semantics(
       button: true,
       selected: sel,
