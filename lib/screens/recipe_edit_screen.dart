@@ -42,7 +42,11 @@ class RecipeEditScreen extends StatefulWidget {
 
   /// Foto già salvate sul telefono per questa bozza (es. ricetta da internet): si cancellano se non si salva.
   final Set<String> newPhotos;
-  const RecipeEditScreen({super.key, required this.recipe, this.newPhotos = const {}});
+
+  /// Avviso in cima (es. ricetta letta da foto: "controlla i campi"). Con un avviso la bozza
+  /// conta come modificata: uscendo si chiede se salvarla.
+  final String? notice;
+  const RecipeEditScreen({super.key, required this.recipe, this.newPhotos = const {}, this.notice});
 
   @override
   State<RecipeEditScreen> createState() => _RecipeEditScreenState();
@@ -113,7 +117,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     return jsonEncode(c.toJson());
   }
 
-  bool get _dirty => _normalized() != _initial || _added.isNotEmpty;
+  bool get _dirty => _normalized() != _initial || _added.isNotEmpty || widget.notice != null;
 
   Future<void> _discardPhotos() async {
     for (final p in _added) {
@@ -212,8 +216,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     try {
       final x = await ImagePicker().pickImage(source: src, maxWidth: 2400, maxHeight: 2400, imageQuality: 92);
       if (x == null || !mounted) return;
-      final cropped = await cropPhoto(context, await x.readAsBytes(),
-          aspect: 4 / 3, maxSide: photoMaxSide, quality: photoQuality);
+      final cropped =
+          await cropPhoto(context, await x.readAsBytes(), aspect: 4 / 3, maxSide: photoMaxSide, quality: photoQuality);
       if (cropped == null || !mounted) return;
       final id = await _store(cropped);
       if (mounted) setState(() => r.coverPhoto = id);
@@ -229,7 +233,10 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     try {
       final picker = ImagePicker();
       final files = src == ImageSource.camera
-          ? [if (await picker.pickImage(source: src, maxWidth: 2000, maxHeight: 2000, imageQuality: 90) case final x?) x]
+          ? [
+              if (await picker.pickImage(source: src, maxWidth: 2000, maxHeight: 2000, imageQuality: 90) case final x?)
+                x
+            ]
           : await picker.pickMultiImage(maxWidth: 2000, maxHeight: 2000, imageQuality: 90);
       for (final f in files) {
         final bytes = await compressPhoto(await f.readAsBytes());
@@ -311,6 +318,17 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(6, 8, 12, 60),
               children: [
+                if (widget.notice != null)
+                  Card(
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      leading: Icon(Icons.document_scanner_outlined,
+                          color: Theme.of(context).colorScheme.onTertiaryContainer),
+                      title: Text(widget.notice!,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer)),
+                    ),
+                  ),
                 if (_isNew && appState.isCloud) _bookPicker(),
                 _categoryPicker(),
                 const SizedBox(height: 12),
@@ -459,8 +477,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
         segments: [
           for (final d in Difficulty.values)
             ButtonSegment(
-                value: d,
-                label: FittedBox(fit: BoxFit.scaleDown, child: Text(difficultyLabel(d), maxLines: 1))),
+                value: d, label: FittedBox(fit: BoxFit.scaleDown, child: Text(difficultyLabel(d), maxLines: 1))),
         ],
         selected: {r.difficulty},
         onSelectionChanged: (s) => setState(() => r.difficulty = s.first),
@@ -531,7 +548,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     final courses = r.courses.map(appState.recipeById).whereType<Recipe>().toList();
     return [
       HandHeader(tr('recipe.courses'), icon: Icons.restaurant_menu),
-      Text(tr('edit.coursesHint'), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      Text(tr('edit.coursesHint'),
+          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
       const SizedBox(height: 6),
       for (final c in courses)
         Card(
@@ -649,8 +667,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             IconButton(
               tooltip: tr('edit.moveDown'),
               icon: const Icon(Icons.arrow_downward),
-              onPressed:
-                  i == _steps.length - 1 ? null : () => setState(() => _steps.insert(i + 1, _steps.removeAt(i))),
+              onPressed: i == _steps.length - 1 ? null : () => setState(() => _steps.insert(i + 1, _steps.removeAt(i))),
             ),
             IconButton(
               tooltip: tr('edit.removeStep'),
@@ -705,7 +722,8 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: _busyPhoto
-                      ? const Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2)))
+                      ? const Center(
+                          child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2)))
                       : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                           Icon(Icons.add_a_photo_outlined, color: scheme.primary),
                           const SizedBox(height: 4),

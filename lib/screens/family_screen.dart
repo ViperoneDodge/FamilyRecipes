@@ -13,7 +13,7 @@ import '../widgets/group_qr.dart';
 import '../widgets/recipe_browser.dart';
 import 'login_screen.dart';
 import 'recipe_detail_screen.dart';
-import 'recipe_edit_screen.dart';
+import 'new_recipe.dart';
 
 class FamilyTab extends StatelessWidget {
   final void Function(Recipe r) onOpen;
@@ -42,8 +42,8 @@ class FamilyTab extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: FilledButton.icon(
-                onPressed: () => Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
+                onPressed: () =>
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
                 icon: const Icon(Icons.cloud_upload_outlined),
                 label: Text(tr('upgrade.button')),
               ),
@@ -215,9 +215,7 @@ class GroupBookScreen extends StatelessWidget {
             ),
             floatingActionButton: g != null && appState.canAddTo(g.id)
                 ? FloatingActionButton.extended(
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => RecipeEditScreen(recipe: Recipe(bookId: g.id)),
-                    )),
+                    onPressed: () => newRecipeFlow(context, bookId: g.id),
                     icon: const Icon(Icons.add),
                     label: Text(tr('recipe.new')),
                   )
@@ -500,8 +498,8 @@ class GroupScreen extends StatelessWidget {
                     ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(isOwner ? Icons.delete_forever_outlined : Icons.exit_to_app,
-                        color: Colors.red.shade700),
+                    leading:
+                        Icon(isOwner ? Icons.delete_forever_outlined : Icons.exit_to_app, color: Colors.red.shade700),
                     title: Text(isOwner ? tr('family.delete') : tr('family.leave')),
                     subtitle: Text(isOwner ? tr('family.deleteInfo') : tr('family.leaveInfo')),
                     onTap: () => _leave(context, g, isOwner),

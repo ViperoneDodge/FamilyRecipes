@@ -9,9 +9,9 @@ import '../services/app_state.dart';
 import '../theme.dart';
 import '../widgets/recipe_browser.dart';
 import 'family_screen.dart';
+import 'new_recipe.dart';
 import 'suggest_screen.dart';
 import 'recipe_detail_screen.dart';
-import 'recipe_edit_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,13 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedId;
   bool _twoPane = false;
 
-  void _openAdd({String? bookId, RecipeCategory? category}) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => RecipeEditScreen(
-        recipe: Recipe(category: category ?? _myCategory ?? RecipeCategory.primi, bookId: bookId),
-      ),
-    ));
-  }
+  void _openAdd({String? bookId, RecipeCategory? category}) =>
+      newRecipeFlow(context, bookId: bookId, category: category ?? _myCategory);
 
   void _openDetail(Recipe r) {
     if (_twoPane) {
