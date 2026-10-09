@@ -1,12 +1,14 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
 import '../services/online_recipes.dart';
 import '../services/photo_tools.dart';
+import '../services/recipe_translator.dart';
 import '../theme.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/common.dart';
@@ -462,7 +464,7 @@ class OnlineRecipeCard extends StatelessWidget {
                       Text(meta.toUpperCase(),
                           style: TextStyle(
                               fontSize: 11, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
-                    Text(recipe.title, style: TextStyle(fontFamily: handFont, fontSize: 26, color: nb.ink)),
+                    TranslatedText(recipe.title, style: TextStyle(fontFamily: handFont, fontSize: 26, color: nb.ink)),
                     Text(tr('suggest.webOpen'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                   ]),
                 ),
@@ -479,7 +481,7 @@ class OnlineRecipeCard extends StatelessWidget {
                         Text(meta.toUpperCase(),
                             style: TextStyle(
                                 fontSize: 10.5, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
-                      Text(recipe.title,
+                      TranslatedText(recipe.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontFamily: handFont, fontSize: 21, height: 1.1, color: nb.ink)),
@@ -504,13 +506,24 @@ class OnlineRecipeScreen extends StatefulWidget {
 
 class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
   late OnlineRecipe _r = widget.recipe;
+  OnlineRecipe? _translated;
+  bool _showOriginal = false;
   bool _loading = false;
+  bool _translating = false;
   bool _saving = false;
+
+  /// Ricetta mostrata (e salvata): tradotta, salvo richiesta dell'originale.
+  OnlineRecipe get _shown => (!_showOriginal ? _translated : null) ?? _r;
 
   @override
   void initState() {
     super.initState();
-    if (_r.isPartial) _load();
+    _start();
+  }
+
+  Future<void> _start() async {
+    if (_r.isPartial) await _load();
+    await _translate();
   }
 
   Future<void> _load() async {
@@ -525,9 +538,22 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
     }
   }
 
+  Future<void> _translate() async {
+    if (RecipeTranslator.instance.target == null || _r.isPartial) return;
+    setState(() => _translating = true);
+    try {
+      final t = await RecipeTranslator.instance.recipe(_r);
+      if (mounted) setState(() => _translated = t);
+    } catch (_) {
+      if (mounted) showSnack(context, tr('online.translateFailed'));
+    } finally {
+      if (mounted) setState(() => _translating = false);
+    }
+  }
+
   Future<void> _save() async {
     setState(() => _saving = true);
-    final recipe = _r.toRecipe();
+    final recipe = _shown.toRecipe();
     final added = <String>{};
     try {
       final bytes = await OnlineRecipes.download(_r.thumb);
@@ -548,14 +574,15 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
   Widget build(BuildContext context) {
     final nb = NotebookColors.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final r = _r;
+    final r = _shown;
     final ink = TextStyle(color: nb.ink, fontSize: 16, height: 1.45);
+    final meta = [r.categoryText, r.areaText].where((e) => e.isNotEmpty).join(' · ');
     return TableclothBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(title: Text(tr('suggest.webTitle'))),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: _loading || _saving ? null : _save,
+          onPressed: _loading || _translating || _saving ? null : _save,
           icon: _saving
               ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
               : const Icon(Icons.bookmark_add_outlined),
@@ -565,14 +592,35 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(6, 6, 12, 96),
             children: [
-              if (r.category.isNotEmpty || r.area.isNotEmpty)
-                Text([r.category, r.area].where((e) => e.isNotEmpty).join(' · ').toUpperCase(),
+              if (meta.isNotEmpty)
+                Text(meta.toUpperCase(),
                     style: TextStyle(fontSize: 12, letterSpacing: 1.3, color: nb.accent, fontWeight: FontWeight.w700)),
               Text(r.title, style: TextStyle(fontFamily: handFont, fontSize: 36, height: 1.1, color: nb.ink)),
               Padding(
-                padding: const EdgeInsets.only(top: 2, bottom: 10),
+                padding: const EdgeInsets.only(top: 2, bottom: 6),
                 child: Text(tr('suggest.webSource'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
               ),
+              if (_translating)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(children: [
+                    const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(tr('online.translating'),
+                          style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                    ),
+                  ]),
+                ),
+              if (_translated != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: () => setState(() => _showOriginal = !_showOriginal),
+                    icon: const Icon(Icons.translate, size: 18),
+                    label: Text(_showOriginal ? tr('online.showTranslation') : tr('online.showOriginal')),
+                  ),
+                ),
               if (r.thumb.isNotEmpty)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -593,7 +641,11 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
                     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: nb.line))),
                     child: Row(children: [
                       Expanded(child: Text(i.name, style: ink)),
-                      Text(i.amount, style: ink.copyWith(fontWeight: FontWeight.w700)),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(i.amount,
+                            textAlign: TextAlign.right, style: ink.copyWith(fontWeight: FontWeight.w700)),
+                      ),
                     ]),
                   ),
               ],
@@ -616,10 +668,75 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
                     ]),
                   ),
               ],
+              if (!_loading) ...[
+                HandHeader(tr('online.creditTitle'), icon: Icons.copyright),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: nb.line),
+                  ),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(r.credit, style: TextStyle(fontSize: 13, height: 1.4, color: nb.ink)),
+                    if (r.source.isNotEmpty)
+                      TextButton.icon(
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        onPressed: () => launchUrl(Uri.parse(r.source), mode: LaunchMode.externalApplication),
+                        icon: const Icon(Icons.open_in_new, size: 16),
+                        label: Text(tr('online.openSource')),
+                      ),
+                  ]),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
   }
+}
+
+/// Testo inglese tradotto nella lingua dell'app, se il pacchetto della lingua è già sul telefono.
+class TranslatedText extends StatefulWidget {
+  final String text;
+  final TextStyle? style;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  const TranslatedText(this.text, {super.key, this.style, this.maxLines, this.overflow});
+
+  @override
+  State<TranslatedText> createState() => _TranslatedTextState();
+}
+
+class _TranslatedTextState extends State<TranslatedText> {
+  String? _t;
+
+  @override
+  void initState() {
+    super.initState();
+    _go();
+  }
+
+  @override
+  void didUpdateWidget(TranslatedText old) {
+    super.didUpdateWidget(old);
+    if (old.text != widget.text) {
+      _t = null;
+      _go();
+    }
+  }
+
+  Future<void> _go() async {
+    final tr = RecipeTranslator.instance;
+    if (tr.target == null || !await tr.ready()) return;
+    try {
+      final t = await tr.text(widget.text);
+      if (mounted) setState(() => _t = t);
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      Text(_t ?? widget.text, style: widget.style, maxLines: widget.maxLines, overflow: widget.overflow);
 }

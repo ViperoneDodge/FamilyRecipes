@@ -208,7 +208,7 @@ void main() {
         await shot(tester, const HomeScreen(), '15_dark_tabs');
         appState.theme = ThemeSettings();
         await shot(tester, const HomeScreen(), '14_suggest', then: () async {
-          await tester.tap(find.text(tr('tab.tonight')).last);
+          await tester.tap(find.byIcon(Icons.soup_kitchen_outlined));
           await tester.pumpAndSettle();
           await tester.scrollUntilVisible(find.byIcon(Icons.casino_outlined), 200, scrollable: find.byType(Scrollable).last);
           await tester.tap(find.byIcon(Icons.casino_outlined));
@@ -217,7 +217,7 @@ void main() {
         });
         appState.theme = ThemeSettings(tabs: TabsStyle.right);
         await shot(tester, const HomeScreen(), '16_ingredients', then: () async {
-          await tester.tap(find.text(tr('tab.tonight')).last);
+          await tester.tap(find.byIcon(Icons.soup_kitchen_outlined));
           await tester.pumpAndSettle();
           await tester.tap(find.text(tr('suggest.modeIng')));
           await tester.pumpAndSettle();
@@ -231,7 +231,7 @@ void main() {
           await tester.drag(find.byType(ListView).first, const Offset(0, -260));
         });
         await shot(tester, const HomeScreen(), '17_web', then: () async {
-          await tester.tap(find.text(tr('tab.tonight')).last);
+          await tester.tap(find.byIcon(Icons.soup_kitchen_outlined));
           await tester.pumpAndSettle();
           await tester.tap(find.text(tr('suggest.modeWeb')));
         });

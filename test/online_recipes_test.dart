@@ -1,6 +1,9 @@
+import 'package:familyrecipes/l10n.dart';
 import 'package:familyrecipes/models.dart';
+import 'package:familyrecipes/services/recipe_translator.dart';
 import 'package:familyrecipes/services/online_recipes.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
 // Risposta di esempio nel formato di www.themealdb.com/api/json/v1/1/lookup.php
 const sample = {
@@ -29,6 +32,9 @@ const sample = {
 };
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() => L10n.load('it'));
+
   test('legge una ricetta di TheMealDB', () {
     final list = OnlineRecipes.parseMeals(sample);
     expect(list, hasLength(1));
@@ -58,7 +64,7 @@ void main() {
     expect(r.ingredients, hasLength(3));
     expect(r.steps, hasLength(3));
     expect(r.intro, contains('Italian'));
-    expect(r.intro, contains('TheMealDB'));
+    expect(r.tips, contains('TheMealDB'));
   });
 
   test('categorie e traduzione degli ingredienti', () {
@@ -70,5 +76,43 @@ void main() {
     expect(ingredientToEnglish('Pollo'), 'chicken');
     expect(ingredientToEnglish(' zucchine '), 'zucchini');
     expect(ingredientToEnglish('quinoa'), 'quinoa');
+  });
+
+  test('dosi inglesi scritte per esteso prima della traduzione', () {
+    expect(expandMeasure('2 tbsp'), '2 tablespoons');
+    expect(expandMeasure('1 tsp'), '1 teaspoons');
+    expect(expandMeasure('8 oz'), '8 ounces');
+    expect(expandMeasure('1 lb'), '1 pounds');
+    expect(expandMeasure('320g'), '320g');
+    expect(expandMeasure('Pinch'), 'Pinch');
+  });
+
+  test('copia tradotta e fonte in fondo', () {
+    final o = OnlineRecipes.parseMeals(sample).first;
+    final t = o.translatedCopy(
+      title: 'Spaghetti alla carbonara',
+      category: 'Pasta',
+      area: 'Italiana',
+      ingredientNames: ['Spaghetti', 'Tuorli', 'Pancetta'],
+      amounts: ['320 g', '6', '150 g'],
+      steps: ['Metti a bollire l\'acqua.', 'Trita la pancetta.', 'Sbatti le uova col formaggio.'],
+    );
+    expect(t.translated, isTrue);
+    expect(t.steps.first, "Metti a bollire l'acqua.");
+    expect(t.recipeCategory, RecipeCategory.primi);
+    expect(t.hasIngredient('egg'), isTrue, reason: 'la ricerca usa i nomi originali in inglese');
+    final r = t.toRecipe();
+    expect(r.intro, 'Cucina: Italiana.');
+    expect(r.ingredients[1].name, 'Tuorli');
+    expect(r.tips, contains('TheMealDB'));
+    expect(r.tips, contains('bbcgoodfood'));
+    expect(r.tips, contains("Tradotta automaticamente dall'inglese"));
+    expect(o.toRecipe().tips, isNot(contains('Tradotta')));
+  });
+
+  test('lingua di destinazione', () {
+    expect(RecipeTranslator.targetFor('en'), isNull);
+    expect(RecipeTranslator.targetFor('it')?.bcpCode, 'it');
+    expect(RecipeTranslator.targetFor('nb')?.bcpCode, 'no');
   });
 }

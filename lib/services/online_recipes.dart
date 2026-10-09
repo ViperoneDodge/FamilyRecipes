@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import '../l10n.dart';
 import '../models.dart';
 
 /// Ricetta presa da TheMealDB (www.themealdb.com), archivio gratuito di ricette in inglese.
@@ -16,6 +17,12 @@ class OnlineRecipe {
   final String source;
   final List<Ingredient> ingredients;
 
+  /// Versione in inglese, se questa è una traduzione.
+  final OnlineRecipe? original;
+  final String? _categoryText;
+  final String? _areaText;
+  final List<String>? _steps;
+
   OnlineRecipe({
     required this.id,
     required this.title,
@@ -25,7 +32,45 @@ class OnlineRecipe {
     this.thumb = '',
     this.source = '',
     this.ingredients = const [],
-  });
+    this.original,
+    String? categoryText,
+    String? areaText,
+    List<String>? steps,
+  })  : _categoryText = categoryText,
+        _areaText = areaText,
+        _steps = steps;
+
+  bool get translated => original != null;
+
+  /// Categoria e cucina da mostrare (tradotte, se c'è la traduzione).
+  String get categoryText => _categoryText ?? category;
+  String get areaText => _areaText ?? area;
+
+  /// Copia con i testi tradotti; categoria e cucina originali restano per le regole interne.
+  OnlineRecipe translatedCopy({
+    required String title,
+    required String category,
+    required String area,
+    required List<String> ingredientNames,
+    required List<String> amounts,
+    required List<String> steps,
+  }) =>
+      OnlineRecipe(
+        id: id,
+        title: title,
+        category: this.category,
+        area: this.area,
+        instructions: instructions,
+        thumb: thumb,
+        source: source,
+        ingredients: [
+          for (var i = 0; i < ingredients.length; i++) Ingredient(name: ingredientNames[i], amount: amounts[i]),
+        ],
+        original: original ?? this,
+        categoryText: category,
+        areaText: area,
+        steps: steps,
+      );
 
   /// true se è solo un'anteprima (dalla ricerca per ingrediente): servono i dettagli.
   bool get isPartial => instructions.isEmpty && ingredients.isEmpty;
@@ -68,6 +113,7 @@ class OnlineRecipe {
 
   /// Passaggi: un paragrafo per passaggio, senza le righe "STEP 1".
   List<String> get steps {
+    if (_steps != null) return _steps;
     final out = <String>[];
     for (final raw in instructions.split(RegExp(r'\r?\n'))) {
       final t = raw.trim().replaceFirst(RegExp(r'^(step\s*\d+[:.)]?|\d+[.)])\s*', caseSensitive: false), '');
@@ -77,22 +123,27 @@ class OnlineRecipe {
     return out;
   }
 
-  /// Ricetta del ricettario (senza foto: la copertina si scarica a parte).
+  /// Riconoscimento della fonte, messo in fondo alla ricetta.
+  String get credit => [
+        tr('online.credit', {'title': original?.title ?? title}),
+        if (source.isNotEmpty) tr('online.creditSource', {'url': source}),
+        if (translated) tr('online.creditTranslated'),
+      ].join('\n');
+
+  /// Ricetta del ricettario (senza foto: la copertina si scarica a parte); la fonte va nei consigli.
   Recipe toRecipe() => Recipe(
         category: recipeCategory,
         title: title,
-        intro: [
-          if (area.isNotEmpty && area.toLowerCase() != 'unknown') 'Cucina: $area.',
-          'Fonte: TheMealDB${source.isNotEmpty ? ' ($source)' : ''}.',
-        ].join(' '),
+        intro: area.isNotEmpty && area.toLowerCase() != 'unknown' ? tr('online.cuisine', {'area': areaText}) : '',
         ingredients: [for (final i in ingredients) Ingredient(name: i.name, amount: i.amount)],
         steps: [for (final s in steps) RecipeStep(text: s)],
+        tips: credit,
       );
 
   /// Contiene un ingrediente (nome in inglese, anche parziale)?
   bool hasIngredient(String en) {
     final q = en.toLowerCase();
-    return ingredients.any((i) => i.name.toLowerCase().contains(q));
+    return (original ?? this).ingredients.any((i) => i.name.toLowerCase().contains(q));
   }
 }
 

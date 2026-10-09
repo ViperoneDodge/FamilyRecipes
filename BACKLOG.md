@@ -42,6 +42,13 @@ Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
   - *Internet*: una ricetta a sorpresa da TheMealDB (gratuito, in inglese); si legge e si può salvare
     nel ricettario passando dall'editor, con la foto. Ingredienti italiani comuni tradotti in inglese
     per la ricerca. Privacy aggiornata.
+- [x] Scheda rinominata **"Suggerimento dello chef"** (su due righe nella barra in basso); il titolo della
+  pagina è "Cosa mangio oggi?".
+- [x] **Ricette da internet tradotte** nella lingua dell'app, sul telefono, con Google ML Kit Translation
+  (gratuito, senza chiavi; la prima volta scarica il pacchetto della lingua, ~30 MB, poi funziona offline).
+  Si traducono titolo, categoria, cucina, ingredienti, dosi (abbreviazioni inglesi espanse prima) e
+  passaggi; c'è "Mostra originale". **La fonte è sempre in fondo** (TheMealDB, link alla ricetta
+  originale, "Tradotta automaticamente dall'inglese") e, salvando, finisce nei consigli della ricetta.
 
 Da fare:
 

@@ -154,9 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   tooltip: tr('pdf.export'),
                   icon: const Icon(Icons.picture_as_pdf_outlined),
                   onPressed: () {
-                    final list = _myCategory == null
-                        ? mine
-                        : mine.where((r) => r.category == _myCategory).toList();
+                    final list = _myCategory == null ? mine : mine.where((r) => r.category == _myCategory).toList();
                     exportPdf(
                       context,
                       _myCategory == null ? tr('book.mine') : '${tr('book.mine')} - ${categoryLabel(_myCategory!)}',
@@ -168,8 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 tooltip: tr('settings.title'),
                 icon: const Icon(Icons.settings),
-                onPressed: () =>
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
               ),
             ],
           ),
@@ -216,10 +213,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Icon(sel ? selectedIcon : icon, color: sel ? theme.colorScheme.primary : color),
                 ),
                 const SizedBox(height: 2),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(label,
-                      maxLines: 1, style: TextStyle(fontFamily: handFont, fontSize: 17, color: color)),
+                // Le etichette lunghe ("Suggerimento dello chef") vanno su due righe.
+                SizedBox(
+                  height: 36,
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(label.length > 14 ? _twoLines(label) : label,
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontFamily: handFont, fontSize: 17, height: 1.0, color: color)),
+                    ),
+                  ),
                 ),
               ]),
             ),
@@ -235,10 +240,20 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(children: [
           item(0, Icons.edit_note_outlined, Icons.edit_note, tr('tab.mine')),
           item(1, Icons.groups_outlined, Icons.groups, tr('tab.family')),
-          item(2, Icons.lightbulb_outline, Icons.lightbulb, tr('tab.tonight')),
+          item(2, Icons.soup_kitchen_outlined, Icons.soup_kitchen, tr('tab.tonight')),
         ]),
       ),
     );
+  }
+
+  /// Spezza un'etichetta in due righe allo spazio più vicino a metà.
+  static String _twoLines(String s) {
+    final mid = s.length ~/ 2;
+    var best = -1;
+    for (var i = 0; i < s.length; i++) {
+      if (s[i] == ' ' && (best < 0 || (i - mid).abs() < (best - mid).abs())) best = i;
+    }
+    return best < 0 ? s : '${s.substring(0, best)}\n${s.substring(best + 1)}';
   }
 
   Widget _myTab() {
