@@ -76,3 +76,12 @@ Da fare:
   - Si apre l'editor della ricetta già compilato, da controllare e correggere prima di salvare; la foto
     usata può diventare la foto del piatto o di un passaggio.
   - Funziona insieme all'importazione da file (stessa logica di riconoscimento per i testi da OneNote).
+
+- [ ] **Tutte le 36 lingue di MyFleetManager** (ora solo italiano e inglese):
+  - Frasi in comune con MyFleetManager (accesso, gruppi, ruoli, impostazioni, privacy): riuso delle
+    traduzioni esistenti, adattate da "veicoli" a "ricette".
+  - Frasi nuove (ricette, ingredienti, passaggi, categorie, linguette, "Cosa mangio stasera?"):
+    traduzione in tutte le 34 lingue mancanti; nomi delle categorie adattati alle abitudini di ogni paese.
+  - Menu Lingua con tutte le 36 lingue e font per il PDF di cinese, giapponese, coreano, hindi e thai
+    (come in MyFleetManager).
+  - Test automatico: ogni lingua deve avere tutte le frasi e gli stessi segnaposto ({n}, {name}…).
