@@ -25,6 +25,30 @@ class PdfExport {
   static Future<pw.Font> _asset(String name) async =>
       pw.Font.ttf(await rootBundle.load('assets/fonts/$name'));
 
+  static const Set<String> _latin = {
+    'it', 'en', 'fr', 'de', 'es', 'pt', 'nl', 'hr', 'sl', 'pl', 'cs', 'sk', 'hu', 'ro', 'sv', 'da', 'nb', //
+    'fi', 'is', 'et', 'lv', 'lt', 'mt', 'ga', 'tr', 'id', 'vi',
+  };
+
+  /// Font di riserva per le scritture che Noto Sans non copre (devanagari, thai, cinese, giapponese, coreano).
+  static Future<List<pw.Font>> _fallback() async {
+    final out = <pw.Font>[
+      await _asset('NotoSansDevanagari-Regular.ttf'),
+      await _asset('NotoSansThai-Regular.ttf'),
+    ];
+    try {
+      switch (L10n.code) {
+        case 'zh':
+          out.insert(0, await PdfGoogleFonts.notoSansSCRegular());
+        case 'ja':
+          out.insert(0, await PdfGoogleFonts.notoSansJPRegular());
+        case 'ko':
+          out.insert(0, await PdfGoogleFonts.notoSansKRRegular());
+      }
+    } catch (_) {}
+    return out;
+  }
+
   static String fileName(String title) {
     final safe = title.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
     final day = DateFormat('yyyyMMdd').format(DateTime.now());
@@ -49,8 +73,9 @@ class PdfExport {
   }) async {
     final base = await _asset('NotoSans-Regular.ttf');
     final bold = await _asset('NotoSans-Bold.ttf');
-    final hand = await _asset('PatrickHand-Regular.ttf');
-    final theme = pw.ThemeData.withFont(base: base, bold: bold);
+    // Il font a mano ha solo l'alfabeto latino: per le altre scritture i titoli usano Noto.
+    final hand = _latin.contains(L10n.code) ? await _asset('PatrickHand-Regular.ttf') : bold;
+    final theme = pw.ThemeData.withFont(base: base, bold: bold, fontFallback: await _fallback());
     final doc = pw.Document(title: title, creator: 'FamilyRecipes', theme: theme);
 
     final images = <String, pw.ImageProvider>{};

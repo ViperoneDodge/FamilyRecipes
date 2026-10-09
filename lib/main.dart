@@ -99,7 +99,11 @@ class _FamilyRecipesAppState extends State<FamilyRecipesApp> with WidgetsBinding
       listenable: appState,
       builder: (context, _) {
         final t = appState.theme;
-        final supported = [for (final c in L10n.available) Locale(c)];
+        final supported = <Locale>[
+          for (final c in L10n.available)
+            if (GlobalMaterialLocalizations.delegate.isSupported(Locale(c))) Locale(c),
+        ];
+        if (!supported.contains(const Locale('en'))) supported.add(const Locale('en'));
         final current = Locale(L10n.code);
         return MaterialApp(
           title: 'FamilyRecipes',

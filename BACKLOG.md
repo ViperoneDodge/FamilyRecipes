@@ -52,6 +52,22 @@ Pubblicata il 9 ottobre 2026:
 - [x] **Linguette senza numeri**: tolto il conteggio delle ricette da ogni linguetta (in alto e a destra);
   le categorie vuote restano più chiare.
 
+## Versione 1.3.0
+
+- [x] **Nuova ricetta letta da foto o PDF**: *Nuova ricetta* chiede se scriverla a mano, fotografarla
+  (anche più pagine, una dopo l'altra), sceglierla dalla galleria o aprire un PDF (prime 6 pagine).
+  - Testo letto **sul telefono** con Google ML Kit Text Recognition: niente invio a server, funziona
+    offline. I PDF vengono trasformati in immagini pagina per pagina; testo su due colonne riordinato.
+  - Riconosciuti titolo, ingredienti con dose (g, kg, ml, cucchiai, pizzico, q.b., frazioni…),
+    passaggi (numerati o dopo "Preparazione"/"Procedimento"), dosi, tempi, difficoltà, consigli;
+    categoria proposta dalle parole chiave.
+  - Si apre l'editor già compilato con un avviso "controlla e correggi" prima di salvare.
+- [x] **36 lingue** come MyFleetManager: frasi in comune riprese dall'altra app, frasi nuove (ricette,
+  categorie, linguette, suggerimento dello chef, lettura da foto) tradotte in tutte le lingue; menu
+  Lingua con tutte le 36 lingue; nel PDF font per cinese, giapponese, coreano, hindi e thai (il font
+  a mano dei titoli resta per le lingue con alfabeto latino). Test automatico: ogni lingua ha tutte le
+  frasi e gli stessi segnaposto.
+
 ## Prossima release
 
 - [ ] **Importazione ricette da file** (per caricare il primo ricettario, ad esempio da OneNote):
@@ -71,26 +87,6 @@ Pubblicata il 9 ottobre 2026:
   - Utile anche dopo: esportare un ricettario nello stesso formato per passarlo ad altri o farne
     una copia di sicurezza.
 
-- [ ] **Importare una ricetta da foto o PDF** (lettura automatica, come la lettura del libretto in
-  MyFleetManager):
-  - Da *Nuova ricetta* → *Leggi da foto o PDF*: si scatta o si sceglie una foto (anche più pagine, per
-    esempio il quaderno della nonna o una pagina di libro) oppure un PDF.
-  - Lettura del testo **sul telefono** con Google ML Kit Text Recognition (come `registration_reader.dart`
-    di MyFleetManager): niente invio a server, funziona anche offline. I PDF vengono prima trasformati in
-    immagini pagina per pagina; se il PDF ha già il testo si usa direttamente quello.
-  - Riconoscimento delle parti della ricetta: titolo (prima riga in evidenza), ingredienti (righe con
-    quantità e unità: g, kg, ml, l, cucchiai, cucchiaini, bicchieri, pizzico, q.b., numeri e frazioni),
-    passaggi (righe numerate o paragrafi dopo "Preparazione"/"Procedimento"), tempi e dosi ("per 4
-    persone", "cottura 30 minuti"), consigli; categoria proposta dalle parole chiave.
-  - Si apre l'editor della ricetta già compilato, da controllare e correggere prima di salvare; la foto
-    usata può diventare la foto del piatto o di un passaggio.
-  - Funziona insieme all'importazione da file (stessa logica di riconoscimento per i testi da OneNote).
-
-- [ ] **Tutte le 36 lingue di MyFleetManager** (ora solo italiano e inglese):
-  - Frasi in comune con MyFleetManager (accesso, gruppi, ruoli, impostazioni, privacy): riuso delle
-    traduzioni esistenti, adattate da "veicoli" a "ricette".
-  - Frasi nuove (ricette, ingredienti, passaggi, categorie, linguette, "Cosa mangio stasera?"):
-    traduzione in tutte le 34 lingue mancanti; nomi delle categorie adattati alle abitudini di ogni paese.
-  - Menu Lingua con tutte le 36 lingue e font per il PDF di cinese, giapponese, coreano, hindi e thai
-    (come in MyFleetManager).
-  - Test automatico: ogni lingua deve avere tutte le frasi e gli stessi segnaposto ({n}, {name}…).
+- [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
+  (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
+  della scrittura a mano (ora riconosce bene soprattutto il testo stampato).

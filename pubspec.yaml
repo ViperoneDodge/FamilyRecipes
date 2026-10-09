@@ -1,7 +1,7 @@
 name: familyrecipes
 description: Il ricettario di famiglia, da compilare insieme nei gruppi.
 publish_to: 'none'
-version: 1.2.0+5
+version: 1.3.0+6
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -49,6 +49,8 @@ flutter:
     - assets/fonts/NotoSans-Regular.ttf
     - assets/fonts/NotoSans-Bold.ttf
     - assets/fonts/PatrickHand-Regular.ttf
+    - assets/fonts/NotoSansDevanagari-Regular.ttf
+    - assets/fonts/NotoSansThai-Regular.ttf
   fonts:
     - family: PatrickHand
       fonts:

@@ -181,7 +181,6 @@
  "family.title": "Ricettario di famiglia",
  "family.unavailable": "Gruppo non disponibile.",
  "family.you": "(tu)",
- "filter.all": "Tutte ({n})",
  "filter.allShort": "Tutte",
  "filter.category": "Categoria",
  "groupAct.added": "{who} ha aggiunto \"{recipe}\" ({category})",

@@ -7,6 +7,40 @@ class L10n {
   static const Map<String, String> names = {
     'it': 'Italiano',
     'en': 'English',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'es': 'Español',
+    'pt': 'Português',
+    'nl': 'Nederlands',
+    'hr': 'Hrvatski',
+    'sl': 'Slovenščina',
+    'pl': 'Polski',
+    'cs': 'Čeština',
+    'sk': 'Slovenčina',
+    'hu': 'Magyar',
+    'ro': 'Română',
+    'bg': 'Български',
+    'el': 'Ελληνικά',
+    'sv': 'Svenska',
+    'da': 'Dansk',
+    'nb': 'Norsk',
+    'fi': 'Suomi',
+    'is': 'Íslenska',
+    'et': 'Eesti',
+    'lv': 'Latviešu',
+    'lt': 'Lietuvių',
+    'mt': 'Malti',
+    'ga': 'Gaeilge',
+    'uk': 'Українська',
+    'ru': 'Русский',
+    'tr': 'Türkçe',
+    'zh': '中文（简体）',
+    'ja': '日本語',
+    'ko': '한국어',
+    'hi': 'हिन्दी',
+    'id': 'Bahasa Indonesia',
+    'vi': 'Tiếng Việt',
+    'th': 'ไทย',
   };
 
   static final List<String> available = names.keys.toList();
@@ -18,7 +52,8 @@ class L10n {
 
   static String resolve(String? preferred) {
     if (preferred != null && available.contains(preferred)) return preferred;
-    final device = PlatformDispatcher.instance.locale.languageCode;
+    var device = PlatformDispatcher.instance.locale.languageCode;
+    if (device == 'no' || device == 'nn') device = 'nb';
     return available.contains(device) ? device : 'en';
   }
 
