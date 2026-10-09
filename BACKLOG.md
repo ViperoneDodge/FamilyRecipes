@@ -29,9 +29,9 @@ Pubblicata l'8 ottobre 2026:
   il contrasto di titolo e sottotitolo e la visibilità del vapore sopra la pentola.
   → Risolto con la nuova schermata di avvio a tutto schermo.
 
-## Prossima release
+## Versione 1.2.0
 
-Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
+Pubblicata il 9 ottobre 2026:
 
 - [x] **Linguette leggibili in modalità scura**: colori più profondi e testo chiaro (prima quasi invisibili).
 - [x] **Nuova scheda "Cosa mangio stasera?"** (in basso, "Stasera"), con tre modi:
@@ -52,7 +52,7 @@ Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
 - [x] **Linguette senza numeri**: tolto il conteggio delle ricette da ogni linguetta (in alto e a destra);
   le categorie vuote restano più chiare.
 
-Da fare:
+## Prossima release
 
 - [ ] **Importazione ricette da file** (per caricare il primo ricettario, ad esempio da OneNote):
   - Impostazioni → *Importa ricette*: si sceglie un file (`.json` o `.zip`) e la destinazione
