@@ -49,6 +49,8 @@ Già pronto sul ramo `claude/familyrecipes-app-7nxavy` (non ancora su `main`):
   Si traducono titolo, categoria, cucina, ingredienti, dosi (abbreviazioni inglesi espanse prima) e
   passaggi; c'è "Mostra originale". **La fonte è sempre in fondo** (TheMealDB, link alla ricetta
   originale, "Tradotta automaticamente dall'inglese") e, salvando, finisce nei consigli della ricetta.
+- [x] **Linguette senza numeri**: tolto il conteggio delle ricette da ogni linguetta (in alto e a destra);
+  le categorie vuote restano più chiare.
 
 Da fare:
 

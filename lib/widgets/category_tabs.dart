@@ -118,11 +118,7 @@ class CategoryTabs extends StatelessWidget {
                   insets: const EdgeInsets.symmetric(horizontal: 1.2))
               : null,
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(c == null ? Icons.menu_book_outlined : categoryIcon(c), size: 16, color: ink),
-              const SizedBox(width: 3),
-              Text('$n', style: TextStyle(fontSize: 10.5, color: ink.withValues(alpha: 0.8))),
-            ]),
+            Icon(c == null ? Icons.menu_book_outlined : categoryIcon(c), size: 16, color: ink),
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(label,
@@ -205,8 +201,8 @@ class VerticalCategoryTabs extends StatelessWidget {
                     quarterTurns: 1,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text('$label · $n',
-                          maxLines: 1, style: TextStyle(fontFamily: handFont, fontSize: 16, height: 1.0, color: ink)),
+                      child: Text(label,
+                          maxLines: 1, style: TextStyle(fontFamily: handFont, fontSize: 13.5, height: 1.0, color: ink)),
                     ),
                   ),
                 ),
