@@ -10,6 +10,7 @@ import '../version.dart';
 import '../widgets/common.dart';
 import 'admin_screen.dart';
 import 'family_screen.dart';
+import 'import_screen.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -46,6 +47,13 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () =>
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
                   ),
+                ListTile(
+                  leading: const Icon(Icons.file_open_outlined),
+                  title: Text(tr('import.title')),
+                  subtitle: Text(tr('import.menuInfo')),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => importRecipesFlow(context),
+                ),
                 _header(context, tr('settings.language')),
                 ListTile(
                   leading: const Icon(Icons.language),

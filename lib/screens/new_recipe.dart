@@ -7,6 +7,7 @@ import '../models.dart';
 import '../services/recipe_reader.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import 'import_screen.dart';
 import 'recipe_edit_screen.dart';
 
 /// "Nuova ricetta": scritta a mano oppure letta da foto (fotocamera o galleria) o da un PDF.
@@ -48,6 +49,13 @@ Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory
           subtitle: Text(tr('scan.pdfInfo', {'n': RecipeReader.maxPdfPages})),
           onTap: () => Navigator.pop(ctx, 'pdf'),
         ),
+        const Divider(height: 1),
+        ListTile(
+          leading: const Icon(Icons.file_open_outlined),
+          title: Text(tr('import.menu')),
+          subtitle: Text(tr('import.menuInfo')),
+          onTap: () => Navigator.pop(ctx, 'import'),
+        ),
         const SizedBox(height: 8),
       ]),
     ),
@@ -57,6 +65,10 @@ Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => RecipeEditScreen(recipe: Recipe(category: category ?? RecipeCategory.primi, bookId: bookId)),
     ));
+    return;
+  }
+  if (choice == 'import') {
+    await importRecipesFlow(context, bookId: bookId);
     return;
   }
   final paths = await _pick(context, choice);

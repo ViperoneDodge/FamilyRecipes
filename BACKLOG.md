@@ -70,22 +70,22 @@ Pubblicata il 9 ottobre 2026:
 
 ## Prossima release
 
-- [ ] **Importazione ricette da file** (per caricare il primo ricettario, ad esempio da OneNote):
-  - Impostazioni → *Importa ricette*: si sceglie un file (`.json` o `.zip`) e la destinazione
-    (Le mie ricette o un gruppo dove si può modificare); anteprima con l'elenco delle ricette
-    trovate e conferma prima di salvare.
-  - Formato del file: un elenco di ricette con gli stessi campi dell'app (categoria, titolo,
-    presentazione, difficoltà, costo, tempi, dosi, ingredienti con dose, passaggi, consigli) e le
-    foto in base64 o come file nello `.zip`; valori mancanti → valori predefiniti modificabili.
-  - Le ricette vengono create con l'account di chi importa (nessuna chiave Firebase da condividere)
-    e passano per il normale salvataggio: foto ridimensionate, sincronizzazione, avvisi al gruppo.
-  - Evitare doppioni: se esiste già una ricetta con lo stesso titolo e categoria nella destinazione,
-    chiedere se saltarla o importarla comunque.
-  - Conversione da OneNote: esportare le sezioni in Word (.docx) o PDF; Claude trasforma le pagine
-    nel file di importazione (una pagina = una ricetta). In seguito si può valutare l'importazione
-    diretta di un `.docx` dall'app.
-  - Utile anche dopo: esportare un ricettario nello stesso formato per passarlo ad altri o farne
-    una copia di sicurezza.
+- [x] **Importazione ricette da file** (per caricare il primo ricettario):
+  - Modulo web condiviso **"Ricettario da compilare"** (pagina su claude.ai): si scrivono le ricette anche
+    in più persone (categoria, titolo, presentazione, difficoltà, costo, tempi, dosi, ingredienti con dose,
+    passaggi, consigli, autore, foto del piatto rimpicciolita); incollando un elenco di ingredienti o un
+    testo a paragrafi si divide da solo in righe e passaggi. Con *Scarica il file per l'app* si ottiene
+    un `.json` con tutte le ricette e le foto.
+  - Nell'app: *Nuova ricetta → Importa un file di ricette* (o Impostazioni → *Importa ricette*): si sceglie
+    il file e il ricettario di destinazione (Le mie o un gruppo dove si può modificare); anteprima con le
+    ricette trovate, quelle già presenti (stesso titolo e categoria) deselezionate; salvataggio normale
+    (foto ridimensionate, sincronizzazione, avvisi al gruppo). Le ricette restano dell'account di chi
+    importa, con "Scritta da" il nome indicato nel modulo.
+  - Il file accetta anche valori in italiano ("Primi", "Media"…) e un elenco semplice, così si può
+    preparare a mano o da OneNote.
+
+- [ ] Esportare un ricettario nello stesso formato `.json` (per passarlo ad altri o farne una copia di
+  sicurezza).
 
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
