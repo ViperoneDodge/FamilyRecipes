@@ -1,0 +1,253 @@
+=== flutter create ===
+Recreating project ....
+  ios/Runner.xcodeproj/project.pbxproj (created)
+  ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme (created)
+  ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata (created)
+  ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist (created)
+  ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings (created)
+  ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json (created)
+  ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png (created)
+  ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png (created)
+  ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png (created)
+  ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png (created)
+  ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png (created)
+  ios/Runner/Base.lproj/Main.storyboard (created)
+  ios/Runner/Base.lproj/LaunchScreen.storyboard (created)
+  ios/Runner/AppDelegate.swift (created)
+  ios/Runner/Runner-Bridging-Header.h (created)
+  ios/Runner/Info.plist (created)
+  ios/Runner.xcworkspace/contents.xcworkspacedata (created)
+  ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist (created)
+  ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings (created)
+  ios/.gitignore (created)
+  ios/Flutter/Debug.xcconfig (created)
+  ios/Flutter/AppFrameworkInfo.plist (created)
+  ios/Flutter/Release.xcconfig (created)
+  ios/RunnerTests/RunnerTests.swift (created)
+  android/app/src/profile/AndroidManifest.xml (created)
+  android/app/src/main/res/values-night/styles.xml (created)
+  android/app/src/main/res/mipmap-mdpi/ic_launcher.png (created)
+  android/app/src/main/res/drawable-v21/launch_background.xml (created)
+  android/app/src/main/res/drawable/launch_background.xml (created)
+  android/app/src/main/res/values/styles.xml (created)
+  android/app/src/main/res/mipmap-hdpi/ic_launcher.png (created)
+  android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png (created)
+  android/app/src/main/res/mipmap-xhdpi/ic_launcher.png (created)
+  android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png (created)
+  android/app/src/main/AndroidManifest.xml (created)
+  android/app/src/debug/AndroidManifest.xml (created)
+  android/.gitignore (created)
+  android/settings.gradle.kts (created)
+  android/gradle.properties (created)
+  android/gradle/wrapper/gradle-wrapper.properties (created)
+  android/familyrecipes_android.iml (created)
+  android/app/build.gradle.kts (created)
+  android/app/src/main/kotlin/it/familyrecipes/familyrecipes/MainActivity.kt (created)
+  android/build.gradle.kts (created)
+  .idea/modules.xml (created)
+  .idea/libraries/KotlinJavaRuntime.xml (created)
+  .idea/libraries/Dart_SDK.xml (created)
+  .idea/runConfigurations/main_dart.xml (created)
+  .idea/workspace.xml (created)
+  familyrecipes.iml (created)
+  analysis_options.yaml (created)
+  test/widget_test.dart (created)
+Resolving dependencies...
+Downloading packages...
+Got dependencies.
+Wrote 70 files.
+
+All done!
+You can find general documentation for Flutter at: https://docs.flutter.dev/
+Detailed API documentation is available at: https://api.flutter.dev/
+If you prefer video documentation, consider: https://www.youtube.com/c/flutterdev
+
+In order to run your application, type:
+
+  $ flutter run
+
+Your application code is in ./lib/main.dart.
+
+=== patch ===
+Patched /home/runner/work/FamilyRecipes/FamilyRecipes/android/app/build.gradle.kts
+Firebase google-services configurato
+Patched /home/runner/work/FamilyRecipes/FamilyRecipes/android/app/src/main/AndroidManifest.xml
+Icons copied
+Splash patched
+Patched /home/runner/work/FamilyRecipes/FamilyRecipes/ios/Runner/Info.plist
+=== pub get ===
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.3.77 available)
+  archive 4.0.9 (4.4.0 available)
+  characters 1.4.0 (1.4.1 available)
+  clock 1.1.2 (1.1.3 available)
+  cloud_firestore 5.6.12 (6.10.0 available)
+  cloud_firestore_platform_interface 6.6.12 (8.0.7 available)
+  cloud_firestore_web 4.4.12 (5.7.3 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  dbus 0.7.15 (0.8.0 available)
+  device_info_plus 11.5.0 (13.3.0 available)
+  device_info_plus_platform_interface 7.0.3 (8.1.0 available)
+  file_picker 11.0.3 (13.1.0 available)
+  firebase_auth 5.7.0 (6.7.0 available)
+  firebase_auth_platform_interface 7.7.3 (9.1.0 available)
+  firebase_auth_web 5.15.3 (6.3.0 available)
+  firebase_core 3.15.2 (4.15.0 available)
+  firebase_core_platform_interface 6.0.3 (8.1.1 available)
+  firebase_core_web 2.24.1 (3.12.0 available)
+  firebase_messaging 15.2.10 (16.7.0 available)
+  firebase_messaging_platform_interface 4.6.10 (4.10.0 available)
+  firebase_messaging_web 3.10.10 (4.2.5 available)
+  flutter_local_notifications 18.0.1 (22.3.1 available)
+  flutter_local_notifications_linux 5.0.0 (8.0.1 available)
+  flutter_local_notifications_platform_interface 8.0.0 (12.2.0 available)
+  google_mlkit_commons 0.12.0 (0.13.0 available)
+  google_mlkit_text_recognition 0.16.0 (0.17.1 available)
+  google_mlkit_translation 0.14.0 (0.15.1 available)
+  google_sign_in 6.3.0 (7.2.0 available)
+  google_sign_in_android 6.2.1 (7.2.17 available)
+  google_sign_in_ios 5.9.0 (6.3.6 available)
+  google_sign_in_platform_interface 2.5.0 (3.1.0 available)
+  google_sign_in_web 0.12.4+4 (1.1.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  image_picker 1.2.3 (1.2.4 available)
+  image_picker_android 0.8.13+17 (0.8.13+25 available)
+  image_picker_ios 0.8.13+7 (0.8.13+10 available)
+  image_picker_platform_interface 2.11.1 (2.11.2 available)
+  in_app_update 4.2.5 (5.0.0 available)
+  intl 0.20.2 (0.20.3 available)
+  matcher 0.12.17 (0.12.20 available)
+  material_color_utilities 0.11.1 (0.13.1 available)
+  meta 1.17.0 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  package_config 2.2.0 (3.0.0 available)
+  pdf 3.12.0 (3.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  printing 5.14.3 (5.15.1 available)
+  qr 3.0.2 (4.0.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  share_plus 12.0.2 (13.3.1 available)
+  share_plus_platform_interface 6.1.0 (7.2.0 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  test_api 0.7.7 (0.7.15 available)
+  timezone 0.10.1 (0.11.1 available)
+  url_launcher 6.3.2 (6.3.3 available)
+  url_launcher_android 6.3.30 (6.3.33 available)
+  vector_math 2.2.0 (2.4.3 available)
+  win32 5.15.0 (6.4.0 available)
+  win32_registry 2.1.0 (3.0.3 available)
+  xml 6.6.1 (7.1.0 available)
+Got dependencies!
+62 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+=== analyze ===
+Analyzing FamilyRecipes...                                      
+
+warning • The include file 'package:flutter_lints/flutter.yaml' in '/home/runner/work/FamilyRecipes/FamilyRecipes/analysis_options.yaml' can't be found when analyzing '/home/runner/work/FamilyRecipes/FamilyRecipes' • analysis_options.yaml:10:10 • include_file_not_found
+
+1 issue found. (ran in 19.2s)
+=== test ===
+
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: ogni lingua ha un file
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: it: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: en: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: fr: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: de: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: es: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: pt: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: nl: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: hr: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: sl: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: pl: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: cs: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: sk: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: hu: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: ro: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: bg: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: el: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: sv: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: da: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: nb: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: fi: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: is: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: et: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: lv: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: lt: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: mt: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: ga: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: uk: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: ru: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: tr: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: zh: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: ja: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: ko: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: hi: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: id: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: vi: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/l10n_test.dart: th: tutte le chiavi e gli stessi segnaposto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: legge una ricetta di TheMealDB
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: risposta vuota
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: diventa una ricetta del ricettario
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: categorie e traduzione degli ingredienti
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: dosi inglesi scritte per esteso prima della traduzione
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: copia tradotta e fonte in fondo
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/online_recipes_test.dart: lingua di destinazione
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipe_text_parser_test.dart: scheda in stile GialloZafferano
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipe_text_parser_test.dart: pagina di quaderno senza intestazioni
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipe_text_parser_test.dart: ricetta in inglese
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipe_text_parser_test.dart: liquore e testo vuoto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: ricetta: JSON andata e ritorno
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: ricetta: foto, anteprima, tempi e ricerca
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: valori sconosciuti tornano ai predefiniti
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: tutte le categorie hanno un nome
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: ruoli nel gruppo
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: avvisi di gruppo: aggiunte, modifiche, eliminazioni
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: PDF di una ricetta e di un ricettario
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipes_test.dart: i testi italiani e inglesi hanno le stesse chiavi
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipe_import_test.dart: file del modulo: ricette, valori italiani e foto
+✅ /home/runner/work/FamilyRecipes/FamilyRecipes/test/recipe_import_test.dart: anche un elenco semplice; file non valido
+
+🎉 58 tests passed.
+=== build apk ===
+Running Gradle task 'assembleRelease'...                        
+Checking the license for package NDK (Side by side) 28.2.13676358 in /usr/local/lib/android/sdk/licenses
+License for package NDK (Side by side) 28.2.13676358 accepted.
+Preparing "Install NDK (Side by side) 28.2.13676358 v.28.2.13676358".
+"Install NDK (Side by side) 28.2.13676358 v.28.2.13676358" ready.
+Installing NDK (Side by side) 28.2.13676358 in /usr/local/lib/android/sdk/ndk/28.2.13676358
+"Install NDK (Side by side) 28.2.13676358 v.28.2.13676358" complete.
+"Install NDK (Side by side) 28.2.13676358 v.28.2.13676358" finished.
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 18844 bytes (98.9% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Caught exception: Already watching path: /home/runner/work/FamilyRecipes/FamilyRecipes/android
+Running Gradle task 'assembleRelease'...                          518.3s
+✓ Built build/app/outputs/flutter-apk/app-release.apk (161.0MB)
+=== appbundle saltato: chiave di caricamento non configurata ===
+=== firma ===
+V2 Signer: certificate SHA-1 digest: 3a89119487cf4323d839385638f2b811105fe114
