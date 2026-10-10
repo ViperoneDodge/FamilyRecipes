@@ -1,7 +1,7 @@
 name: familyrecipes
 description: Il ricettario di famiglia, da compilare insieme nei gruppi.
 publish_to: 'none'
-version: 1.3.0+6
+version: 1.4.0+7
 
 environment:
   sdk: '>=3.5.0 <4.0.0'

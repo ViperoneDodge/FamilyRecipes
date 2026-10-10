@@ -68,7 +68,7 @@ Pubblicata il 9 ottobre 2026:
   a mano dei titoli resta per le lingue con alfabeto latino). Test automatico: ogni lingua ha tutte le
   frasi e gli stessi segnaposto.
 
-## Prossima release
+## Versione 1.4.0
 
 - [x] **Importazione ricette da file** (per caricare il primo ricettario):
   - Modulo web condiviso **"Ricettario da compilare"** (pagina su claude.ai): si scrivono le ricette anche
@@ -83,6 +83,8 @@ Pubblicata il 9 ottobre 2026:
     importa, con "Scritta da" il nome indicato nel modulo.
   - Il file accetta anche valori in italiano ("Primi", "Media"…) e un elenco semplice, così si può
     preparare a mano o da OneNote.
+
+## Prossima release
 
 - [ ] Esportare un ricettario nello stesso formato `.json` (per passarlo ad altri o farne una copia di
   sicurezza).
