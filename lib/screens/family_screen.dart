@@ -206,8 +206,8 @@ class GroupBookScreen extends StatelessWidget {
                   ? Center(child: Text(tr('family.unavailable')))
                   : RecipeBrowser(
                       recipes: list,
-                      onOpen: (r) => Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: r.id))),
+                      onOpen: (r, shown) => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => RecipeDetailScreen(recipeId: r.id, sequence: [for (final x in shown) x.id]))),
                       onLongPress: (r) => moveRecipeSheet(context, r),
                       emptyTitle: tr('family.noRecipes'),
                       emptyHint: appState.canAddTo(g.id) ? tr('family.noRecipesHint') : null,

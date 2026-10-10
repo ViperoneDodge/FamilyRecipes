@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../l10n.dart';
@@ -10,17 +12,100 @@ import 'recipe_edit_screen.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final String recipeId;
+
+  /// Le ricette dell'elenco da cui si è aperta, nello stesso ordine: con lo swipe si sfogliano.
+  final List<String> sequence;
   final bool embedded;
   final VoidCallback? onClosed;
-  const RecipeDetailScreen({super.key, required this.recipeId, this.embedded = false, this.onClosed});
+  final ValueChanged<String>? onRecipeChanged;
+  const RecipeDetailScreen({
+    super.key,
+    required this.recipeId,
+    this.sequence = const [],
+    this.embedded = false,
+    this.onClosed,
+    this.onRecipeChanged,
+  });
 
   @override
   State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
 }
 
-class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
-  /// Ingredienti spuntati mentre si cucina (solo su questo schermo).
-  final Set<int> _checked = {};
+class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTickerProviderStateMixin {
+  late String _id = widget.recipeId;
+
+  /// Durante lo sfoglio: la ricetta che arriva e il verso (+1 successiva, -1 precedente).
+  String? _other;
+  int _dir = 0;
+  late final AnimationController _flip =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
+
+  @override
+  void dispose() {
+    _flip.dispose();
+    super.dispose();
+  }
+
+  List<String> get _seq => [for (final id in widget.sequence) if (appState.recipeById(id) != null) id];
+
+  void _go(int dir) {
+    if (_flip.isAnimating) return;
+    final seq = _seq;
+    final j = seq.indexOf(_id) + dir;
+    if (j < 0 || j >= seq.length || seq.indexOf(_id) < 0) return;
+    setState(() {
+      _other = seq[j];
+      _dir = dir;
+    });
+    _flip.forward(from: 0).whenComplete(() {
+      if (!mounted) return;
+      setState(() {
+        _id = _other ?? _id;
+        _other = null;
+        _dir = 0;
+      });
+      _flip.value = 0;
+      widget.onRecipeChanged?.call(_id);
+    });
+  }
+
+  void _onSwipe(DragEndDetails d) {
+    final v = d.primaryVelocity ?? 0;
+    if (v < -250) _go(1);
+    if (v > 250) _go(-1);
+  }
+
+  /// Il foglio che gira attorno agli anelli in alto: `t` va da 0 (steso) a 1 (di taglio, sparito).
+  Widget _lifted(Widget sheet, double t) {
+    if (t >= 0.999) return const SizedBox.shrink();
+    return Transform(
+      alignment: Alignment.topCenter,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.0009)
+        ..rotateX(-t * math.pi / 2),
+      child: Stack(fit: StackFit.expand, children: [
+        sheet,
+        IgnorePointer(child: ColoredBox(color: Colors.black.withValues(alpha: 0.28 * t))),
+      ]),
+    );
+  }
+
+  Widget _pages(BuildContext context, Widget Function(Widget) sheet, Recipe r) {
+    return GestureDetector(
+      onHorizontalDragEnd: _onSwipe,
+      child: AnimatedBuilder(
+        animation: _flip,
+        builder: (context, _) {
+          final o = _other == null ? null : appState.recipeById(_other!);
+          if (o == null) return sheet(_body(context, r));
+          final t = Curves.easeInOutCubic.transform(_flip.value);
+          return Stack(fit: StackFit.expand, children: _dir > 0
+              ? [sheet(_body(context, o)), _lifted(sheet(_body(context, r)), t)]
+              : [sheet(_body(context, r)), _lifted(sheet(_body(context, o)), 1 - t)]);
+        },
+      ),
+    );
+  }
 
   Future<void> _delete(Recipe r) async {
     final ok = await showDialog<bool>(
@@ -61,7 +146,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     return ListenableBuilder(
       listenable: appState,
       builder: (context, _) {
-        final r = appState.recipeById(widget.recipeId);
+        final r = appState.recipeById(_id);
         if (r == null) {
           return TableclothBackground(
             child: Scaffold(
@@ -108,7 +193,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               ),
             ],
           ),
-          body: NotebookPage(child: _body(context, r)),
+          body: NotebookPage.sheets(builder: (context, sheet) => _pages(context, sheet, r)),
         );
         return widget.embedded ? scaffold : TableclothBackground(child: scaffold);
       },
@@ -121,10 +206,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     final ink = TextStyle(color: nb.ink, fontSize: 16, height: 1.45);
     final courses = r.courses.map(appState.recipeById).whereType<Recipe>().toList();
     final cover = r.coverPhoto;
+    final seq = _seq;
+    final pos = seq.indexOf(r.id);
     return ListView(
+      key: PageStorageKey('recipe-${r.id}'),
       padding: const EdgeInsets.fromLTRB(6, 6, 12, 40),
       children: [
-        Text(categoryLabel(r.category).toUpperCase(),
+        Text([categoryLabel(r.category).toUpperCase(), if (pos >= 0 && seq.length > 1) '${pos + 1} / ${seq.length}'].join('  ·  '),
             style: TextStyle(fontSize: 12, letterSpacing: 1.3, color: nb.accent, fontWeight: FontWeight.w700)),
         Text(r.displayTitle, style: TextStyle(fontFamily: handFont, fontSize: 38, height: 1.1, color: nb.ink)),
         Padding(
@@ -166,27 +254,15 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               child: Text(tr('recipe.dosesFor', {'n': r.servings}),
                   style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
             ),
-          for (var i = 0; i < r.ingredients.length; i++)
-            InkWell(
-              onTap: () => setState(() => _checked.contains(i) ? _checked.remove(i) : _checked.add(i)),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 7),
-                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: nb.line))),
-                child: Row(children: [
-                  Icon(_checked.contains(i) ? Icons.check_box : Icons.check_box_outline_blank,
-                      size: 20, color: _checked.contains(i) ? scheme.primary : scheme.outline),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(r.ingredients[i].name,
-                        style: ink.copyWith(
-                          decoration: _checked.contains(i) ? TextDecoration.lineThrough : null,
-                          color: _checked.contains(i) ? scheme.outline : nb.ink,
-                        )),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(r.ingredients[i].amount, style: ink.copyWith(fontWeight: FontWeight.w700)),
-                ]),
-              ),
+          for (final ing in r.ingredients)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: nb.line))),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(child: Text(ing.name, style: ink)),
+                const SizedBox(width: 8),
+                Text(ing.amount, style: ink.copyWith(fontWeight: FontWeight.w700)),
+              ]),
             ),
         ],
         if (r.steps.isNotEmpty) ...[

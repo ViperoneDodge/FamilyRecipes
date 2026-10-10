@@ -26,17 +26,22 @@ class _HomeScreenState extends State<HomeScreen> {
   RecipeCategory? _myCategory;
 
   String? _selectedId;
+  List<String> _selectedSeq = const [];
   bool _twoPane = false;
 
   void _openAdd({String? bookId, RecipeCategory? category}) =>
       newRecipeFlow(context, bookId: bookId, category: category ?? _myCategory);
 
-  void _openDetail(Recipe r) {
+  void _openDetail(Recipe r, [List<Recipe>? shown]) {
+    final seq = shown == null ? const <String>[] : [for (final x in shown) x.id];
     if (_twoPane) {
-      setState(() => _selectedId = r.id);
+      setState(() {
+        _selectedId = r.id;
+        _selectedSeq = seq;
+      });
       return;
     }
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: r.id)));
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: r.id, sequence: seq)));
   }
 
   static Rect? _verticalHinge(MediaQueryData mq) {
@@ -72,6 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   : RecipeDetailScreen(
                       key: ValueKey(selected.id),
                       recipeId: selected.id,
+                      sequence: _selectedSeq,
+                      onRecipeChanged: (id) => setState(() => _selectedId = id),
                       embedded: true,
                       onClosed: () => setState(() => _selectedId = null),
                     );

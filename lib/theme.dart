@@ -286,9 +286,16 @@ class _GinghamPainter extends CustomPainter {
 
 /// Foglio di un blocco degli appunti con la spirale in alto.
 class NotebookPage extends StatelessWidget {
-  final Widget child;
+  final Widget? child;
   final bool lines;
-  const NotebookPage({super.key, required this.child, this.lines = true});
+
+  /// Per pagine che si sfogliano: riceve `sheet`, che avvolge un contenuto nel foglio di carta;
+  /// gli anelli restano fermi sopra a tutto.
+  final Widget Function(BuildContext context, Widget Function(Widget child) sheet)? builder;
+
+  const NotebookPage({super.key, required Widget this.child, this.lines = true}) : builder = null;
+  const NotebookPage.sheets({super.key, required Widget Function(BuildContext, Widget Function(Widget)) this.builder, this.lines = true})
+      : child = null;
 
   static const double spiral = 26;
   static const double gutter = 30;
@@ -297,20 +304,23 @@ class NotebookPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nb = NotebookColors.of(context);
+    Widget sheet(Widget c) => CustomPaint(
+          painter: _PagePainter(nb, lines),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
+            child: Padding(
+              padding: const EdgeInsets.only(left: gutter, top: spiral),
+              child: c,
+            ),
+          ),
+        );
     return LayoutBuilder(builder: (context, box) {
       final extra = box.maxWidth > maxPageWidth ? (box.maxWidth - maxPageWidth) / 2 : 0.0;
       return Padding(
         padding: EdgeInsets.fromLTRB(10 + extra, 10, 10 + extra, 6),
         child: CustomPaint(
-          painter: _PagePainter(nb, lines),
           foregroundPainter: _SpiralPainter(nb),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.only(left: gutter, top: spiral),
-              child: child,
-            ),
-          ),
+          child: builder == null ? sheet(child!) : builder!(context, sheet),
         ),
       );
     });

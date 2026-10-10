@@ -10,7 +10,8 @@ import 'common.dart';
 /// Elenco di ricette con linguette per categoria (stile rubrica) e ricerca.
 class RecipeBrowser extends StatefulWidget {
   final List<Recipe> recipes;
-  final void Function(Recipe r) onOpen;
+  /// Riceve anche l'elenco mostrato (filtri e ordine), per sfogliare le ricette in quell'ordine.
+  final void Function(Recipe r, List<Recipe> shown) onOpen;
   final void Function(Recipe r)? onLongPress;
   final String? Function(Recipe r)? badgeFor;
   final String emptyTitle;
@@ -119,7 +120,7 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
               badge: widget.badgeFor?.call(r),
               showCategory: _cat == null,
               selected: r.id == widget.selectedId,
-              onTap: () => widget.onOpen(r),
+              onTap: () => widget.onOpen(r, list),
               onLongPress: widget.onLongPress == null ? null : () => widget.onLongPress!(r),
             ),
           ...widget.footer,

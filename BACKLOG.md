@@ -86,6 +86,12 @@ Pubblicata il 9 ottobre 2026:
 
 ## Prossima release
 
+- [x] **Sfogliare le ricette con lo swipe**: nella ricetta, swipe da destra a sinistra → ricetta successiva,
+  da sinistra a destra → precedente, nell'ordine dell'elenco da cui la si è aperta (ricettario, categoria,
+  ricerca e ordinamento scelti). Il foglio gira attorno agli anelli in alto, come un bloc-notes; sotto la
+  categoria compare la posizione (es. "3 / 12"). Funziona anche nella vista a due colonne del tablet.
+- [x] **Ingredienti senza caselle** nella lettura della ricetta: solo nome e dose.
+
 - [ ] Esportare un ricettario nello stesso formato `.json` (per passarlo ad altri o farne una copia di
   sicurezza).
 

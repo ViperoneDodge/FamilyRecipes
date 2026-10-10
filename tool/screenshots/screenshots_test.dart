@@ -119,7 +119,7 @@ Future<void> precacheAll(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> shot(WidgetTester tester, Widget home, String name, {Future<void> Function()? then}) async {
+Future<void> shot(WidgetTester tester, Widget home, String name, {Future<void> Function()? then, bool settle = true}) async {
   await tester.runAsync(() async {
     for (final p in ['COVER1', 'COVER2', 'STEP1', 'STEP2']) {
       await appState.photos.load(p);
@@ -147,8 +147,10 @@ Future<void> shot(WidgetTester tester, Widget home, String name, {Future<void> F
   await precacheAll(tester);
   if (then != null) {
     await then();
-    await tester.pumpAndSettle();
-    await precacheAll(tester);
+    if (settle) {
+      await tester.pumpAndSettle();
+      await precacheAll(tester);
+    }
   }
   await expectLater(find.byType(MaterialApp), matchesGoldenFile('out/${L10n.code}/$name.png'));
 }
@@ -202,6 +204,22 @@ void main() {
           await tester.drag(find.byType(ListView).first, const Offset(0, -300));
         });
         await shot(tester, const RecipeDetailScreen(recipeId: 'r9'), '09_menu');
+        const seq = ['r1', 'r2', 'r3'];
+        await shot(tester, const RecipeDetailScreen(recipeId: 'r1', sequence: seq), '16_flip_next', settle: false,
+            then: () async {
+          await tester.fling(find.byType(ListView).first, const Offset(-400, 0), 1500);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 220));
+        });
+        await shot(tester, const RecipeDetailScreen(recipeId: 'r2', sequence: seq), '17_flip_prev', settle: false,
+            then: () async {
+          await tester.fling(find.byType(ListView).first, const Offset(400, 0), 1500);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 240));
+        });
+        await shot(tester, const RecipeDetailScreen(recipeId: 'r1', sequence: seq), '18_after_flip', then: () async {
+          await tester.fling(find.byType(ListView).first, const Offset(-400, 0), 1500);
+        });
         appState.theme = ThemeSettings(mode: ThemeMode.dark, palette: 3, paper: PaperStyle.quadretti);
         await shot(tester, const RecipeDetailScreen(recipeId: 'r1'), '10_dark');
         appState.theme = ThemeSettings(mode: ThemeMode.dark);
