@@ -84,16 +84,28 @@ Pubblicata il 9 ottobre 2026:
   - Il file accetta anche valori in italiano ("Primi", "Media"…) e un elenco semplice, così si può
     preparare a mano o da OneNote.
 
-## Prossima release
+## Versione 1.5.0
 
 - [x] **Sfogliare le ricette con lo swipe**: nella ricetta, swipe da destra a sinistra → ricetta successiva,
   da sinistra a destra → precedente, nell'ordine dell'elenco da cui la si è aperta (ricettario, categoria,
   ricerca e ordinamento scelti). Il foglio gira attorno agli anelli in alto, come un bloc-notes; sotto la
   categoria compare la posizione (es. "3 / 12"). Funziona anche nella vista a due colonne del tablet.
 - [x] **Ingredienti senza caselle** nella lettura della ricetta: solo nome e dose.
+- [x] **Ricette dai siti nella lingua dell'app**: il Suggerimento dello chef (sorpresa e per ingredienti)
+  usa GialloZafferano in italiano, Marmiton in francese, Chefkoch in tedesco, BBC Good Food in inglese,
+  Cookpad in spagnolo; la ricetta arriva com'è scritta, senza traduzione automatica, con la fonte in fondo.
+  Per le altre lingue resta TheMealDB tradotto. La ricetta si legge dai dati schema.org/Recipe della pagina.
+- [x] **Ricetta da un link**: *Nuova ricetta → Da un link* (incolla l'indirizzo, preso anche dagli appunti)
+  oppure *Condividi → FamilyRecipes* dal browser: si apre la ricetta, pronta da salvare nel ricettario.
+- [x] **Dosi ricalcolate**: nella ricetta, − e + accanto a "Dosi per N persone" ricalcolano le quantità
+  (anche frazioni e intervalli; "q.b." e simili restano com'è).
+- [x] **Schermo sempre acceso** mentre una ricetta è aperta.
+- [x] **Esporta ricettario** (Impostazioni): un file `.json` con ricette e foto, lo stesso formato
+  dell'importazione, da conservare o passare ad altri.
+- [x] Semplificazioni: un solo elenco di parole (categorie, difficoltà, costo in più lingue) per lettura da
+  foto, importazione e siti; PDF e schermate invariati.
 
-- [ ] Esportare un ricettario nello stesso formato `.json` (per passarlo ad altri o farne una copia di
-  sicurezza).
+## Prossima release
 
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura

@@ -9,6 +9,7 @@ import '../models.dart';
 import '../services/online_recipes.dart';
 import '../services/photo_tools.dart';
 import '../services/recipe_translator.dart';
+import '../services/web_recipes.dart';
 import '../theme.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/common.dart';
@@ -119,7 +120,10 @@ class _SuggestTabState extends State<SuggestTab> {
       _error = null;
     });
     try {
-      final res = await OnlineRecipes.byIngredients(_ings.map(ingredientToEnglish).toList());
+      final site = WebRecipes.site;
+      final res = site != null
+          ? await WebRecipes.search(site, _ings.join(' '))
+          : await OnlineRecipes.byIngredients(_ings.map(ingredientToEnglish).toList());
       if (mounted) setState(() => _onlineByIng = res);
     } catch (_) {
       if (mounted) setState(() => _error = tr('suggest.offline'));
@@ -136,13 +140,19 @@ class _SuggestTabState extends State<SuggestTab> {
       _error = null;
     });
     try {
-      final r = await OnlineRecipes.random();
+      final site = WebRecipes.site;
+      final r = site != null ? await WebRecipes.surprise(site) : await OnlineRecipes.random();
       if (mounted) setState(() => _surprise = r);
     } catch (_) {
       if (mounted) setState(() => _error = tr('suggest.offline'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  String get _webNote {
+    final site = WebRecipes.site;
+    return site == null ? tr('suggest.webNote') : tr('suggest.webNoteSite', {'site': site.name});
   }
 
   void _openOnline(OnlineRecipe o) =>
@@ -397,7 +407,7 @@ class _SuggestTabState extends State<SuggestTab> {
       ],
       if (_onlineByIng != null) ...[
         HandHeader(tr('suggest.webResults'), icon: Icons.public),
-        Text(tr('suggest.webNote'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+        Text(_webNote, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
         if (_onlineByIng!.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 6),
@@ -412,7 +422,7 @@ class _SuggestTabState extends State<SuggestTab> {
     final scheme = Theme.of(context).colorScheme;
     return [
       HandHeader(tr('suggest.webTitle'), icon: Icons.public),
-      Text(tr('suggest.webNote'), style: TextStyle(color: scheme.onSurfaceVariant)),
+      Text(_webNote, style: TextStyle(color: scheme.onSurfaceVariant)),
       const SizedBox(height: 12),
       FilledButton.icon(
         style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
@@ -445,7 +455,7 @@ class OnlineRecipeCard extends StatelessWidget {
     final meta = [if (recipe.category.isNotEmpty) recipe.category, if (recipe.area.isNotEmpty) recipe.area].join(' · ');
     final img = recipe.thumb.isEmpty
         ? Container(color: scheme.surfaceContainerHighest, child: Icon(Icons.restaurant, color: scheme.outline))
-        : Image.network(big ? recipe.thumb : '${recipe.thumb}/preview',
+        : Image.network(big || recipe.fromSite ? recipe.thumb : '${recipe.thumb}/preview',
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) =>
                 Container(color: scheme.surfaceContainerHighest, child: Icon(Icons.restaurant, color: scheme.outline)));
@@ -464,7 +474,8 @@ class OnlineRecipeCard extends StatelessWidget {
                       Text(meta.toUpperCase(),
                           style: TextStyle(
                               fontSize: 11, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
-                    TranslatedText(recipe.title, style: TextStyle(fontFamily: handFont, fontSize: 26, color: nb.ink)),
+                    TranslatedText(recipe.title,
+                        translate: !recipe.fromSite, style: TextStyle(fontFamily: handFont, fontSize: 26, color: nb.ink)),
                     Text(tr('suggest.webOpen'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                   ]),
                 ),
@@ -482,6 +493,7 @@ class OnlineRecipeCard extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 10.5, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
                       TranslatedText(recipe.title,
+                          translate: !recipe.fromSite,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontFamily: handFont, fontSize: 21, height: 1.1, color: nb.ink)),
@@ -529,7 +541,7 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final full = await OnlineRecipes.lookup(_r.id);
+      final full = _r.fromSite ? await WebRecipes.read(_r.id) : await OnlineRecipes.lookup(_r.id);
       if (full != null && mounted) setState(() => _r = full);
     } catch (_) {
       if (mounted) showSnack(context, tr('suggest.offline'));
@@ -539,7 +551,7 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
   }
 
   Future<void> _translate() async {
-    if (RecipeTranslator.instance.target == null || _r.isPartial) return;
+    if (_r.fromSite || RecipeTranslator.instance.target == null || _r.isPartial) return;
     setState(() => _translating = true);
     try {
       final t = await RecipeTranslator.instance.recipe(_r);
@@ -598,8 +610,11 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
               Text(r.title, style: TextStyle(fontFamily: handFont, fontSize: 36, height: 1.1, color: nb.ink)),
               Padding(
                 padding: const EdgeInsets.only(top: 2, bottom: 6),
-                child: Text(tr('suggest.webSource'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                child: Text(r.fromSite ? tr('suggest.webSourceSite', {'site': r.site}) : tr('suggest.webSource'),
+                    style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
               ),
+              if (r.intro.isNotEmpty)
+                Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(r.intro, style: ink)),
               if (_translating)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -703,7 +718,8 @@ class TranslatedText extends StatefulWidget {
   final TextStyle? style;
   final int? maxLines;
   final TextOverflow? overflow;
-  const TranslatedText(this.text, {super.key, this.style, this.maxLines, this.overflow});
+  final bool translate;
+  const TranslatedText(this.text, {super.key, this.style, this.maxLines, this.overflow, this.translate = true});
 
   @override
   State<TranslatedText> createState() => _TranslatedTextState();
@@ -729,7 +745,7 @@ class _TranslatedTextState extends State<TranslatedText> {
 
   Future<void> _go() async {
     final tr = RecipeTranslator.instance;
-    if (tr.target == null || !await tr.ready()) return;
+    if (!widget.translate || tr.target == null || !await tr.ready()) return;
     try {
       final t = await tr.text(widget.text);
       if (mounted) setState(() => _t = t);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:familyrecipes/models.dart';
 import 'package:familyrecipes/services/recipe_import.dart';
@@ -59,5 +60,18 @@ void main() {
         RecipeCategory.dolci);
     expect(() => RecipeImport.parse('{"ciao": 1}'), throwsFormatException);
     expect(() => RecipeImport.parse('non è json'), throwsFormatException);
+  });
+
+  test('esportazione e reimportazione', () {
+    final r = Recipe(category: RecipeCategory.dolci, title: 'Tiramisù', servings: 6, prepMinutes: 30,
+        ingredients: [Ingredient(name: 'Mascarpone', amount: '500 g')], steps: [RecipeStep(text: 'Monta.')],
+        createdByName: 'Nonna');
+    final back = RecipeImport.parse(RecipeImport.encode([r], {r.id: Uint8List.fromList([1, 2, 3])}));
+    final x = back.single.recipe;
+    expect([x.category, x.title, x.servings, x.prepMinutes, x.createdByName],
+        [RecipeCategory.dolci, 'Tiramisù', 6, 30, 'Nonna']);
+    expect(x.ingredients.single.amount, '500 g');
+    expect(x.steps.single.text, 'Monta.');
+    expect(back.single.photo, [1, 2, 3]);
   });
 }

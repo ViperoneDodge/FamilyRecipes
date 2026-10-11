@@ -1,14 +1,17 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../l10n.dart';
 import '../models.dart';
 import '../services/recipe_reader.dart';
+import '../services/web_recipes.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'import_screen.dart';
 import 'recipe_edit_screen.dart';
+import 'suggest_screen.dart' show OnlineRecipeScreen;
 
 /// "Nuova ricetta": scritta a mano oppure letta da foto (fotocamera o galleria) o da un PDF.
 Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory? category}) async {
@@ -49,6 +52,12 @@ Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory
           subtitle: Text(tr('scan.pdfInfo', {'n': RecipeReader.maxPdfPages})),
           onTap: () => Navigator.pop(ctx, 'pdf'),
         ),
+        ListTile(
+          leading: const Icon(Icons.link),
+          title: Text(tr('link.menu')),
+          subtitle: Text(tr('link.menuInfo')),
+          onTap: () => Navigator.pop(ctx, 'link'),
+        ),
         const Divider(height: 1),
         ListTile(
           leading: const Icon(Icons.file_open_outlined),
@@ -65,6 +74,11 @@ Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => RecipeEditScreen(recipe: Recipe(category: category ?? RecipeCategory.primi, bookId: bookId)),
     ));
+    return;
+  }
+  if (choice == 'link') {
+    final url = await _askLink(context);
+    if (url != null && context.mounted) await openRecipeLink(context, url);
     return;
   }
   if (choice == 'import') {
@@ -148,4 +162,74 @@ Future<void> _readAndEdit(BuildContext context, List<String> paths, {String? boo
   r.bookId = bookId;
   if (category != null && r.category == RecipeCategory.secondi) r.category = category;
   nav.push(MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: r!, notice: tr('scan.check'))));
+}
+
+Future<String?> _askLink(BuildContext context) async {
+  String start = '';
+  try {
+    start = firstUrl((await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '') ?? '';
+  } catch (_) {}
+  if (!context.mounted) return null;
+  final ctrl = TextEditingController(text: start);
+  final res = await showDialog<String>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(tr('link.title')),
+      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(tr('link.info')),
+        const SizedBox(height: 10),
+        TextField(
+          controller: ctrl,
+          autofocus: start.isEmpty,
+          keyboardType: TextInputType.url,
+          decoration: const InputDecoration(hintText: 'https://…', prefixIcon: Icon(Icons.link)),
+          onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+      ]),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(tr('common.cancel'))),
+        FilledButton(onPressed: () => Navigator.pop(ctx, ctrl.text), child: Text(tr('link.read'))),
+      ],
+    ),
+  );
+  return res == null ? null : firstUrl(res);
+}
+
+/// Legge la ricetta dalla pagina di un sito (link scritto o condiviso dal browser) e la mostra,
+/// pronta da salvare nel ricettario.
+Future<void> openRecipeLink(BuildContext context, String text) async {
+  final url = firstUrl(text);
+  if (url == null) {
+    showSnack(context, tr('link.none'));
+    return;
+  }
+  final nav = Navigator.of(context);
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        content: Row(children: [
+          const CircularProgressIndicator(),
+          const SizedBox(width: 18),
+          Expanded(child: Text(tr('link.reading'))),
+        ]),
+      ),
+    ),
+  );
+  dynamic r;
+  var failed = false;
+  try {
+    r = await WebRecipes.read(url);
+  } catch (_) {
+    failed = true;
+  }
+  nav.pop();
+  if (!context.mounted) return;
+  if (r == null) {
+    showSnack(context, failed ? tr('suggest.offline') : tr('link.none'));
+    return;
+  }
+  nav.push(MaterialPageRoute(builder: (_) => OnlineRecipeScreen(recipe: r)));
 }

@@ -178,10 +178,62 @@ receivers = """
 if "ScheduledNotificationReceiver" not in m:
     m = m.replace("</application>", receivers + "    </application>", 1)
 m = re.sub(r'android:label="[^"]*"', 'android:label="FamilyRecipes"', m, count=1)
+share_filter = """            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+"""
+if "android.intent.action.SEND\"" not in m:
+    m = m.replace("        </activity>", share_filter + "        </activity>", 1)
 if "resizeableActivity" not in m:
     m = m.replace("<activity", '<activity\n            android:resizeableActivity="true"', 1)
 man.write_text(m)
 print("Patched", man)
+
+# MainActivity: riceve i testi condivisi (link delle ricette) e li passa a Dart.
+main_activity = """package it.familyrecipes.familyrecipes
+
+import android.content.Intent
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
+
+class MainActivity : FlutterActivity() {
+    private var channel: MethodChannel? = null
+    private var pending: String? = null
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        pending = sharedText(intent)
+        channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "familyrecipes/share").also {
+            it.setMethodCallHandler { call, result ->
+                if (call.method == "initialText") {
+                    result.success(pending)
+                    pending = null
+                } else {
+                    result.notImplemented()
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val text = sharedText(intent) ?: return
+        channel?.invokeMethod("shared", text)
+    }
+
+    private fun sharedText(i: Intent?): String? =
+        if (i?.action == Intent.ACTION_SEND && i.type?.startsWith("text/") == true) i.getStringExtra(Intent.EXTRA_TEXT) else null
+}
+"""
+activities = list((APP / "src" / "main").rglob("MainActivity.kt"))
+if not activities:
+    raise SystemExit("MainActivity.kt non trovata")
+for a in activities:
+    a.write_text(main_activity)
+    print("Patched", a)
 
 icons = ROOT / "tool" / "icons"
 res = APP / "src" / "main" / "res"

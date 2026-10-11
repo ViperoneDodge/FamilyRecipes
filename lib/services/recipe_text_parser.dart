@@ -1,4 +1,5 @@
 import '../models.dart';
+import 'recipe_words.dart';
 
 /// Trasforma il testo letto da una foto o da un PDF (quaderno, libro, stampa) in una bozza di
 /// ricetta: titolo, ingredienti con le dosi, passaggi, tempi, persone, difficoltà e categoria.
@@ -234,14 +235,7 @@ class RecipeTextParser {
         RegExp(r'difficolt[aà]\s*:?\s*(molto facile|facile|media|medio|difficile|alta|bassa)', caseSensitive: false)
             .firstMatch(low);
     if (diff != null) {
-      final d = diff.group(1)!;
-      r.difficulty = d.startsWith('molto')
-          ? Difficulty.veryEasy
-          : d.startsWith('facile') || d == 'bassa'
-              ? Difficulty.easy
-              : d.startsWith('medi')
-                  ? Difficulty.medium
-                  : Difficulty.hard;
+      r.difficulty = RecipeWords.difficulty(diff.group(1)) ?? r.difficulty;
       used = true;
     }
     // La riga è "solo meta" se è corta e non sembra un ingrediente né una frase.
@@ -249,90 +243,5 @@ class RecipeTextParser {
   }
 
   /// Categoria proposta dalle parole del titolo.
-  static RecipeCategory guessCategory(String text) {
-    final t = text.toLowerCase();
-    bool any(List<String> w) => w.any(t.contains);
-    if (any(['menù', 'menu '])) return RecipeCategory.menu;
-    if (any([
-      'liquore',
-      'limoncello',
-      'nocino',
-      'amaro',
-      'grappa',
-      'rosolio',
-      'mirto',
-      'genziana',
-      'elicriso',
-      'liqueur'
-    ])) {
-      return RecipeCategory.liquori;
-    }
-    if (any([
-      'marmellata',
-      'confettura',
-      'conserva',
-      "sott'olio",
-      'sottolio',
-      'sottaceto',
-      'passata',
-      'salsa di pomodoro',
-      'giardiniera',
-      'jam',
-      'pickle'
-    ])) {
-      return RecipeCategory.conserve;
-    }
-    if (any(['spritz', 'cocktail', 'aperitivo', 'negroni', 'sangria'])) return RecipeCategory.aperitivi;
-    if (any([
-      'torta',
-      'dolce',
-      'biscott',
-      'crostata',
-      'tiramis',
-      'gelato',
-      'budino',
-      'panna cotta',
-      'ciambell',
-      'frittell',
-      'cake',
-      'cookie',
-      'pie',
-      'dessert',
-      'muffin',
-      'crema',
-      'semifreddo',
-      'strudel'
-    ])) {
-      return RecipeCategory.dolci;
-    }
-    if (any([
-      'pasta',
-      'spaghetti',
-      'risotto',
-      'lasagn',
-      'gnocchi',
-      'zuppa',
-      'minestr',
-      'tagliatelle',
-      'ravioli',
-      'tortellini',
-      'penne',
-      'fusilli',
-      'orecchiette',
-      'pappardelle',
-      'cannelloni',
-      'polenta',
-      'soup',
-      'noodle'
-    ])) {
-      return RecipeCategory.primi;
-    }
-    if (any(['insalata', 'contorno', 'patate', 'verdure', 'peperonata', 'caponata', 'salad', 'purè', 'pure '])) {
-      return RecipeCategory.contorni;
-    }
-    if (any(['crostini', 'bruschett', 'antipasto', 'tartine', 'frittatine', 'vol-au-vent', 'starter'])) {
-      return RecipeCategory.antipasti;
-    }
-    return RecipeCategory.secondi;
-  }
+  static RecipeCategory guessCategory(String text) => RecipeWords.guessCategory(text);
 }

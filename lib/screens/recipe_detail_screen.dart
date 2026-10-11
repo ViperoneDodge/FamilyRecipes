@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
+import '../services/dose_scaler.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'family_screen.dart';
@@ -40,9 +42,22 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
   late final AnimationController _flip =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
 
+  /// Persone scelte per ricalcolare le dosi (per ricetta, solo su questo schermo).
+  final Map<String, int> _people = {};
+
+  // Schermo sempre acceso mentre una ricetta è aperta (si conta per le ricette aperte una sopra l'altra).
+  static int _awake = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_awake++ == 0) WakelockPlus.enable().catchError((_) {});
+  }
+
   @override
   void dispose() {
     _flip.dispose();
+    if (--_awake == 0) WakelockPlus.disable().catchError((_) {});
     super.dispose();
   }
 
@@ -200,9 +215,39 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
     );
   }
 
+  int _servings(Recipe r) => _people[r.id] ?? r.servings;
+  double _factor(Recipe r) => r.servings > 0 ? _servings(r) / r.servings : 1;
+
+  /// "Dosi per [–] 4 persone [+]": cambiando le persone si ricalcolano le quantità.
+  Widget _servingsRow(BuildContext context, Recipe r) {
+    final scheme = Theme.of(context).colorScheme;
+    final n = _servings(r);
+    void set(int v) => setState(() => _people[r.id] = v.clamp(1, 99));
+    return Row(children: [
+      Expanded(
+        child: Text(tr('recipe.dosesFor', {'n': n}),
+            style: TextStyle(
+                fontSize: 13,
+                color: n == r.servings ? scheme.onSurfaceVariant : scheme.primary,
+                fontWeight: n == r.servings ? null : FontWeight.w700)),
+      ),
+      IconButton(
+        visualDensity: VisualDensity.compact,
+        tooltip: tr('recipe.fewer'),
+        onPressed: n > 1 ? () => set(n - 1) : null,
+        icon: const Icon(Icons.remove_circle_outline),
+      ),
+      IconButton(
+        visualDensity: VisualDensity.compact,
+        tooltip: tr('recipe.more'),
+        onPressed: n < 99 ? () => set(n + 1) : null,
+        icon: const Icon(Icons.add_circle_outline),
+      ),
+    ]);
+  }
+
   Widget _body(BuildContext context, Recipe r) {
     final nb = NotebookColors.of(context);
-    final scheme = Theme.of(context).colorScheme;
     final ink = TextStyle(color: nb.ink, fontSize: 16, height: 1.45);
     final courses = r.courses.map(appState.recipeById).whereType<Recipe>().toList();
     final cover = r.coverPhoto;
@@ -248,12 +293,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
         ],
         if (r.ingredients.isNotEmpty) ...[
           HandHeader(tr('recipe.ingredients'), icon: Icons.shopping_basket_outlined),
-          if (r.servings > 0)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(tr('recipe.dosesFor', {'n': r.servings}),
-                  style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
-            ),
+          if (r.servings > 0) _servingsRow(context, r),
           for (final ing in r.ingredients)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 7),
@@ -261,7 +301,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(child: Text(ing.name, style: ink)),
                 const SizedBox(width: 8),
-                Text(ing.amount, style: ink.copyWith(fontWeight: FontWeight.w700)),
+                Text(DoseScaler.scale(ing.amount, _factor(r), comma: L10n.code != 'en'),
+                    style: ink.copyWith(fontWeight: FontWeight.w700)),
               ]),
             ),
         ],

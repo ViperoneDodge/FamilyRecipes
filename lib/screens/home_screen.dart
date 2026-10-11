@@ -6,6 +6,7 @@ import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
 import '../services/app_state.dart';
+import '../services/share_receiver.dart';
 import '../theme.dart';
 import '../widgets/recipe_browser.dart';
 import 'family_screen.dart';
@@ -28,6 +29,17 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedId;
   List<String> _selectedSeq = const [];
   bool _twoPane = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Link di una ricetta condiviso dal browser ("Condividi → FamilyRecipes").
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ShareReceiver.listen((text) {
+        if (mounted) openRecipeLink(context, text);
+      });
+    });
+  }
 
   void _openAdd({String? bookId, RecipeCategory? category}) =>
       newRecipeFlow(context, bookId: bookId, category: category ?? _myCategory);

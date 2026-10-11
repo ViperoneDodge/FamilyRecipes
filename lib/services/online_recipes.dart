@@ -6,7 +6,8 @@ import 'dart:typed_data';
 import '../l10n.dart';
 import '../models.dart';
 
-/// Ricetta presa da TheMealDB (www.themealdb.com), archivio gratuito di ricette in inglese.
+/// Ricetta da internet: da TheMealDB (www.themealdb.com, in inglese, da tradurre) oppure da un sito
+/// di ricette nella lingua dell'app ([site] non vuoto: GialloZafferano, Marmiton…), già nella lingua giusta.
 class OnlineRecipe {
   final String id;
   final String title;
@@ -16,6 +17,14 @@ class OnlineRecipe {
   final String thumb;
   final String source;
   final List<Ingredient> ingredients;
+
+  /// Nome del sito di ricette ('' = TheMealDB) e dati che solo i siti danno.
+  final String site;
+  final String intro;
+  final int prepMinutes;
+  final int cookMinutes;
+  final int servings;
+  final RecipeCategory? webCategory;
 
   /// Versione in inglese, se questa è una traduzione.
   final OnlineRecipe? original;
@@ -32,6 +41,12 @@ class OnlineRecipe {
     this.thumb = '',
     this.source = '',
     this.ingredients = const [],
+    this.site = '',
+    this.intro = '',
+    this.prepMinutes = 0,
+    this.cookMinutes = 0,
+    this.servings = 4,
+    this.webCategory,
     this.original,
     String? categoryText,
     String? areaText,
@@ -41,6 +56,9 @@ class OnlineRecipe {
         _steps = steps;
 
   bool get translated => original != null;
+
+  /// Da un sito nella lingua dell'app: niente traduzione.
+  bool get fromSite => site.isNotEmpty;
 
   /// Categoria e cucina da mostrare (tradotte, se c'è la traduzione).
   String get categoryText => _categoryText ?? category;
@@ -96,6 +114,7 @@ class OnlineRecipe {
 
   /// Categoria del ricettario più vicina a quella di TheMealDB.
   RecipeCategory get recipeCategory {
+    if (webCategory != null) return webCategory!;
     switch (category.toLowerCase()) {
       case 'dessert':
         return RecipeCategory.dolci;
@@ -125,7 +144,9 @@ class OnlineRecipe {
 
   /// Riconoscimento della fonte, messo in fondo alla ricetta.
   String get credit => [
-        tr('online.credit', {'title': original?.title ?? title}),
+        fromSite
+            ? tr('online.creditSite', {'title': title, 'site': site})
+            : tr('online.credit', {'title': original?.title ?? title}),
         if (source.isNotEmpty) tr('online.creditSource', {'url': source}),
         if (translated) tr('online.creditTranslated'),
       ].join('\n');
@@ -134,7 +155,12 @@ class OnlineRecipe {
   Recipe toRecipe() => Recipe(
         category: recipeCategory,
         title: title,
-        intro: area.isNotEmpty && area.toLowerCase() != 'unknown' ? tr('online.cuisine', {'area': areaText}) : '',
+        intro: fromSite
+            ? intro
+            : (area.isNotEmpty && area.toLowerCase() != 'unknown' ? tr('online.cuisine', {'area': areaText}) : ''),
+        prepMinutes: prepMinutes,
+        cookMinutes: cookMinutes,
+        servings: fromSite ? servings : 4,
         ingredients: [for (final i in ingredients) Ingredient(name: i.name, amount: i.amount)],
         steps: [for (final s in steps) RecipeStep(text: s)],
         tips: credit,

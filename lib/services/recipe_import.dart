@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import '../models.dart';
+import 'recipe_words.dart';
 
 /// Una ricetta letta da un file di importazione, con la sua foto (se c'è).
 class ImportedRecipe {
@@ -19,6 +20,31 @@ class ImportedRecipe {
 /// `author`, `photo` (JPEG/PNG in base64, anche come `data:image/...`). I valori mancanti o sconosciuti
 /// diventano quelli predefiniti.
 class RecipeImport {
+  /// File di esportazione, nello stesso formato letto da [parse]; [photos]: foto del piatto per id ricetta.
+  static String encode(List<Recipe> recipes, Map<String, Uint8List> photos) => const JsonEncoder.withIndent(' ').convert({
+        'app': 'FamilyRecipes',
+        'format': 1,
+        'exportedAt': DateTime.now().toUtc().toIso8601String(),
+        'recipes': [
+          for (final r in recipes)
+            {
+              'category': r.category.name,
+              'title': r.title,
+              'intro': r.intro,
+              'difficulty': r.difficulty.name,
+              'cost': r.cost.name,
+              'prepMinutes': r.prepMinutes,
+              'cookMinutes': r.cookMinutes,
+              'servings': r.servings,
+              'ingredients': [for (final i in r.ingredients) {'name': i.name, 'amount': i.amount}],
+              'steps': [for (final s in r.steps) s.text],
+              'tips': r.tips,
+              'author': r.createdByName,
+              if (photos[r.id] != null) 'photo': 'data:image/jpeg;base64,${base64Encode(photos[r.id]!)}',
+            },
+        ],
+      });
+
   static List<ImportedRecipe> parse(String text) {
     final root = jsonDecode(text.trim().replaceFirst('﻿', ''));
     final list = root is List ? root : (root is Map ? root['recipes'] : null);
@@ -50,11 +76,11 @@ class RecipeImport {
     }
     if (title.isEmpty && ingredients.isEmpty && steps.isEmpty) return null;
     final r = Recipe(
-      category: _category(j['category']),
+      category: RecipeWords.categoryFromLabel(_str(j['category'])) ?? RecipeCategory.secondi,
       title: title,
       intro: _str(j['intro']),
-      difficulty: _pick(Difficulty.values, j['difficulty'], _diffWords, Difficulty.easy),
-      cost: _pick(Cost.values, j['cost'], _costWords, Cost.low),
+      difficulty: RecipeWords.difficulty(_str(j['difficulty'])) ?? Difficulty.easy,
+      cost: RecipeWords.cost(_str(j['cost'])) ?? Cost.low,
       prepMinutes: _int(j['prepMinutes'] ?? j['prep']),
       cookMinutes: _int(j['cookMinutes'] ?? j['cook']),
       servings: _int(j['servings'], 4).clamp(1, 99),
@@ -72,65 +98,6 @@ class RecipeImport {
     if (v is num) return v.round().clamp(0, 100000);
     final m = RegExp(r'\d+').firstMatch(_str(v));
     return m == null ? fallback : int.parse(m[0]!);
-  }
-
-  static String _key(Object? v) => _str(v).toLowerCase().replaceAll(RegExp(r'[^a-zàèéìòù]'), '');
-
-  static const Map<String, RecipeCategory> _catWords = {
-    'aperitivo': RecipeCategory.aperitivi,
-    'aperitivi': RecipeCategory.aperitivi,
-    'antipasto': RecipeCategory.antipasti,
-    'antipasti': RecipeCategory.antipasti,
-    'primo': RecipeCategory.primi,
-    'primi': RecipeCategory.primi,
-    'primipiatti': RecipeCategory.primi,
-    'secondo': RecipeCategory.secondi,
-    'secondi': RecipeCategory.secondi,
-    'secondipiatti': RecipeCategory.secondi,
-    'contorno': RecipeCategory.contorni,
-    'contorni': RecipeCategory.contorni,
-    'dolce': RecipeCategory.dolci,
-    'dolci': RecipeCategory.dolci,
-    'liquore': RecipeCategory.liquori,
-    'liquori': RecipeCategory.liquori,
-    'conserva': RecipeCategory.conserve,
-    'conserve': RecipeCategory.conserve,
-    'menù': RecipeCategory.menu,
-    'menu': RecipeCategory.menu,
-    'menùcompleti': RecipeCategory.menu,
-    'menucompleti': RecipeCategory.menu,
-  };
-
-  static RecipeCategory _category(Object? v) {
-    final k = _key(v);
-    for (final c in RecipeCategory.values) {
-      if (c.name == k) return c;
-    }
-    return _catWords[k] ?? RecipeCategory.secondi;
-  }
-
-  static const Map<String, Difficulty> _diffWords = {
-    'moltofacile': Difficulty.veryEasy,
-    'facile': Difficulty.easy,
-    'media': Difficulty.medium,
-    'medio': Difficulty.medium,
-    'difficile': Difficulty.hard,
-  };
-
-  static const Map<String, Cost> _costWords = {
-    'moltobasso': Cost.veryLow,
-    'basso': Cost.low,
-    'medio': Cost.medium,
-    'alto': Cost.high,
-    'elevato': Cost.high,
-  };
-
-  static T _pick<T extends Enum>(List<T> values, Object? v, Map<String, T> words, T fallback) {
-    final k = _key(v);
-    for (final x in values) {
-      if (x.name.toLowerCase() == k) return x;
-    }
-    return words[k] ?? fallback;
   }
 
   static Uint8List? _photo(Object? v) {

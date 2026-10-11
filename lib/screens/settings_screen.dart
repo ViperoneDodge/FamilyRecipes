@@ -54,6 +54,12 @@ class SettingsScreen extends StatelessWidget {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => importRecipesFlow(context),
                 ),
+                ListTile(
+                  leading: const Icon(Icons.ios_share),
+                  title: Text(tr('export.title')),
+                  subtitle: Text(tr('export.info')),
+                  onTap: () => exportRecipesFlow(context),
+                ),
                 _header(context, tr('settings.language')),
                 ListTile(
                   leading: const Icon(Icons.language),

@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../l10n.dart';
 import '../main.dart';
@@ -29,6 +32,52 @@ Future<void> importRecipesFlow(BuildContext context, {String? bookId}) async {
     return;
   }
   await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ImportScreen(items: items, bookId: bookId)));
+}
+
+/// Esporta un ricettario (Le mie o un gruppo) in un file `.json` con le foto, da condividere o
+/// conservare come copia; si reimporta con [importRecipesFlow].
+Future<void> exportRecipesFlow(BuildContext context) async {
+  final List<FamilyGroup> groups = appState.isCloud ? appState.data.groups : const [];
+  String? book = '';
+  if (groups.isNotEmpty) {
+    book = await showDialog<String>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(tr('export.which')),
+        children: [
+          SimpleDialogOption(onPressed: () => Navigator.pop(ctx, ''), child: Text(tr('book.mine'))),
+          for (final g in groups) SimpleDialogOption(onPressed: () => Navigator.pop(ctx, g.id), child: Text(g.name)),
+        ],
+      ),
+    );
+    if (book == null) return;
+  }
+  final list = book.isEmpty ? appState.recipes.where(appState.isPersonal).toList() : appState.groupRecipes(book);
+  if (!context.mounted) return;
+  if (list.isEmpty) {
+    showSnack(context, tr('export.empty'));
+    return;
+  }
+  final name = book.isEmpty ? tr('book.mine') : groups.firstWhere((g) => g.id == book).name;
+  try {
+    final photos = <String, Uint8List>{};
+    for (final r in list) {
+      final id = r.thumbnail;
+      if (id == null) continue;
+      final b = await appState.photos.load(id, bookId: appState.bookOf(r));
+      if (b != null) photos[r.id] = b;
+    }
+    final safe = name.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
+    final day = DateTime.now().toIso8601String().substring(0, 10);
+    final file = File('${(await getTemporaryDirectory()).path}/ricettario-${safe.isEmpty ? 'famiglia' : safe}-$day.json');
+    await file.writeAsString(RecipeImport.encode(list, photos));
+    await SharePlus.instance.share(ShareParams(
+      files: [XFile(file.path, mimeType: 'application/json')],
+      text: trn('export.shareText', list.length, {'name': name}),
+    ));
+  } catch (e) {
+    if (context.mounted) showSnack(context, tr('export.failed'));
+  }
 }
 
 class ImportScreen extends StatefulWidget {
