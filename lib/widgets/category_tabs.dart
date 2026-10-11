@@ -6,30 +6,18 @@ import '../theme.dart';
 import 'common.dart';
 
 /// Colore della linguetta di ogni categoria (toni caldi da ricettario).
-Color categoryTabColor(RecipeCategory? c) {
-  switch (c) {
-    case null:
-      return const Color(0xFFE6D3AE);
-    case RecipeCategory.aperitivi:
-      return const Color(0xFFF4C9A3);
-    case RecipeCategory.antipasti:
-      return const Color(0xFFEBD89A);
-    case RecipeCategory.primi:
-      return const Color(0xFFF2B47D);
-    case RecipeCategory.secondi:
-      return const Color(0xFFDDA08C);
-    case RecipeCategory.contorni:
-      return const Color(0xFFCCD69C);
-    case RecipeCategory.dolci:
-      return const Color(0xFFF2BDB3);
-    case RecipeCategory.liquori:
-      return const Color(0xFFDAB8CB);
-    case RecipeCategory.conserve:
-      return const Color(0xFFE7A974);
-    case RecipeCategory.menu:
-      return const Color(0xFFCDBBA0);
-  }
-}
+Color categoryTabColor(RecipeCategory? c) => switch (c) {
+      null => const Color(0xFFE6D3AE),
+      RecipeCategory.aperitivi => const Color(0xFFF4C9A3),
+      RecipeCategory.antipasti => const Color(0xFFEBD89A),
+      RecipeCategory.primi => const Color(0xFFF2B47D),
+      RecipeCategory.secondi => const Color(0xFFDDA08C),
+      RecipeCategory.contorni => const Color(0xFFCCD69C),
+      RecipeCategory.dolci => const Color(0xFFF2BDB3),
+      RecipeCategory.liquori => const Color(0xFFDAB8CB),
+      RecipeCategory.conserve => const Color(0xFFE7A974),
+      RecipeCategory.menu => const Color(0xFFCDBBA0),
+    };
 
 /// In modalità scura: stesso colore ma più profondo, così la linguetta si stacca dal foglio scuro
 /// e il testo chiaro resta leggibile.
@@ -37,6 +25,30 @@ Color categoryTabColorDark(Color base) {
   final h = HSLColor.fromColor(base);
   return h.withLightness(0.34).withSaturation((h.saturation * 0.75).clamp(0.3, 0.6).toDouble()).toColor();
 }
+
+/// Colore della linguetta: quella scelta ha il colore del foglio.
+Color _tabColor(RecipeCategory? c, NotebookColors nb, bool dark, bool sel) {
+  final base = categoryTabColor(c);
+  return sel ? nb.paper : (dark ? categoryTabColorDark(base) : base);
+}
+
+/// Colore di icona e testo; più tenue per le categorie senza ricette.
+Color _tabInk(RecipeCategory? c, NotebookColors nb, bool dark, bool sel, int n) =>
+    sel ? nb.accent : (dark ? Colors.white : nb.ink).withValues(alpha: n == 0 && c != null ? 0.5 : 0.92);
+
+String _tabLabel(RecipeCategory? c) => c == null ? tr('filter.allShort') : categoryShortLabel(c);
+
+IconData _tabIcon(RecipeCategory? c) => c == null ? Icons.menu_book_outlined : categoryIcon(c);
+
+/// Linguetta toccabile, letta come "Categoria (n)" dall'accessibilità.
+Widget _tabButton(RecipeCategory? c, int n, bool sel, ValueChanged<RecipeCategory?> onSelected, {required Widget child}) =>
+    Semantics(
+      button: true,
+      selected: sel,
+      label: '${c == null ? tr('filter.allShort') : categoryLabel(c)} ($n)',
+      excludeSemantics: true,
+      child: GestureDetector(onTap: () => onSelected(c), child: child),
+    );
 
 /// Linguette in stile rubrica, su due righe: "Tutte" più una per categoria.
 /// La linguetta scelta ha il colore del foglio; quelle della seconda riga
@@ -86,20 +98,12 @@ class CategoryTabs extends StatelessWidget {
 
   Widget _tab(BuildContext context, RecipeCategory? c, NotebookColors nb, bool dark, {required bool back}) {
     final sel = selected == c;
-    final base = categoryTabColor(c);
-    var color = sel ? nb.paper : (dark ? categoryTabColorDark(base) : base);
+    var color = _tabColor(c, nb, dark, sel);
     if (back && !sel) color = Color.lerp(color, Colors.black, dark ? 0.0 : 0.05)!;
     final n = count(c);
-    final label = c == null ? tr('filter.allShort') : categoryShortLabel(c);
-    final ink = sel ? nb.accent : (dark ? Colors.white : nb.ink).withValues(alpha: n == 0 && c != null ? 0.5 : 0.92);
+    final ink = _tabInk(c, nb, dark, sel, n);
     final h = back ? 44.0 : 48.0;
-    return Semantics(
-      button: true,
-      selected: sel,
-      label: '${c == null ? label : categoryLabel(c)} ($n)',
-      excludeSemantics: true,
-      child: GestureDetector(
-        onTap: () => onSelected(c),
+    return _tabButton(c, n, sel, onSelected,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           height: sel ? h + 4 : h,
@@ -118,16 +122,14 @@ class CategoryTabs extends StatelessWidget {
                   insets: const EdgeInsets.symmetric(horizontal: 1.2))
               : null,
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(c == null ? Icons.menu_book_outlined : categoryIcon(c), size: 16, color: ink),
+            Icon(_tabIcon(c), size: 16, color: ink),
             FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(label,
+              child: Text(_tabLabel(c),
                   maxLines: 1, style: TextStyle(fontFamily: handFont, fontSize: 17, height: 1.05, color: ink)),
             ),
           ]),
-        ),
-      ),
-    );
+        ));
   }
 }
 
@@ -162,18 +164,9 @@ class VerticalCategoryTabs extends StatelessWidget {
 
   Widget _tab(BuildContext context, RecipeCategory? c, NotebookColors nb, bool dark) {
     final sel = selected == c;
-    final base = categoryTabColor(c);
-    final color = sel ? nb.paper : (dark ? categoryTabColorDark(base) : base);
     final n = count(c);
-    final label = c == null ? tr('filter.allShort') : categoryShortLabel(c);
-    final ink = sel ? nb.accent : (dark ? Colors.white : nb.ink).withValues(alpha: n == 0 && c != null ? 0.5 : 0.92);
-    return Semantics(
-      button: true,
-      selected: sel,
-      label: '${c == null ? label : categoryLabel(c)} ($n)',
-      excludeSemantics: true,
-      child: GestureDetector(
-        onTap: () => onSelected(c),
+    final ink = _tabInk(c, nb, dark, sel, n);
+    return _tabButton(c, n, sel, onSelected,
         child: Align(
           alignment: Alignment.centerLeft,
           child: AnimatedContainer(
@@ -182,7 +175,7 @@ class VerticalCategoryTabs extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 1.2),
             padding: const EdgeInsets.fromLTRB(2, 4, 3, 4),
             decoration: ShapeDecoration(
-              color: color,
+              color: _tabColor(c, nb, dark, sel),
               shape: RoundedRectangleBorder(
                 borderRadius: const BorderRadius.horizontal(right: Radius.circular(11)),
                 side: BorderSide(color: nb.line, width: 1.2),
@@ -193,7 +186,7 @@ class VerticalCategoryTabs extends StatelessWidget {
               final showIcon = box.maxHeight >= 64;
               return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 if (showIcon) ...[
-                  Icon(c == null ? Icons.menu_book_outlined : categoryIcon(c), size: 15, color: ink),
+                  Icon(_tabIcon(c), size: 15, color: ink),
                   const SizedBox(height: 2),
                 ],
                 Flexible(
@@ -201,7 +194,7 @@ class VerticalCategoryTabs extends StatelessWidget {
                     quarterTurns: 1,
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(label,
+                      child: Text(_tabLabel(c),
                           maxLines: 1, style: TextStyle(fontFamily: handFont, fontSize: 13.5, height: 1.0, color: ink)),
                     ),
                   ),
@@ -209,9 +202,7 @@ class VerticalCategoryTabs extends StatelessWidget {
               ]);
             }),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
 

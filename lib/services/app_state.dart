@@ -94,12 +94,7 @@ class AppState extends ChangeNotifier {
 
   String? bookOf(Recipe r) => r.bookId ?? data.personalBookId;
 
-  Recipe? recipeById(String id) {
-    for (final r in data.recipes) {
-      if (r.id == id && !r.deleted) return r;
-    }
-    return null;
-  }
+  Recipe? recipeById(String id) => data.recipes.where((r) => r.id == id && !r.deleted).firstOrNull;
 
   /// Ricette che si possono inserire in un menù dello stesso ricettario.
   List<Recipe> menuCandidates(Recipe menu) => sortedForList(recipes.where((r) =>
@@ -119,13 +114,8 @@ class AppState extends ChangeNotifier {
     try {
       await notifications.init();
     } catch (_) {}
-    var s = await store.readSession();
-    if (s != null && s.mode == AccountMode.cloud && !auth.cloudSessionValid(s)) {
-      s = null;
-    }
-    if (s != null) {
-      await _open(s);
-    }
+    final s = await store.readSession();
+    if (s != null && (s.mode != AccountMode.cloud || auth.cloudSessionValid(s))) await _open(s);
     loading = false;
     notifyListeners();
     UpdateService.instance.start(pushAvailable: auth.cloudAvailable);
@@ -184,14 +174,16 @@ class AppState extends ChangeNotifier {
     for (final r in remote) {
       if (r.updatedAt > maxTs) maxTs = r.updatedAt;
     }
-    if (since == null) {
-      watch.seen[bookId] = remote.isEmpty ? DateTime.now().millisecondsSinceEpoch : maxTs;
+    Future<void> markSeen(int ts) async {
+      watch.seen[bookId] = ts;
       for (final r in remote) {
         if (!r.deleted) watch.remember(r.id);
       }
       await watch.save();
-      return;
     }
+
+    // Prima volta: si prende nota di quello che c'è, senza avvisi.
+    if (since == null) return markSeen(remote.isEmpty ? DateTime.now().millisecondsSinceEpoch : maxTs);
     if (maxTs <= since) return;
     final acts = findActivities(
       groupName: data.groupById(bookId)?.name ?? tr('family.defaultName'),
@@ -201,22 +193,14 @@ class AppState extends ChangeNotifier {
       remote: remote,
       existed: (id) => existedBefore.contains(id) || watch.known.contains(id),
     );
-    watch.seen[bookId] = maxTs;
-    for (final r in remote) {
-      if (!r.deleted) watch.remember(r.id);
-    }
-    await watch.save();
-    if (watch.enabled && acts.isNotEmpty) {
-      await showActivities(notifications, acts);
-    }
+    await markSeen(maxTs);
+    if (watch.enabled && acts.isNotEmpty) await showActivities(notifications, acts);
   }
 
   Future<void> startPush() async {
     final s = session;
     if (s == null || s.mode != AccountMode.cloud || !auth.cloudAvailable) return;
-    await push.start(s.key, onForeground: (title, body) {
-      notifications.showRemote(title, body);
-    });
+    await push.start(s.key, onForeground: notifications.showRemote);
     notifyListeners();
   }
 
@@ -293,8 +277,7 @@ class AppState extends ChangeNotifier {
     final i = data.recipes.indexWhere((x) => x.id == r.id);
     if (i >= 0) {
       final old = data.recipes[i];
-      final gone = old.photoIds.difference(r.photoIds);
-      for (final p in gone) {
+      for (final p in old.photoIds.difference(r.photoIds)) {
         await photos.delete(p);
         _deleteCloudPhoto(old, p);
       }
@@ -321,19 +304,8 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Recipe _tombstone(Recipe r, int now) => Recipe(
-        id: r.id,
-        category: r.category,
-        title: r.title,
-        createdBy: r.createdBy,
-        createdByName: r.createdByName,
-        createdAt: r.createdAt,
-        updatedAt: now,
-        updatedBy: session?.displayName ?? '',
-        updatedByUid: session?.key ?? '',
-        deleted: true,
-        bookId: r.bookId,
-      );
+  Recipe _tombstone(Recipe r, int now) =>
+      r.tombstone(at: now, by: session?.displayName ?? '', byUid: session?.key ?? '');
 
   Future<void> deleteRecipe(String id) async {
     final i = data.recipes.indexWhere((x) => x.id == id);
@@ -484,10 +456,9 @@ class AppState extends ChangeNotifier {
   // ---- Sincronizzazione ----
 
   Future<void> retrySync() async {
-    if (isCloud) {
-      if (!push.registered) startPush();
-      await _startSync();
-    }
+    if (!isCloud) return;
+    if (!push.registered) startPush();
+    await _startSync();
   }
 
   Future<void> _startSync() async {
@@ -587,16 +558,11 @@ class AppState extends ChangeNotifier {
 
   // ---- Gruppi ----
 
-  Future<FamilyGroup> createGroup(String name) async {
-    final g = await sync.createGroup(session!, name);
-    if (data.groupById(g.id) == null) data.groups.add(g);
-    await _persist();
-    notifyListeners();
-    return g;
-  }
+  Future<FamilyGroup> createGroup(String name) async => _addGroup(await sync.createGroup(session!, name));
 
-  Future<FamilyGroup> joinGroup(String code) async {
-    final g = await sync.joinGroup(session!, code);
+  Future<FamilyGroup> joinGroup(String code) async => _addGroup(await sync.joinGroup(session!, code));
+
+  Future<FamilyGroup> _addGroup(FamilyGroup g) async {
     if (data.groupById(g.id) == null) data.groups.add(g);
     await _persist();
     notifyListeners();

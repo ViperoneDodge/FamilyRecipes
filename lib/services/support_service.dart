@@ -23,19 +23,17 @@ class SupportService {
   }
 
   static Future<bool> openEmail({required String subject, required String body}) async {
-    final uri = Uri.parse('mailto:$email'
+    return _open(Uri.parse('mailto:$email'
         '?subject=${Uri.encodeComponent(subject)}'
-        '&body=${Uri.encodeComponent(body)}');
-    try {
-      return await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      return false;
-    }
+        '&body=${Uri.encodeComponent(body)}'));
   }
 
-  static Future<bool> openPrivacy() async {
+  static Future<bool> openPrivacy() => _open(Uri.parse(privacyUrl));
+
+  /// Apre l'indirizzo in un'altra app; false se non si può.
+  static Future<bool> _open(Uri uri) async {
     try {
-      return await launchUrl(Uri.parse(privacyUrl), mode: LaunchMode.externalApplication);
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
       return false;
     }

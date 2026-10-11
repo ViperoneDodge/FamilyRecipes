@@ -41,11 +41,7 @@ class RecipeTextParser {
     if (lines.isEmpty) return r;
 
     // Informazioni sparse: tempi, persone, difficoltà (si tolgono dal testo).
-    final rest = <String>[];
-    for (final l in lines) {
-      if (_meta(l, r)) continue;
-      rest.add(l);
-    }
+    final rest = [for (final l in lines) if (!_meta(l, r)) l];
 
     // Sezioni.
     String? title;
@@ -53,16 +49,16 @@ class RecipeTextParser {
     var section = 'intro';
     for (final l in rest) {
       final low = l.toLowerCase();
-      if (_ingHeader.hasMatch(low)) {
-        section = 'ing';
+      final header = _ingHeader.hasMatch(low)
+          ? ('ing', ings)
+          : _stepHeader.hasMatch(low)
+              ? ('steps', steps)
+              : null;
+      if (header case (final name, final into)) {
+        section = name;
+        // "Ingredienti: farina, uova" → il testo dopo i due punti è già della sezione.
         final after = l.replaceFirst(RegExp(r'^[^:]*:\s*'), '');
-        if (after != l && after.isNotEmpty) ings.add(after);
-        continue;
-      }
-      if (_stepHeader.hasMatch(low)) {
-        section = 'steps';
-        final after = l.replaceFirst(RegExp(r'^[^:]*:\s*'), '');
-        if (after != l && after.isNotEmpty) steps.add(after);
+        if (after != l && after.isNotEmpty) into.add(after);
         continue;
       }
       if (_tipHeader.hasMatch(low) && l.length < 40) {
@@ -84,13 +80,10 @@ class RecipeTextParser {
           } else {
             ings.add(l);
           }
-          break;
         case 'steps':
           steps.add(l);
-          break;
         case 'tips':
           tips.add(l);
-          break;
         default:
           if (_looksIngredient(l)) {
             section = 'ing';
@@ -107,11 +100,11 @@ class RecipeTextParser {
     }
 
     r.title = title ?? '';
-    r.intro = _joinParagraph(intro);
+    r.intro = intro.join(' ').trim();
     r.ingredients = [for (final l in ings) ..._ingredients(l)];
     r.steps = [for (final s in _steps(steps)) RecipeStep(text: s)];
-    r.tips = _joinParagraph(tips);
-    r.category = guessCategory('${r.title} ${r.intro}');
+    r.tips = tips.join(' ').trim();
+    r.category = RecipeWords.guessCategory('${r.title} ${r.intro}');
     return r;
   }
 
@@ -127,7 +120,7 @@ class RecipeTextParser {
 
   /// Un ingrediente, o più se sulla stessa riga separati da virgola con le loro dosi.
   static List<Ingredient> _ingredients(String line) {
-    var t = line.replaceFirst(_bullet, '').trim();
+    final t = line.replaceFirst(_bullet, '').trim();
     final parts = t.contains(',') && RegExp(r'\d').allMatches(t).length > 1 ? t.split(',') : [t];
     final out = <Ingredient>[];
     for (var p in parts) {
@@ -191,8 +184,6 @@ class RecipeTextParser {
     return out.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
   }
 
-  static String _joinParagraph(List<String> lines) => lines.join(' ').trim();
-
   static String _cap(String s) {
     final t = s.trim().replaceAll(RegExp(r'^[:\-–\s]+|[:\-–\s]+$'), '');
     return t.isEmpty ? t : t[0].toUpperCase() + t.substring(1);
@@ -241,7 +232,4 @@ class RecipeTextParser {
     // La riga è "solo meta" se è corta e non sembra un ingrediente né una frase.
     return used && l.length < 80 && !l.endsWith('.');
   }
-
-  /// Categoria proposta dalle parole del titolo.
-  static RecipeCategory guessCategory(String text) => RecipeWords.guessCategory(text);
 }

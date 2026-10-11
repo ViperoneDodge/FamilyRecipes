@@ -22,6 +22,10 @@ class PdfExport {
   static const PdfColor _line = PdfColor.fromInt(0xFFE6D3AE);
   static const PdfColor _muted = PdfColor.fromInt(0xFF7A6552);
 
+  /// Testo normale e paragrafi (introduzione, passaggi, consigli).
+  static const pw.TextStyle _body = pw.TextStyle(fontSize: 10.5, color: _ink);
+  static const pw.TextStyle _paragraph = pw.TextStyle(fontSize: 10.5, color: _ink, lineSpacing: 2);
+
   static Future<pw.Font> _asset(String name) async =>
       pw.Font.ttf(await rootBundle.load('assets/fonts/$name'));
 
@@ -159,7 +163,7 @@ class PdfExport {
           padding: const pw.EdgeInsets.symmetric(vertical: 3),
           decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: _line, width: 0.6))),
           child: pw.Row(children: [
-            pw.Expanded(child: pw.Text(r.displayTitle, style: const pw.TextStyle(fontSize: 10.5, color: _ink))),
+            pw.Expanded(child: pw.Text(r.displayTitle, style: _body)),
             pw.Text(
                 [
                   difficultyLabel(r.difficulty),
@@ -221,7 +225,7 @@ class PdfExport {
       if (r.intro.trim().isNotEmpty)
         pw.Padding(
           padding: const pw.EdgeInsets.only(top: 10),
-          child: pw.Text(r.intro.trim(), style: const pw.TextStyle(fontSize: 10.5, color: _ink, lineSpacing: 2)),
+          child: pw.Text(r.intro.trim(), style: _paragraph),
         ),
     ];
 
@@ -231,7 +235,7 @@ class PdfExport {
       for (final c in courses) {
         out.add(pw.Bullet(
           text: '${c.displayTitle}  (${categoryLabel(c.category)})',
-          style: const pw.TextStyle(fontSize: 10.5, color: _ink),
+          style: _body,
           bulletColor: _accent,
         ));
       }
@@ -252,7 +256,7 @@ class PdfExport {
               children: [
                 pw.Padding(
                   padding: const pw.EdgeInsets.symmetric(vertical: 3),
-                  child: pw.Text(i.name, style: const pw.TextStyle(fontSize: 10.5, color: _ink)),
+                  child: pw.Text(i.name, style: _body),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.symmetric(vertical: 3),
@@ -286,7 +290,7 @@ class PdfExport {
             pw.Expanded(
               child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
                 if (s.text.trim().isNotEmpty)
-                  pw.Text(s.text.trim(), style: const pw.TextStyle(fontSize: 10.5, color: _ink, lineSpacing: 2)),
+                  pw.Text(s.text.trim(), style: _paragraph),
                 if (pics.isNotEmpty)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(top: 5),
@@ -314,7 +318,7 @@ class PdfExport {
           color: const PdfColor.fromInt(0xFFFBEBC8),
           borderRadius: pw.BorderRadius.circular(4),
         ),
-        child: pw.Text(r.tips.trim(), style: const pw.TextStyle(fontSize: 10.5, color: _ink, lineSpacing: 2)),
+        child: pw.Text(r.tips.trim(), style: _paragraph),
       ));
     }
     return out;

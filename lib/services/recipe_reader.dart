@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:path_provider/path_provider.dart';
@@ -56,8 +57,8 @@ class RecipeReader {
   static String _ordered(RecognizedText res) {
     final lines = <TextLine>[for (final b in res.blocks) ...b.lines];
     if (lines.isEmpty) return '';
-    final minX = lines.map((l) => l.boundingBox.left).reduce((a, b) => a < b ? a : b);
-    final maxX = lines.map((l) => l.boundingBox.right).reduce((a, b) => a > b ? a : b);
+    final minX = lines.map((l) => l.boundingBox.left).reduce(min);
+    final maxX = lines.map((l) => l.boundingBox.right).reduce(max);
     final mid = (minX + maxX) / 2;
     final left = lines.where((l) => l.boundingBox.right < mid + (maxX - minX) * 0.05).toList();
     final right = lines.where((l) => l.boundingBox.left > mid - (maxX - minX) * 0.05 && !left.contains(l)).toList();

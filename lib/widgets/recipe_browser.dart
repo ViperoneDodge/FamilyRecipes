@@ -134,7 +134,7 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
       ),
     );
     if (!widget.showCategoryChips) return listView;
-    int count(RecipeCategory? c) => c == null ? all.length : all.where((r) => r.category == c).length;
+    int count(RecipeCategory? c) => _count(all, c);
     switch (appState.theme.tabs) {
       case TabsStyle.top:
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -167,10 +167,13 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         onLongPress: widget.onLongPress == null ? null : () => widget.onLongPress!(r),
       );
 
+  /// Ricette della categoria (null = tutte).
+  static int _count(List<Recipe> all, RecipeCategory? c) =>
+      c == null ? all.length : all.where((r) => r.category == c).length;
+
   Widget _categoryMenu(BuildContext context, List<Recipe> all) {
     final nb = NotebookColors.of(context);
-    String label(RecipeCategory? c) =>
-        '${c == null ? tr('filter.allShort') : categoryLabel(c)} (${c == null ? all.length : all.where((r) => r.category == c).length})';
+    String label(RecipeCategory? c) => '${c == null ? tr('filter.allShort') : categoryLabel(c)} (${_count(all, c)})';
     return PopupMenuButton<RecipeCategory?>(
       tooltip: tr('filter.category'),
       initialValue: _cat,

@@ -1,10 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import '../l10n.dart';
 import '../models.dart';
+import 'http_get.dart';
 import 'online_recipes.dart';
 import 'recipe_words.dart';
 
@@ -71,46 +71,32 @@ final Map<String, RecipeSite> recipeSites = {
 };
 
 class WebRecipes {
-  static const Duration _timeout = Duration(seconds: 15);
   static final Random _rnd = Random();
 
   /// Il sito per la lingua dell'app, se c'è.
   static RecipeSite? get site => recipeSites[L10n.code];
 
+  /// Pagina HTML come la chiede il browser di un telefono (al massimo 4 MB).
   static Future<String> fetch(String url) async {
-    final client = HttpClient()
-      ..connectionTimeout = _timeout
-      ..userAgent = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36';
-    try {
-      final req = await client.getUrl(Uri.parse(url)).timeout(_timeout);
-      req.headers.set(HttpHeaders.acceptHeader, 'text/html,application/xhtml+xml');
-      req.headers.set(HttpHeaders.acceptLanguageHeader, L10n.code);
-      final res = await req.close().timeout(_timeout);
-      if (res.statusCode != 200) throw HttpException('HTTP ${res.statusCode}');
-      final bytes = <int>[];
-      await for (final chunk in res.timeout(_timeout)) {
-        bytes.addAll(chunk);
-        if (bytes.length > 4 * 1024 * 1024) break;
-      }
-      return utf8.decode(bytes, allowMalformed: true);
-    } finally {
-      client.close();
-    }
+    final bytes = await httpGet(
+      url,
+      userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+      headers: {
+        HttpHeaders.acceptHeader: 'text/html,application/xhtml+xml',
+        HttpHeaders.acceptLanguageHeader: L10n.code,
+      },
+      maxBytes: 4 * 1024 * 1024,
+    );
+    return utf8.decode(bytes, allowMalformed: true);
   }
 
   /// Legge la ricetta da una pagina web qualsiasi che ha i dati schema.org/Recipe.
   static Future<OnlineRecipe?> read(String url) async => parsePage(await fetch(url), url);
 
   /// Indirizzi delle ricette nei risultati di una ricerca.
-  static List<String> links(RecipeSite s, String html) {
-    final out = <String>[];
-    for (final m in s.link.allMatches(html)) {
-      var u = m[0]!;
-      if (u.startsWith('/')) u = '${s.home}$u';
-      if (!out.contains(u)) out.add(u);
-    }
-    return out;
-  }
+  static List<String> links(RecipeSite s, String html) => {
+        for (final m in s.link.allMatches(html)) m[0]!.startsWith('/') ? '${s.home}${m[0]}' : m[0]!,
+      }.toList();
 
   /// Ricette trovate sul sito con queste parole (al massimo [max], lette in parallelo).
   static Future<List<OnlineRecipe>> search(RecipeSite s, String query, {int max = 8}) async {
@@ -207,7 +193,7 @@ class WebRecipes {
     addSteps(j['recipeInstructions']);
     final ingredients = [
       for (final i in _list(j['recipeIngredient'] ?? j['ingredients']))
-        if (clean(_text(i)).isNotEmpty) splitIngredient(clean(_text(i))),
+        if (clean(_text(i)) case final t when t.isNotEmpty) splitIngredient(t),
     ];
     final cat = clean(_text(_first(j['recipeCategory'])));
     final cuisine = clean(_text(_first(j['recipeCuisine'])));

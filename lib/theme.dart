@@ -5,18 +5,12 @@ import 'l10n.dart';
 
 enum PaperStyle { righe, quadretti, puntini, liscio }
 
-String paperStyleLabel(PaperStyle p) {
-  switch (p) {
-    case PaperStyle.righe:
-      return tr('paper.lines');
-    case PaperStyle.quadretti:
-      return tr('paper.grid');
-    case PaperStyle.puntini:
-      return tr('paper.dots');
-    case PaperStyle.liscio:
-      return tr('paper.plain');
-  }
-}
+String paperStyleLabel(PaperStyle p) => switch (p) {
+      PaperStyle.righe => tr('paper.lines'),
+      PaperStyle.quadretti => tr('paper.grid'),
+      PaperStyle.puntini => tr('paper.dots'),
+      PaperStyle.liscio => tr('paper.plain'),
+    };
 
 /// Dove stanno le linguette delle categorie.
 enum TabsStyle { top, right, none }
@@ -70,23 +64,11 @@ class ThemeSettings {
 
   factory ThemeSettings.fromJson(Map<String, dynamic>? j) {
     if (j == null) return ThemeSettings();
-    ThemeMode mode = ThemeMode.system;
-    for (final m in ThemeMode.values) {
-      if (m.name == j['mode']) mode = m;
-    }
-    PaperStyle paper = PaperStyle.righe;
-    for (final p in PaperStyle.values) {
-      if (p.name == j['paper']) paper = p;
-    }
-    TabsStyle tabs = TabsStyle.top;
-    for (final t in TabsStyle.values) {
-      if (t.name == j['tabs']) tabs = t;
-    }
     return ThemeSettings(
-      tabs: tabs,
-      mode: mode,
+      tabs: TabsStyle.values.asNameMap()[j['tabs']] ?? TabsStyle.top,
+      mode: ThemeMode.values.asNameMap()[j['mode']] ?? ThemeMode.system,
       palette: (j['palette'] as num?)?.toInt() ?? 0,
-      paper: paper,
+      paper: PaperStyle.values.asNameMap()[j['paper']] ?? PaperStyle.righe,
       tablecloth: j['tablecloth'] as bool? ?? true,
     );
   }
@@ -362,7 +344,6 @@ class _PagePainter extends CustomPainter {
         for (var y = top + 22; y < size.height; y += 30) {
           canvas.drawLine(Offset(0, y), Offset(size.width, y), line);
         }
-        break;
       case PaperStyle.quadretti:
         const q = 22.0;
         for (var y = top; y < size.height; y += q) {
@@ -371,7 +352,6 @@ class _PagePainter extends CustomPainter {
         for (var x = q; x < size.width; x += q) {
           canvas.drawLine(Offset(x, top), Offset(x, size.height), line);
         }
-        break;
       case PaperStyle.puntini:
         const q = 20.0;
         final dot = Paint()..color = nb.line;
@@ -380,9 +360,7 @@ class _PagePainter extends CustomPainter {
             canvas.drawCircle(Offset(x, y), 1.3, dot);
           }
         }
-        break;
       case PaperStyle.liscio:
-        break;
     }
     // Margine rosso a sinistra.
     final m = Paint()
@@ -413,9 +391,9 @@ class _SpiralPainter extends CustomPainter {
     if (count <= 0) return;
     final start = (size.width - (count - 1) * spacing) / 2;
     final holePaint = Paint()..color = nb.hole;
+    const holeY = 13.0;
     for (var i = 0; i < count; i++) {
       final x = start + i * spacing;
-      const holeY = 13.0;
       canvas.drawCircle(Offset(x, holeY), 3.8, holePaint);
       final path = Path()
         ..moveTo(x - 2, holeY)

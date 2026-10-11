@@ -8,10 +8,7 @@ import '../models.dart';
 class LocalStore {
   Directory? _dir;
 
-  Future<Directory> _base() async {
-    _dir ??= await getApplicationDocumentsDirectory();
-    return _dir!;
-  }
+  Future<Directory> _base() async => _dir ??= await getApplicationDocumentsDirectory();
 
   Future<File> _file(String name) async => File('${(await _base()).path}/$name');
 
@@ -62,18 +59,20 @@ class LocalStore {
     return d;
   }
 
+  String _dataFile(Session s) => 'data_${s.storageKey}.json';
+
   Future<UserData> readUserData(Session s) async {
-    final j = await _readJson('data_${s.storageKey}.json');
+    final j = await _readJson(_dataFile(s));
     return j == null ? UserData() : UserData.fromJson(j);
   }
 
   Future<void> deleteUserData(Session s) async {
     try {
-      final f = await _file('data_${s.storageKey}.json');
+      final f = await _file(_dataFile(s));
       if (await f.exists()) await f.delete();
     } catch (_) {}
   }
 
   Future<void> writeUserData(Session s, UserData d) =>
-      _writeJson('data_${s.storageKey}.json', d.toJson());
+      _writeJson(_dataFile(s), d.toJson());
 }

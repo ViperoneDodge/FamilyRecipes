@@ -17,10 +17,7 @@ class RecipeTranslator {
   static TranslateLanguage? targetFor(String code) {
     if (code == 'en') return null;
     final c = code == 'nb' ? 'no' : code;
-    for (final l in TranslateLanguage.values) {
-      if (l.bcpCode == c) return l;
-    }
-    return null;
+    return TranslateLanguage.values.where((l) => l.bcpCode == c).firstOrNull;
   }
 
   TranslateLanguage? get target => targetFor(L10n.code);

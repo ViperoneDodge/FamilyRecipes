@@ -67,7 +67,7 @@ class RecipeWords {
     for (final d in Difficulty.values) {
       if (d.name.toLowerCase() == k) return d;
     }
-    if (k.startsWith('molto') || k == 'veryeasy' || k == 'trèsfacile' || k == 'trèsfacile') return Difficulty.veryEasy;
+    if (k.startsWith('molto') || k == 'veryeasy' || k == 'trèsfacile') return Difficulty.veryEasy;
     if (k.startsWith('facil') || k == 'bassa' || k == 'easy' || k == 'einfach' || k == 'leicht') return Difficulty.easy;
     if (k.startsWith('medi') || k == 'moyen' || k == 'moyenne' || k == 'normal') return Difficulty.medium;
     if (k.startsWith('diffic') || k == 'alta' || k == 'hard' || k == 'schwer' || k == 'difícil') return Difficulty.hard;

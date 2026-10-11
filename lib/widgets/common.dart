@@ -7,9 +7,9 @@ import '../main.dart';
 import '../models.dart';
 import '../theme.dart';
 
-final DateFormat dateFmt = DateFormat('dd/MM/yyyy');
+final DateFormat _dateFmt = DateFormat('dd/MM/yyyy');
 
-String fmtDate(DateTime? d) => d == null ? '—' : dateFmt.format(d);
+String fmtDate(DateTime? d) => d == null ? '—' : _dateFmt.format(d);
 
 void showSnack(BuildContext context, String msg) {
   ScaffoldMessenger.of(context)
@@ -17,40 +17,23 @@ void showSnack(BuildContext context, String msg) {
     ..showSnackBar(SnackBar(content: Text(msg)));
 }
 
-IconData categoryIcon(RecipeCategory c) {
-  switch (c) {
-    case RecipeCategory.aperitivi:
-      return Icons.local_bar;
-    case RecipeCategory.antipasti:
-      return Icons.tapas;
-    case RecipeCategory.primi:
-      return Icons.ramen_dining;
-    case RecipeCategory.secondi:
-      return Icons.set_meal;
-    case RecipeCategory.contorni:
-      return Icons.eco;
-    case RecipeCategory.dolci:
-      return Icons.cake;
-    case RecipeCategory.liquori:
-      return Icons.liquor;
-    case RecipeCategory.conserve:
-      return Icons.kitchen;
-    case RecipeCategory.menu:
-      return Icons.restaurant_menu;
-  }
-}
+IconData categoryIcon(RecipeCategory c) => switch (c) {
+      RecipeCategory.aperitivi => Icons.local_bar,
+      RecipeCategory.antipasti => Icons.tapas,
+      RecipeCategory.primi => Icons.ramen_dining,
+      RecipeCategory.secondi => Icons.set_meal,
+      RecipeCategory.contorni => Icons.eco,
+      RecipeCategory.dolci => Icons.cake,
+      RecipeCategory.liquori => Icons.liquor,
+      RecipeCategory.conserve => Icons.kitchen,
+      RecipeCategory.menu => Icons.restaurant_menu,
+    };
 
-IconData difficultyIcon(Difficulty d) {
-  switch (d) {
-    case Difficulty.veryEasy:
-    case Difficulty.easy:
-      return Icons.sentiment_satisfied_alt;
-    case Difficulty.medium:
-      return Icons.sentiment_neutral;
-    case Difficulty.hard:
-      return Icons.whatshot;
-  }
-}
+IconData difficultyIcon(Difficulty d) => switch (d) {
+      Difficulty.veryEasy || Difficulty.easy => Icons.sentiment_satisfied_alt,
+      Difficulty.medium => Icons.sentiment_neutral,
+      Difficulty.hard => Icons.whatshot,
+    };
 
 /// Foto di una ricetta: dal telefono o, se manca, scaricata dal ricettario.
 class RecipePhoto extends StatefulWidget {

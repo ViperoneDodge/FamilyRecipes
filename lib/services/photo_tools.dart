@@ -13,11 +13,10 @@ Uint8List _compress(Uint8List bytes) {
   final decoded = img.decodeImage(bytes);
   if (decoded == null) throw const FormatException('image');
   var im = img.bakeOrientation(decoded);
-  final side = im.width > im.height ? im.width : im.height;
-  if (side > photoMaxSide) {
-    im = im.width >= im.height
-        ? img.copyResize(im, width: photoMaxSide, interpolation: img.Interpolation.average)
-        : img.copyResize(im, height: photoMaxSide, interpolation: img.Interpolation.average);
+  final wide = im.width >= im.height;
+  if ((wide ? im.width : im.height) > photoMaxSide) {
+    im = img.copyResize(im,
+        width: wide ? photoMaxSide : null, height: wide ? null : photoMaxSide, interpolation: img.Interpolation.average);
   }
   return img.encodeJpg(im, quality: photoQuality);
 }
