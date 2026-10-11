@@ -55,10 +55,9 @@ class _SuggestTabState extends State<SuggestTab> {
         if (_book == '' && !appState.isPersonal(r)) return false;
         if (_book != null && _book!.isNotEmpty && r.bookId != _book) return false;
         if (_easyOnly && (r.difficulty == Difficulty.medium || r.difficulty == Difficulty.hard)) return false;
+        final limit = switch (_time) { MaxTime.any => null, MaxTime.m30 => 30, MaxTime.m60 => 60 };
         final t = r.totalMinutes;
-        if (_time == MaxTime.m30 && (t == 0 || t > 30)) return false;
-        if (_time == MaxTime.m60 && (t == 0 || t > 60)) return false;
-        return true;
+        return limit == null || (t > 0 && t <= limit);
       }).toList();
 
   /// Pesca una ricetta della categoria, diversa da quella già proposta se possibile.
@@ -92,12 +91,15 @@ class _SuggestTabState extends State<SuggestTab> {
   void _addIngredient(String raw) {
     final t = raw.trim().toLowerCase();
     if (t.isEmpty || _ings.contains(t) || _ings.length >= maxIngredients) return;
-    setState(() {
-      _ings = [..._ings, t];
-      _ingSearched = false;
-      _onlineByIng = null;
-    });
+    _setIngredients([..._ings, t]);
   }
+
+  /// Cambiando gli ingredienti, i risultati precedenti non valgono più.
+  void _setIngredients(List<String> ings) => setState(() {
+        _ings = ings;
+        _ingSearched = false;
+        _onlineByIng = null;
+      });
 
   /// Ricette del ricettario con gli ingredienti scelti: prima quelle che li hanno tutti.
   List<({Recipe r, int n})> get _localMatches {
@@ -114,35 +116,30 @@ class _SuggestTabState extends State<SuggestTab> {
     return out;
   }
 
-  Future<void> _searchOnline() async {
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      final site = WebRecipes.site;
-      final res = site != null
-          ? await WebRecipes.search(site, _ings.join(' '))
-          : await OnlineRecipes.byIngredients(_ings.map(ingredientToEnglish).toList());
-      if (mounted) setState(() => _onlineByIng = res);
-    } catch (_) {
-      if (mounted) setState(() => _error = tr('suggest.offline'));
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
+  Future<void> _searchOnline() => _online(() async {
+        final site = WebRecipes.site;
+        final res = site != null
+            ? await WebRecipes.search(site, _ings.join(' '))
+            : await OnlineRecipes.byIngredients(_ings.map(ingredientToEnglish).toList());
+        if (mounted) setState(() => _onlineByIng = res);
+      });
 
   // ---- Da internet ----
 
-  Future<void> _randomOnline() async {
+  Future<void> _randomOnline() => _online(() async {
+        final site = WebRecipes.site;
+        final r = site != null ? await WebRecipes.surprise(site) : await OnlineRecipes.random();
+        if (mounted) setState(() => _surprise = r);
+      });
+
+  /// Esegue una richiesta online mostrando l'attesa e, se fallisce, l'errore.
+  Future<void> _online(Future<void> Function() job) async {
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      final site = WebRecipes.site;
-      final r = site != null ? await WebRecipes.surprise(site) : await OnlineRecipes.random();
-      if (mounted) setState(() => _surprise = r);
+      await job();
     } catch (_) {
       if (mounted) setState(() => _error = tr('suggest.offline'));
     } finally {
@@ -173,18 +170,15 @@ class _SuggestTabState extends State<SuggestTab> {
         SegmentedButton<SuggestMode>(
           showSelectedIcon: false,
           segments: [
-            ButtonSegment(
-                value: SuggestMode.book,
-                icon: const Icon(Icons.menu_book_outlined),
-                label: FittedBox(fit: BoxFit.scaleDown, child: Text(tr('suggest.modeBook'), maxLines: 1))),
-            ButtonSegment(
-                value: SuggestMode.ingredients,
-                icon: const Icon(Icons.shopping_basket_outlined),
-                label: FittedBox(fit: BoxFit.scaleDown, child: Text(tr('suggest.modeIng'), maxLines: 1))),
-            ButtonSegment(
-                value: SuggestMode.internet,
-                icon: const Icon(Icons.public),
-                label: FittedBox(fit: BoxFit.scaleDown, child: Text(tr('suggest.modeWeb'), maxLines: 1))),
+            for (final (mode, icon, label) in [
+              (SuggestMode.book, Icons.menu_book_outlined, 'suggest.modeBook'),
+              (SuggestMode.ingredients, Icons.shopping_basket_outlined, 'suggest.modeIng'),
+              (SuggestMode.internet, Icons.public, 'suggest.modeWeb'),
+            ])
+              ButtonSegment(
+                  value: mode,
+                  icon: Icon(icon),
+                  label: FittedBox(fit: BoxFit.scaleDown, child: Text(tr(label), maxLines: 1))),
           ],
           selected: {_mode},
           onSelectionChanged: (s) => setState(() {
@@ -215,20 +209,20 @@ class _SuggestTabState extends State<SuggestTab> {
       return [EmptyState(icon: Icons.restaurant, title: tr('suggest.empty'), hint: tr('suggest.emptyHint'))];
     }
     final chosen = RecipeCategory.values.where(_courses.contains).toList();
+    final chipInk = dark ? Colors.white : nb.ink;
+    Color tabColor(RecipeCategory c) => dark ? categoryTabColorDark(categoryTabColor(c)) : categoryTabColor(c);
     return [
       HandHeader(tr('suggest.courses'), icon: Icons.restaurant_menu),
       Wrap(spacing: 6, runSpacing: 6, children: [
         for (final c in RecipeCategory.values)
           FilterChip(
-            avatar: Icon(categoryIcon(c), size: 18, color: dark ? Colors.white : nb.ink),
-            label:
-                Text('${categoryLabel(c)} (${_pool(c).length})', style: TextStyle(color: dark ? Colors.white : nb.ink)),
+            avatar: Icon(categoryIcon(c), size: 18, color: chipInk),
+            label: Text('${categoryLabel(c)} (${_pool(c).length})', style: TextStyle(color: chipInk)),
             selected: _courses.contains(c),
             showCheckmark: false,
-            backgroundColor:
-                (dark ? categoryTabColorDark(categoryTabColor(c)) : categoryTabColor(c)).withValues(alpha: 0.35),
-            selectedColor: dark ? categoryTabColorDark(categoryTabColor(c)) : categoryTabColor(c),
-            side: BorderSide(color: _courses.contains(c) ? nb.accent : nb.line, width: _courses.contains(c) ? 2 : 1),
+            backgroundColor: tabColor(c).withValues(alpha: 0.35),
+            selectedColor: tabColor(c),
+            side: _courses.contains(c) ? BorderSide(color: nb.accent, width: 2) : BorderSide(color: nb.line),
             onSelected: (on) => setState(() {
               if (on) {
                 _courses = {..._courses, c};
@@ -292,7 +286,6 @@ class _SuggestTabState extends State<SuggestTab> {
     final id = _picked[c];
     final r = id == null ? null : appState.recipeById(id);
     final scheme = Theme.of(context).colorScheme;
-    final canChange = _pool(c).length > 1;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(children: [
@@ -311,7 +304,7 @@ class _SuggestTabState extends State<SuggestTab> {
         IconButton(
           tooltip: tr('suggest.another'),
           icon: const Icon(Icons.refresh),
-          onPressed: canChange ? () => setState(() => _picked[c] = _draw(c)) : null,
+          onPressed: _pool(c).length > 1 ? () => setState(() => _picked[c] = _draw(c)) : null,
         ),
       ]),
     );
@@ -319,7 +312,6 @@ class _SuggestTabState extends State<SuggestTab> {
 
   List<Widget> _ingredientsSection(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final full = _ings.length < maxIngredients;
     final known = _knownIngredients;
     final matches = _ingSearched ? _localMatches : const <({Recipe r, int n})>[];
     final all = matches.where((m) => m.n == _ings.length).toList();
@@ -332,14 +324,10 @@ class _SuggestTabState extends State<SuggestTab> {
         for (final i in _ings)
           InputChip(
             label: Text(i),
-            onDeleted: () => setState(() {
-              _ings = [..._ings]..remove(i);
-              _ingSearched = false;
-              _onlineByIng = null;
-            }),
+            onDeleted: () => _setIngredients([..._ings]..remove(i)),
           ),
       ]),
-      if (full) ...[
+      if (_ings.length < maxIngredients) ...[
         const SizedBox(height: 8),
         Autocomplete<String>(
           optionsBuilder: (v) {
@@ -348,27 +336,25 @@ class _SuggestTabState extends State<SuggestTab> {
             return known.where((k) => k.contains(q) && !_ings.contains(k)).take(8);
           },
           onSelected: _addIngredient,
-          fieldViewBuilder: (context, ctrl, focus, onSubmit) => TextField(
-            controller: ctrl,
-            focusNode: focus,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (t) {
-              _addIngredient(t);
+          fieldViewBuilder: (context, ctrl, focus, onSubmit) {
+            void add() {
+              _addIngredient(ctrl.text);
               ctrl.clear();
-            },
-            decoration: InputDecoration(
-              isDense: true,
-              prefixIcon: const Icon(Icons.add),
-              hintText: tr('suggest.ingField'),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.check),
-                onPressed: () {
-                  _addIngredient(ctrl.text);
-                  ctrl.clear();
-                },
+            }
+
+            return TextField(
+              controller: ctrl,
+              focusNode: focus,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => add(),
+              decoration: InputDecoration(
+                isDense: true,
+                prefixIcon: const Icon(Icons.add),
+                hintText: tr('suggest.ingField'),
+                suffixIcon: IconButton(icon: const Icon(Icons.check), onPressed: add),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ],
       const SizedBox(height: 12),
@@ -384,9 +370,7 @@ class _SuggestTabState extends State<SuggestTab> {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: _ings.isEmpty || _busy ? null : _searchOnline,
-            icon: _busy
-                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.public),
+            icon: _busy ? const _Spinner(16) : const Icon(Icons.public),
             label: Text(tr('suggest.ingWeb')),
           ),
         ),
@@ -427,9 +411,7 @@ class _SuggestTabState extends State<SuggestTab> {
       FilledButton.icon(
         style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
         onPressed: _busy ? null : _randomOnline,
-        icon: _busy
-            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-            : const Icon(Icons.casino_outlined),
+        icon: _busy ? const _Spinner(18) : const Icon(Icons.casino_outlined),
         label: Text(_surprise == null ? tr('suggest.webGo') : tr('suggest.webAgain'),
             style: const TextStyle(fontSize: 16)),
       ),
@@ -439,6 +421,16 @@ class _SuggestTabState extends State<SuggestTab> {
       ],
     ];
   }
+}
+
+/// Rotellina d'attesa piccola, per pulsanti e righe di stato.
+class _Spinner extends StatelessWidget {
+  final double size;
+  const _Spinner(this.size);
+
+  @override
+  Widget build(BuildContext context) =>
+      SizedBox(width: size, height: size, child: const CircularProgressIndicator(strokeWidth: 2));
 }
 
 /// Anteprima di una ricetta da internet.
@@ -453,12 +445,12 @@ class OnlineRecipeCard extends StatelessWidget {
     final nb = NotebookColors.of(context);
     final scheme = Theme.of(context).colorScheme;
     final meta = [if (recipe.category.isNotEmpty) recipe.category, if (recipe.area.isNotEmpty) recipe.area].join(' · ');
+    final placeholder =
+        Container(color: scheme.surfaceContainerHighest, child: Icon(Icons.restaurant, color: scheme.outline));
     final img = recipe.thumb.isEmpty
-        ? Container(color: scheme.surfaceContainerHighest, child: Icon(Icons.restaurant, color: scheme.outline))
+        ? placeholder
         : Image.network(big || recipe.fromSite ? recipe.thumb : '${recipe.thumb}/preview',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                Container(color: scheme.surfaceContainerHighest, child: Icon(Icons.restaurant, color: scheme.outline)));
+            fit: BoxFit.cover, errorBuilder: (_, __, ___) => placeholder);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5),
       clipBehavior: Clip.antiAlias,
@@ -475,7 +467,8 @@ class OnlineRecipeCard extends StatelessWidget {
                           style: TextStyle(
                               fontSize: 11, letterSpacing: 1.1, color: nb.accent, fontWeight: FontWeight.w600)),
                     TranslatedText(recipe.title,
-                        translate: !recipe.fromSite, style: TextStyle(fontFamily: handFont, fontSize: 26, color: nb.ink)),
+                        translate: !recipe.fromSite,
+                        style: TextStyle(fontFamily: handFont, fontSize: 26, color: nb.ink)),
                     Text(tr('suggest.webOpen'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                   ]),
                 ),
@@ -595,9 +588,7 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
         appBar: AppBar(title: Text(tr('suggest.webTitle'))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _loading || _translating || _saving ? null : _save,
-          icon: _saving
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.bookmark_add_outlined),
+          icon: _saving ? const _Spinner(18) : const Icon(Icons.bookmark_add_outlined),
           label: Text(tr('suggest.webSave')),
         ),
         body: NotebookPage(
@@ -619,7 +610,7 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(children: [
-                    const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                    const _Spinner(16),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(tr('online.translating'),

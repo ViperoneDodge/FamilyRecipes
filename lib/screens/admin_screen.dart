@@ -13,13 +13,6 @@ import 'recipe_detail_screen.dart';
 class AdminScreen extends StatelessWidget {
   const AdminScreen({super.key});
 
-  static Widget error(Object e) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text('${tr('admin.denied')}\n\n${cloudErrorMessage(e)}', textAlign: TextAlign.center),
-        ),
-      );
-
   @override
   Widget build(BuildContext context) {
     final nb = NotebookColors.of(context);
@@ -50,6 +43,22 @@ class AdminScreen extends StatelessWidget {
     );
   }
 }
+
+Widget _errorView(Object e) => Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text('${tr('admin.denied')}\n\n${cloudErrorMessage(e)}', textAlign: TextAlign.center),
+      ),
+    );
+
+/// Titolo e spiegazione in cima a una scheda dell'amministrazione.
+List<Widget> _tabHeader(BuildContext context, String title, String info) => [
+      Text(title, style: TextStyle(fontFamily: handFont, fontSize: 22, color: NotebookColors.of(context).accent)),
+      Padding(
+        padding: const EdgeInsets.only(top: 4, bottom: 8),
+        child: Text(info, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      ),
+    ];
 
 class _AdminUser {
   final String uid;
@@ -107,7 +116,7 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
           stream: _recipes,
           builder: (context, rs) {
             final err = fs.error ?? us.error ?? rs.error;
-            if (err != null) return AdminScreen.error(err);
+            if (err != null) return _errorView(err);
             if (!fs.hasData || !us.hasData || !rs.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
@@ -121,17 +130,19 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
 
   bool _personal(Map<String, dynamic>? f) => f?['personal'] == true;
 
+  String _who(String uid, Map<String, _AdminUser> people) =>
+      uid.isEmpty ? tr('admin.unknown') : (people[uid]?.label ?? uid);
+
   String _owner(Recipe r, Map<String, Map<String, dynamic>> books) {
     if (r.createdBy.isNotEmpty) return r.createdBy;
     final f = books[r.bookId];
     return _personal(f) ? (f?['ownerUid'] as String? ?? r.bookId!) : '';
   }
 
-  Widget _content(BuildContext context, List<Recipe> all, Map<String, Map<String, dynamic>> books,
-      Map<String, _AdminUser> people) {
-    final nb = NotebookColors.of(context);
+  Widget _content(
+      BuildContext context, List<Recipe> all, Map<String, Map<String, dynamic>> books, Map<String, _AdminUser> people) {
     final scheme = Theme.of(context).colorScheme;
-    String who(String uid) => uid.isEmpty ? tr('admin.unknown') : (people[uid]?.label ?? uid);
+    String who(String uid) => _who(uid, people);
     String where(Recipe r) {
       final f = books[r.bookId];
       if (_personal(f)) return tr('admin.personalOf', {'name': who(f?['ownerUid'] as String? ?? r.bookId!)});
@@ -154,12 +165,7 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(8, 12, 10, 24),
       children: [
-        Text(tr('admin.allRecipes', {'n': all.length}),
-            style: TextStyle(fontFamily: handFont, fontSize: 22, color: nb.accent)),
-        Padding(
-          padding: const EdgeInsets.only(top: 4, bottom: 8),
-          child: Text(tr('admin.recipesInfo'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-        ),
+        ..._tabHeader(context, tr('admin.allRecipes', {'n': all.length}), tr('admin.recipesInfo')),
         TextField(
           controller: _search,
           onChanged: (_) => setState(() {}),
@@ -207,28 +213,27 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
       Map<String, _AdminUser> people) async {
     final f = books[r.bookId];
     final personal = _personal(f);
+    final group = f?['name'] ?? r.bookId;
     final groupMembers = ((f?['members'] as List?) ?? const []).map((e) => e.toString()).toSet();
-    final candidates = people.values
-        .where((p) => p.uid != owner && (personal || groupMembers.contains(p.uid)))
-        .toList()
+    final candidates = people.values.where((p) => p.uid != owner && (personal || groupMembers.contains(p.uid))).toList()
       ..sort((a, b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()));
     final picked = await showDialog<_AdminUser>(
       context: context,
       builder: (ctx) => _UserPicker(
         users: candidates,
-        hint: personal ? null : tr('admin.onlyMembers', {'name': f?['name'] ?? r.bookId}),
+        hint: personal ? null : tr('admin.onlyMembers', {'name': group}),
       ),
     );
     if (picked == null || !context.mounted) return;
     final title = r.displayTitle;
-    final oldName = owner.isEmpty ? tr('admin.unknown') : (people[owner]?.label ?? owner);
+    final oldName = _who(owner, people);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(tr('admin.assignTitle', {'recipe': title, 'name': picked.label})),
         content: Text(personal
             ? tr('admin.assignPersonal', {'recipe': title, 'name': picked.label, 'old': oldName})
-            : tr('admin.assignGroup', {'recipe': title, 'name': picked.label, 'group': f?['name'] ?? r.bookId})),
+            : tr('admin.assignGroup', {'recipe': title, 'name': picked.label, 'group': group})),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('common.cancel'))),
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('admin.assign'))),
@@ -260,7 +265,8 @@ class _UserPickerState extends State<_UserPicker> {
   @override
   Widget build(BuildContext context) {
     final q = _q.toLowerCase();
-    final list = widget.users.where((u) => q.isEmpty || '${u.name} ${u.email} ${u.uid}'.toLowerCase().contains(q)).toList();
+    final list =
+        widget.users.where((u) => q.isEmpty || '${u.name} ${u.email} ${u.uid}'.toLowerCase().contains(q)).toList();
     return AlertDialog(
       title: Text(tr('admin.newAuthor')),
       contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -276,7 +282,8 @@ class _UserPickerState extends State<_UserPicker> {
           TextField(
             autofocus: true,
             onChanged: (t) => setState(() => _q = t.trim()),
-            decoration: InputDecoration(prefixIcon: const Icon(Icons.search), hintText: tr('admin.nameOrEmail'), isDense: true),
+            decoration:
+                InputDecoration(prefixIcon: const Icon(Icons.search), hintText: tr('admin.nameOrEmail'), isDense: true),
           ),
           const SizedBox(height: 6),
           Expanded(
@@ -305,12 +312,11 @@ class AdminGroupsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nb = NotebookColors.of(context);
     final scheme = Theme.of(context).colorScheme;
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: appState.sync.watchAllBooks(),
       builder: (context, snap) {
-        if (snap.hasError) return AdminScreen.error(snap.error!);
+        if (snap.hasError) return _errorView(snap.error!);
         if (!snap.hasData) return const Center(child: CircularProgressIndicator());
         final groups = snap.data!
             .where((f) => f['personal'] != true)
@@ -320,36 +326,35 @@ class AdminGroupsTab extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.fromLTRB(8, 12, 10, 24),
           children: [
-            Text(tr('admin.groupsCount', {'n': groups.length}),
-                style: TextStyle(fontFamily: handFont, fontSize: 22, color: nb.accent)),
-            Padding(
-              padding: const EdgeInsets.only(top: 4, bottom: 8),
-              child: Text(tr('admin.groupsInfo'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-            ),
-            ...groups.map((g) => Card(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  child: ExpansionTile(
-                    leading: Icon(Icons.groups_outlined, color: scheme.primary),
-                    title: Text(g.name),
-                    subtitle: Text(tr('admin.groupLine', {'n': g.members.length, 'code': g.id}),
-                        style: const TextStyle(fontSize: 12)),
-                    children: g.members.entries.map((m) {
-                      final role = g.roleOf(m.key);
-                      final owner = m.key == g.ownerUid;
-                      return ListTile(
-                        dense: true,
-                        leading: Icon(owner ? Icons.star : Icons.person_outline,
-                            color: owner ? Colors.amber.shade700 : null),
-                        title: Text(m.value),
-                        subtitle: Text(owner ? '${tr('family.owner')} · ${groupRoleLabel(role)}' : groupRoleLabel(role)),
-                        onTap: owner ? null : () => _change(context, g, m.key, m.value, role),
-                      );
-                    }).toList(),
-                  ),
-                )),
+            ..._tabHeader(context, tr('admin.groupsCount', {'n': groups.length}), tr('admin.groupsInfo')),
+            for (final g in groups)
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: ExpansionTile(
+                  leading: Icon(Icons.groups_outlined, color: scheme.primary),
+                  title: Text(g.name),
+                  subtitle: Text(tr('admin.groupLine', {'n': g.members.length, 'code': g.id}),
+                      style: const TextStyle(fontSize: 12)),
+                  children: [
+                    for (final m in g.members.entries) _member(context, g, m.key, m.value),
+                  ],
+                ),
+              ),
           ],
         );
       },
+    );
+  }
+
+  Widget _member(BuildContext context, FamilyGroup g, String uid, String name) {
+    final role = g.roleOf(uid);
+    final owner = uid == g.ownerUid;
+    return ListTile(
+      dense: true,
+      leading: Icon(owner ? Icons.star : Icons.person_outline, color: owner ? Colors.amber.shade700 : null),
+      title: Text(name),
+      subtitle: Text(owner ? '${tr('family.owner')} · ${groupRoleLabel(role)}' : groupRoleLabel(role)),
+      onTap: owner ? null : () => _change(context, g, uid, name, role),
     );
   }
 
@@ -358,16 +363,17 @@ class AdminGroupsTab extends StatelessWidget {
       context: context,
       builder: (ctx) => SimpleDialog(
         title: Text(tr('admin.roleOf', {'name': name, 'group': g.name})),
-        children: GroupRole.values
-            .map((r) => SimpleDialogOption(
-                  onPressed: () => Navigator.pop(ctx, r),
-                  child: Row(children: [
-                    Icon(r == current ? Icons.radio_button_checked : Icons.radio_button_unchecked, size: 20),
-                    const SizedBox(width: 10),
-                    Text(groupRoleLabel(r)),
-                  ]),
-                ))
-            .toList(),
+        children: [
+          for (final r in GroupRole.values)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, r),
+              child: Row(children: [
+                Icon(r == current ? Icons.radio_button_checked : Icons.radio_button_unchecked, size: 20),
+                const SizedBox(width: 10),
+                Text(groupRoleLabel(r)),
+              ]),
+            ),
+        ],
       ),
     );
     if (picked == null || picked == current) return;

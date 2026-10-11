@@ -41,8 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _openAdd({String? bookId, RecipeCategory? category}) =>
-      newRecipeFlow(context, bookId: bookId, category: category ?? _myCategory);
+  void _openAdd({String? bookId}) => newRecipeFlow(context, bookId: bookId, category: _myCategory);
 
   void _openDetail(Recipe r, [List<Recipe>? shown]) {
     final seq = shown == null ? const <String>[] : [for (final x in shown) x.id];
@@ -121,20 +120,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _syncIcon() {
     if (!appState.isCloud) return const SizedBox.shrink();
-    switch (appState.syncStatus) {
-      case SyncStatus.online:
-        return Tooltip(message: tr('sync.done'), child: const Icon(Icons.cloud_done));
-      case SyncStatus.connecting:
-        return Tooltip(message: tr('sync.connecting'), child: const Icon(Icons.cloud_sync));
-      case SyncStatus.offline:
-        return IconButton(
+    return switch (appState.syncStatus) {
+      SyncStatus.online => Tooltip(message: tr('sync.done'), child: const Icon(Icons.cloud_done)),
+      SyncStatus.connecting => Tooltip(message: tr('sync.connecting'), child: const Icon(Icons.cloud_sync)),
+      SyncStatus.offline => IconButton(
           tooltip: tr('sync.offline'),
           icon: const Icon(Icons.cloud_off),
           onPressed: appState.retrySync,
-        );
-      case SyncStatus.off:
-        return const SizedBox.shrink();
-    }
+        ),
+      SyncStatus.off => const SizedBox.shrink(),
+    };
   }
 
   Widget _mainScaffold(BuildContext context) {
@@ -142,21 +137,15 @@ class _HomeScreenState extends State<HomeScreen> {
       listenable: appState,
       builder: (context, _) {
         final titles = [tr('book.mine'), tr('tab.family'), tr('tab.suggest')];
-        Widget body;
-        switch (_tab) {
-          case 1:
-            body = FamilyTab(
+        final body = switch (_tab) {
+          1 => FamilyTab(
               onOpen: _openDetail,
               onAdd: (g) => _openAdd(bookId: g),
               selectedId: _twoPane ? _selectedId : null,
-            );
-            break;
-          case 2:
-            body = SuggestTab(onOpen: _openDetail);
-            break;
-          default:
-            body = _myTab();
-        }
+            ),
+          2 => SuggestTab(onOpen: _openDetail),
+          _ => _myTab(),
+        };
         final mine = appState.myRecipes;
         final scaffold = Scaffold(
           backgroundColor: Colors.transparent,
@@ -168,11 +157,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   tooltip: tr('pdf.export'),
                   icon: const Icon(Icons.picture_as_pdf_outlined),
                   onPressed: () {
-                    final list = _myCategory == null ? mine : mine.where((r) => r.category == _myCategory).toList();
+                    // _myCategory cambia senza ricostruire: va letta al momento del tocco.
+                    final cat = _myCategory;
                     exportPdf(
                       context,
-                      _myCategory == null ? tr('book.mine') : '${tr('book.mine')} - ${categoryLabel(_myCategory!)}',
-                      list,
+                      cat == null ? tr('book.mine') : '${tr('book.mine')} - ${categoryLabel(cat)}',
+                      cat == null ? mine : mine.where((r) => r.category == cat).toList(),
                     );
                   },
                 ),

@@ -42,8 +42,7 @@ class FamilyTab extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: FilledButton.icon(
-                onPressed: () =>
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
+                onPressed: () => _push(context, const LoginScreen(upgrade: true)),
                 icon: const Icon(Icons.cloud_upload_outlined),
                 label: Text(tr('upgrade.button')),
               ),
@@ -103,7 +102,7 @@ class FamilyTab extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupBookScreen(groupId: g.id))),
+          onTap: () => _push(context, GroupBookScreen(groupId: g.id)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 6),
             child: Row(children: [
@@ -122,18 +121,8 @@ class FamilyTab extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodySmall),
                 ]),
               ),
-              if (list.isNotEmpty)
-                IconButton(
-                  tooltip: tr('pdf.exportGroup'),
-                  icon: const Icon(Icons.picture_as_pdf_outlined),
-                  onPressed: () => exportPdf(context, g.name, list),
-                ),
-              IconButton(
-                tooltip: tr('family.settings'),
-                icon: const Icon(Icons.settings_outlined, size: 20),
-                onPressed: () =>
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupScreen(groupId: g.id))),
-              ),
+              if (list.isNotEmpty) _pdfButton(context, g.name, list),
+              _settingsButton(context, g.id, iconSize: 20),
             ]),
           ),
         ),
@@ -151,8 +140,7 @@ class FamilyTab extends StatelessWidget {
         Wrap(spacing: 4, children: [
           if (list.length > _preview)
             TextButton.icon(
-              onPressed: () =>
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupBookScreen(groupId: g.id))),
+              onPressed: () => _push(context, GroupBookScreen(groupId: g.id)),
               icon: const Icon(Icons.menu_book_outlined),
               label: Text(tr('family.seeAll', {'n': list.length})),
             ),
@@ -186,19 +174,8 @@ class GroupBookScreen extends StatelessWidget {
             appBar: AppBar(
               title: Text(g?.name ?? tr('family.defaultName')),
               actions: [
-                if (list.isNotEmpty)
-                  IconButton(
-                    tooltip: tr('pdf.exportGroup'),
-                    icon: const Icon(Icons.picture_as_pdf_outlined),
-                    onPressed: () => exportPdf(context, g!.name, list),
-                  ),
-                if (g != null)
-                  IconButton(
-                    tooltip: tr('family.settings'),
-                    icon: const Icon(Icons.settings_outlined),
-                    onPressed: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupScreen(groupId: g.id))),
-                  ),
+                if (list.isNotEmpty) _pdfButton(context, g!.name, list),
+                if (g != null) _settingsButton(context, g.id),
               ],
             ),
             body: NotebookPage(
@@ -206,8 +183,8 @@ class GroupBookScreen extends StatelessWidget {
                   ? Center(child: Text(tr('family.unavailable')))
                   : RecipeBrowser(
                       recipes: list,
-                      onOpen: (r, shown) => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => RecipeDetailScreen(recipeId: r.id, sequence: [for (final x in shown) x.id]))),
+                      onOpen: (r, shown) =>
+                          _push(context, RecipeDetailScreen(recipeId: r.id, sequence: [for (final x in shown) x.id])),
                       onLongPress: (r) => moveRecipeSheet(context, r),
                       emptyTitle: tr('family.noRecipes'),
                       emptyHint: appState.canAddTo(g.id) ? tr('family.noRecipesHint') : null,
@@ -225,6 +202,72 @@ class GroupBookScreen extends StatelessWidget {
       },
     );
   }
+}
+
+void _push(BuildContext context, Widget page) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+
+Widget _pdfButton(BuildContext context, String title, List<Recipe> recipes) => IconButton(
+      tooltip: tr('pdf.exportGroup'),
+      icon: const Icon(Icons.picture_as_pdf_outlined),
+      onPressed: () => exportPdf(context, title, recipes),
+    );
+
+Widget _settingsButton(BuildContext context, String groupId, {double? iconSize}) => IconButton(
+      tooltip: tr('family.settings'),
+      icon: Icon(Icons.settings_outlined, size: iconSize),
+      onPressed: () => _push(context, GroupScreen(groupId: groupId)),
+    );
+
+/// Esegue un'operazione sul cloud; se fallisce mostra l'errore.
+Future<void> _cloud(BuildContext context, Future<void> Function() action) async {
+  try {
+    await action();
+  } catch (e) {
+    if (context.mounted) showSnack(context, cloudErrorMessage(e));
+  }
+}
+
+/// Dialogo di conferma: true se l'utente accetta.
+Future<bool> _confirm(BuildContext context,
+    {required String title, required String body, required String ok, Color? okColor}) async {
+  final yes = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(title),
+      content: Text(body),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('common.cancel'))),
+        FilledButton(
+          style: okColor == null ? null : FilledButton.styleFrom(backgroundColor: okColor),
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(ok),
+        ),
+      ],
+    ),
+  );
+  return yes == true;
+}
+
+/// Chiede un nome; null se annullato, altrimenti il testo senza spazi ai lati.
+Future<String?> _askName(BuildContext context,
+    {required String title, required String initial, required String ok, String? label, bool words = false}) {
+  final c = TextEditingController(text: initial);
+  return showDialog<String>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(title),
+      content: TextField(
+        controller: c,
+        autofocus: true,
+        textCapitalization: words ? TextCapitalization.words : TextCapitalization.none,
+        decoration: InputDecoration(labelText: label),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(tr('common.cancel'))),
+        FilledButton(onPressed: () => Navigator.pop(ctx, c.text.trim()), child: Text(ok)),
+      ],
+    ),
+  );
 }
 
 Future<void> exportPdf(BuildContext context, String title, List<Recipe> recipes) async {
@@ -321,31 +364,19 @@ Future<void> copyToMine(BuildContext context, Recipe r) async {
 }
 
 Future<void> createGroupDialog(BuildContext context) async {
-  final c = TextEditingController(text: tr('family.defaultName'));
-  final name = await showDialog<String>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(tr('family.newTitle')),
-      content: TextField(
-        controller: c,
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
-        decoration: InputDecoration(labelText: tr('family.nameHint')),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(tr('common.cancel'))),
-        FilledButton(onPressed: () => Navigator.pop(ctx, c.text.trim()), child: Text(tr('common.create'))),
-      ],
-    ),
+  final name = await _askName(
+    context,
+    title: tr('family.newTitle'),
+    initial: tr('family.defaultName'),
+    ok: tr('common.create'),
+    label: tr('family.nameHint'),
+    words: true,
   );
   if (name == null || name.isEmpty || !context.mounted) return;
-  try {
+  await _cloud(context, () async {
     final g = await appState.createGroup(name);
-    if (!context.mounted) return;
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupScreen(groupId: g.id)));
-  } catch (e) {
-    if (context.mounted) showSnack(context, cloudErrorMessage(e));
-  }
+    if (context.mounted) _push(context, GroupScreen(groupId: g.id));
+  });
 }
 
 Future<void> joinGroupDialog(BuildContext context) async {
@@ -365,22 +396,18 @@ Future<void> joinGroupDialog(BuildContext context) async {
         ),
         const SizedBox(height: 8),
         Wrap(alignment: WrapAlignment.center, spacing: 4, children: [
-          TextButton.icon(
-            icon: const Icon(Icons.qr_code_scanner),
-            label: Text(tr('family.scanQr')),
-            onPressed: () async {
-              final code = await scanGroupQr(ctx);
-              if (code != null && ctx.mounted) Navigator.pop(ctx, code);
-            },
-          ),
-          TextButton.icon(
-            icon: const Icon(Icons.image_outlined),
-            label: Text(tr('family.qrFromImage')),
-            onPressed: () async {
-              final code = await groupQrFromImage(ctx);
-              if (code != null && ctx.mounted) Navigator.pop(ctx, code);
-            },
-          ),
+          for (final (icon, label, read) in [
+            (Icons.qr_code_scanner, 'family.scanQr', scanGroupQr),
+            (Icons.image_outlined, 'family.qrFromImage', groupQrFromImage),
+          ])
+            TextButton.icon(
+              icon: Icon(icon),
+              label: Text(tr(label)),
+              onPressed: () async {
+                final code = await read(ctx);
+                if (code != null && ctx.mounted) Navigator.pop(ctx, code);
+              },
+            ),
         ]),
       ]),
       actions: [
@@ -390,12 +417,10 @@ Future<void> joinGroupDialog(BuildContext context) async {
     ),
   );
   if (code == null || code.isEmpty || !context.mounted) return;
-  try {
+  await _cloud(context, () async {
     final g = await appState.joinGroup(code);
     if (context.mounted) showSnack(context, tr('family.joined', {'name': g.name}));
-  } catch (e) {
-    if (context.mounted) showSnack(context, cloudErrorMessage(e));
-  }
+  });
 }
 
 /// Impostazioni di un gruppo: codice invito, QR, membri e ruoli.
@@ -456,23 +481,23 @@ class GroupScreen extends StatelessWidget {
                   HandHeader(tr('family.membersTitle', {'n': g.members.length}), icon: Icons.people_outline),
                   ...g.members.entries.map((m) {
                     final role = g.roleOf(m.key);
+                    final owner = m.key == g.ownerUid;
+                    final editable = manage && !owner && m.key != me;
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: Icon(
-                          m.key == g.ownerUid
+                          owner
                               ? Icons.star
-                              : (role == GroupRole.admin
-                                  ? Icons.admin_panel_settings_outlined
-                                  : (role == GroupRole.viewer ? Icons.visibility_outlined : Icons.person_outline)),
-                          color: m.key == g.ownerUid ? Colors.amber.shade700 : null),
+                              : switch (role) {
+                                  GroupRole.admin => Icons.admin_panel_settings_outlined,
+                                  GroupRole.viewer => Icons.visibility_outlined,
+                                  _ => Icons.person_outline,
+                                },
+                          color: owner ? Colors.amber.shade700 : null),
                       title: Text(m.value + (m.key == me ? ' ${tr('family.you')}' : '')),
-                      subtitle: Text(m.key == g.ownerUid
-                          ? '${tr('family.owner')} · ${groupRoleLabel(role)}'
-                          : groupRoleLabel(role)),
-                      onTap: manage && m.key != g.ownerUid && m.key != me
-                          ? () => _changeRole(context, g, m.key, m.value)
-                          : null,
-                      trailing: manage && m.key != me && m.key != g.ownerUid
+                      subtitle: Text(owner ? '${tr('family.owner')} · ${groupRoleLabel(role)}' : groupRoleLabel(role)),
+                      onTap: editable ? () => _changeRole(context, g, m.key, m.value) : null,
+                      trailing: editable
                           ? IconButton(
                               tooltip: tr('common.remove'),
                               icon: const Icon(Icons.person_remove_outlined),
@@ -542,26 +567,13 @@ class GroupScreen extends StatelessWidget {
       await _adminLocked(context, g, name);
       return;
     }
-    try {
-      await appState.setRole(g, uid, picked);
-    } catch (e) {
-      if (context.mounted) showSnack(context, cloudErrorMessage(e));
-    }
+    await _cloud(context, () => appState.setRole(g, uid, picked));
   }
 
   Future<void> _adminLocked(BuildContext context, FamilyGroup g, String name) async {
-    final contact = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(tr('role.admin')),
-        content: Text(tr('role.adminLocked')),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('common.cancel'))),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('role.contactSupport'))),
-        ],
-      ),
-    );
-    if (contact != true) return;
+    final contact =
+        await _confirm(context, title: tr('role.admin'), body: tr('role.adminLocked'), ok: tr('role.contactSupport'));
+    if (!contact) return;
     final ok = await SupportService.openEmail(
       subject: 'FamilyRecipes - ${tr('role.adminLocked')}',
       body: '${tr('family.inviteCode')}: ${g.id}\n${g.name}\n$name\n\n'
@@ -571,72 +583,30 @@ class GroupScreen extends StatelessWidget {
   }
 
   Future<void> _rename(BuildContext context, FamilyGroup g) async {
-    final c = TextEditingController(text: g.name);
-    final name = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(tr('family.nameTitle')),
-        content: TextField(controller: c, autofocus: true),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(tr('common.cancel'))),
-          FilledButton(onPressed: () => Navigator.pop(ctx, c.text.trim()), child: Text(tr('common.save'))),
-        ],
-      ),
-    );
+    final name = await _askName(context, title: tr('family.nameTitle'), initial: g.name, ok: tr('common.save'));
     if (name == null || name.isEmpty) return;
-    try {
-      await appState.renameGroup(g.id, name);
-    } catch (e) {
-      if (context.mounted) showSnack(context, cloudErrorMessage(e));
-    }
+    await _cloud(context, () => appState.renameGroup(g.id, name));
   }
 
   Future<void> _removeMember(BuildContext context, FamilyGroup g, String uid, String email) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(tr('family.removeTitle')),
-        content: Text(tr('family.removeBody', {'email': email, 'name': g.name})),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('common.cancel'))),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(tr('common.remove'))),
-        ],
-      ),
-    );
-    if (ok != true) return;
-    try {
-      await appState.removeMember(g.id, uid);
-    } catch (e) {
-      if (context.mounted) showSnack(context, cloudErrorMessage(e));
-    }
+    final ok = await _confirm(context,
+        title: tr('family.removeTitle'),
+        body: tr('family.removeBody', {'email': email, 'name': g.name}),
+        ok: tr('common.remove'));
+    if (!ok) return;
+    await _cloud(context, () => appState.removeMember(g.id, uid));
   }
 
   Future<void> _leave(BuildContext context, FamilyGroup g, bool isOwner) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(isOwner ? tr('family.deleteTitle') : tr('family.leaveTitle')),
-        content: Text(isOwner ? tr('family.deleteBody', {'name': g.name}) : tr('family.leaveBody', {'name': g.name})),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(tr('common.cancel'))),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red.shade700),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(isOwner ? tr('common.delete') : tr('family.leaveShort')),
-          ),
-        ],
-      ),
-    );
-    if (ok != true) return;
-    try {
-      if (isOwner) {
-        await appState.deleteGroup(g.id);
-      } else {
-        await appState.leaveGroup(g.id);
-      }
+    final ok = await _confirm(context,
+        title: isOwner ? tr('family.deleteTitle') : tr('family.leaveTitle'),
+        body: isOwner ? tr('family.deleteBody', {'name': g.name}) : tr('family.leaveBody', {'name': g.name}),
+        ok: isOwner ? tr('common.delete') : tr('family.leaveShort'),
+        okColor: Colors.red.shade700);
+    if (!ok) return;
+    await _cloud(context, () async {
+      await (isOwner ? appState.deleteGroup(g.id) : appState.leaveGroup(g.id));
       if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
-    } catch (e) {
-      if (context.mounted) showSnack(context, cloudErrorMessage(e));
-    }
+    });
   }
 }

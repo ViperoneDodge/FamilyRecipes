@@ -23,12 +23,13 @@ class SettingsScreen extends StatelessWidget {
       builder: (context, _) {
         final s = appState.session;
         final scheme = Theme.of(context).colorScheme;
+        void push(Widget page) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
         return TableclothBackground(
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(title: Text(tr('settings.title'))),
             body: NotebookPage(
-              child: ListView(padding: const EdgeInsets.only(top: 0, right: 4), children: [
+              child: ListView(padding: const EdgeInsets.only(right: 4), children: [
                 _header(context, tr('settings.account')),
                 ListTile(
                   leading: Icon(appState.isCloud ? Icons.cloud : Icons.phone_android),
@@ -44,8 +45,7 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(tr('upgrade.button')),
                     subtitle: Text(tr('upgrade.settingsInfo')),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () =>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen(upgrade: true))),
+                    onTap: () => push(const LoginScreen(upgrade: true)),
                   ),
                 ListTile(
                   leading: const Icon(Icons.file_open_outlined),
@@ -78,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(tr('settings.groupAlerts')),
                     subtitle: Text(tr('settings.groupAlertsInfo')),
                     value: appState.groupAlerts,
-                    onChanged: (on) => appState.setGroupAlerts(on),
+                    onChanged: appState.setGroupAlerts,
                   )
                 else
                   Padding(
@@ -103,15 +103,13 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(appState.push.registered ? tr('settings.pushOk') : tr('settings.pushNo')),
                     subtitle: Text(appState.push.registered ? tr('settings.pushOkInfo') : tr('settings.pushNoInfo')),
                     onTap: () async {
-                      if (!appState.push.registered) {
-                        await appState.startPush();
-                        if (context.mounted && !appState.push.registered) {
-                          showSnack(context, tr('settings.pushFailed'));
-                        }
+                      if (appState.push.registered) {
+                        Clipboard.setData(ClipboardData(text: appState.push.token!));
+                        showSnack(context, tr('settings.pushCopied'));
                         return;
                       }
-                      Clipboard.setData(ClipboardData(text: appState.push.token!));
-                      showSnack(context, tr('settings.pushCopied'));
+                      await appState.startPush();
+                      if (context.mounted && !appState.push.registered) showSnack(context, tr('settings.pushFailed'));
                     },
                   ),
                 Padding(
@@ -129,7 +127,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   )
                 else
-                  ..._familySection(context),
+                  ..._familySection(context, push),
                 _header(context, tr('support.title')),
                 if (appState.isAdmin)
                   ListTile(
@@ -137,7 +135,7 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(tr('admin.title')),
                     subtitle: Text(tr('admin.subtitle')),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminScreen())),
+                    onTap: () => push(const AdminScreen()),
                   ),
                 ListTile(
                   leading: const Icon(Icons.bug_report_outlined),
@@ -292,86 +290,71 @@ class SettingsScreen extends StatelessWidget {
         child: SegmentedButton<ThemeMode>(
           showSelectedIcon: false,
           segments: [
-            ButtonSegment(value: ThemeMode.light, icon: const Icon(Icons.light_mode), label: Text(tr('theme.light'))),
-            ButtonSegment(value: ThemeMode.dark, icon: const Icon(Icons.dark_mode), label: Text(tr('theme.dark'))),
-            ButtonSegment(
-                value: ThemeMode.system, icon: const Icon(Icons.brightness_auto), label: Text(tr('theme.auto'))),
+            for (final (mode, icon, label) in [
+              (ThemeMode.light, Icons.light_mode, 'theme.light'),
+              (ThemeMode.dark, Icons.dark_mode, 'theme.dark'),
+              (ThemeMode.system, Icons.brightness_auto, 'theme.auto'),
+            ])
+              ButtonSegment(value: mode, icon: Icon(icon), label: Text(tr(label))),
           ],
           selected: {t.mode},
           onSelectionChanged: (sel) => save(mode: sel.first),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-        child: Text(tr('theme.cover')),
-      ),
+      _label(tr('theme.cover'), top: 8),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: List.generate(palettes.length, (i) {
-            final p = palettes[i];
-            final sel = i == t.palette;
-            return Tooltip(
-              message: p.name,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => save(palette: i),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: p.seed,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: sel ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
-                      width: 3,
+          children: [
+            for (final (i, p) in palettes.indexed)
+              Tooltip(
+                message: p.name,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => save(palette: i),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: p.seed,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: i == t.palette ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
+                        width: 3,
+                      ),
                     ),
+                    child: i == t.palette ? const Icon(Icons.check, color: Colors.white) : null,
                   ),
-                  child: sel ? const Icon(Icons.check, color: Colors.white) : null,
                 ),
               ),
-            );
-          }),
+          ],
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-        child: Text(tr('theme.paper')),
-      ),
+      _label(tr('theme.paper')),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Wrap(
           spacing: 8,
-          children: PaperStyle.values
-              .map((p) => ChoiceChip(
-                    label: Text(paperStyleLabel(p)),
-                    selected: t.paper == p,
-                    onSelected: (_) => save(paper: p),
-                  ))
-              .toList(),
+          children: [
+            for (final p in PaperStyle.values)
+              ChoiceChip(label: Text(paperStyleLabel(p)), selected: t.paper == p, onSelected: (_) => save(paper: p)),
+          ],
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-        child: Text(tr('tabs.title')),
-      ),
+      _label(tr('tabs.title')),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: SegmentedButton<TabsStyle>(
           showSelectedIcon: false,
           segments: [
-            ButtonSegment(
-                value: TabsStyle.top, icon: const Icon(Icons.border_top), label: Text(tabsStyleLabel(TabsStyle.top))),
-            ButtonSegment(
-                value: TabsStyle.right,
-                icon: const Icon(Icons.border_right),
-                label: Text(tabsStyleLabel(TabsStyle.right))),
-            ButtonSegment(
-                value: TabsStyle.none,
-                icon: const Icon(Icons.filter_list),
-                label: Text(tabsStyleLabel(TabsStyle.none))),
+            for (final (style, icon) in [
+              (TabsStyle.top, Icons.border_top),
+              (TabsStyle.right, Icons.border_right),
+              (TabsStyle.none, Icons.filter_list),
+            ])
+              ButtonSegment(value: style, icon: Icon(icon), label: Text(tabsStyleLabel(style))),
           ],
           selected: {t.tabs},
           onSelectionChanged: (sel) => save(tabs: sel.first),
@@ -392,16 +375,16 @@ class SettingsScreen extends StatelessWidget {
     ];
   }
 
-  List<Widget> _familySection(BuildContext context) {
-    final groups = appState.data.groups;
+  List<Widget> _familySection(BuildContext context, void Function(Widget page) push) {
     return [
-      ...groups.map((g) => ListTile(
-            leading: const Icon(Icons.groups_outlined),
-            title: Text(g.name),
-            subtitle: Text('${trn('family.members', g.members.length)} · ${tr('settings.code', {'code': g.id})}'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => GroupScreen(groupId: g.id))),
-          )),
+      for (final g in appState.data.groups)
+        ListTile(
+          leading: const Icon(Icons.groups_outlined),
+          title: Text(g.name),
+          subtitle: Text('${trn('family.members', g.members.length)} · ${tr('settings.code', {'code': g.id})}'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => push(GroupScreen(groupId: g.id)),
+        ),
       ListTile(
         leading: const Icon(Icons.group_add),
         title: Text(tr('family.create')),
@@ -433,17 +416,21 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => Navigator.pop(ctx, auto),
           ),
           const Divider(height: 1),
-          ...codes.map((c) => ListTile(
-                title: Text(L10n.names[c]!),
-                trailing: appState.langPref == c ? const Icon(Icons.check) : null,
-                onTap: () => Navigator.pop(ctx, c),
-              )),
+          for (final c in codes)
+            ListTile(
+              title: Text(L10n.names[c]!),
+              trailing: appState.langPref == c ? const Icon(Icons.check) : null,
+              onTap: () => Navigator.pop(ctx, c),
+            ),
         ]),
       ),
     );
     if (sel == null) return;
     await appState.setLanguage(sel == auto ? null : sel);
   }
+
+  /// Etichetta di un gruppo di opzioni nella sezione Aspetto.
+  Widget _label(String t, {double top = 14}) => Padding(padding: EdgeInsets.fromLTRB(16, top, 16, 6), child: Text(t));
 
   Widget _header(BuildContext context, String t) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
