@@ -105,17 +105,20 @@ Pubblicata il 9 ottobre 2026:
 - [x] Semplificazioni: un solo elenco di parole (categorie, difficoltà, costo in più lingue) per lettura da
   foto, importazione e siti; PDF e schermate invariati.
 
-## Prossima release
+## Versione 1.5.1
 
 - [x] **Ricette raggruppate per categoria**: con la linguetta "Tutte" (Le mie e ricettario del gruppo) le
   ricette sono divise per categoria, con un titolo per ogni gruppo, nello stesso ordine delle linguette
   (Aperitivi, Antipasti, Primi…); dentro ogni gruppo resta l'ordinamento scelto (alfabetico o più
   recenti). Lo swipe tra le ricette segue lo stesso ordine.
+- [x] **Versioni dei pacchetti bloccate**: `pubspec.lock` è nel repository, così ogni build usa le versioni
+  provate (nella 1.5.0 GitHub aveva preso da solo `image` 4.11.0, incompatibile). I pacchetti si aggiornano
+  solo di proposito, con i test.
+- [x] **Pulizia del codice**: schermate, servizi e widget semplificati (codice ripetuto raccolto in piccoli
+  aiuti, un solo download HTTP per TheMealDB e siti di ricette, una sola "lapide" per le ricette eliminate,
+  switch expression); nessun cambiamento visibile, schermate di prova identiche pixel per pixel.
+
+## Prossima release
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
   della scrittura a mano (ora riconosce bene soprattutto il testo stampato).
-
-- [ ] **Versioni dei pacchetti bloccate**: salvare `pubspec.lock` nel repository (toglierlo dal `.gitignore`)
-  così ogni build usa esattamente le versioni provate. Nella 1.5.0 la build è fallita perché GitHub ha preso
-  da solo `image` 4.11.0, appena uscita e incompatibile con `archive` 4.0.9; per ora `image` è bloccato
-  sotto la 4.11.0 nel `pubspec.yaml`. Dopo, aggiornare i pacchetti solo di proposito, con i test.

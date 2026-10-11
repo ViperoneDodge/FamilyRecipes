@@ -12,6 +12,5 @@ build/
 /macos/
 /windows/
 /web/
-pubspec.lock
 .metadata
 tool/screenshots/out/**/*.pdf
