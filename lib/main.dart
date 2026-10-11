@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -23,15 +22,7 @@ Future<void> main() async {
   } catch (_) {
     await L10n.load('en');
   }
-  if (FirebaseConfig.isConfigured) {
-    try {
-      await Firebase.initializeApp();
-    } catch (_) {
-      try {
-        await Firebase.initializeApp(options: FirebaseConfig.options);
-      } catch (_) {}
-    }
-  }
+  if (FirebaseConfig.isConfigured) await FirebaseConfig.initialize();
   await initGroupWatch();
   await applyOrientationLock();
   appState = AppState();

@@ -23,4 +23,15 @@ class FirebaseConfig {
         projectId: projectId,
         storageBucket: storageBucket,
       );
+
+  /// Avvia Firebase con `google-services.json` o, se manca, con i valori qui sopra.
+  static Future<void> initialize() async {
+    try {
+      await Firebase.initializeApp();
+    } catch (_) {
+      try {
+        await Firebase.initializeApp(options: options);
+      } catch (_) {}
+    }
+  }
 }

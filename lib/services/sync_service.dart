@@ -18,21 +18,13 @@ String cloudErrorMessage(Object e) {
   if (e is GroupException) return e.message;
   if (e is TimeoutException) return tr('cloud.offline');
   if (e is FirebaseException) {
-    switch (e.code) {
-      case 'permission-denied':
-        return tr('cloud.permissionDenied');
-      case 'not-found':
-        return (e.message ?? '').contains('database')
-            ? tr('cloud.noDatabase')
-            : tr('family.badCode');
-      case 'unavailable':
-      case 'deadline-exceeded':
-        return tr('cloud.offline');
-      case 'unauthenticated':
-        return tr('cloud.unauthenticated');
-      default:
-        return tr('cloud.generic', {'code': e.code});
-    }
+    return switch (e.code) {
+      'permission-denied' => tr('cloud.permissionDenied'),
+      'not-found' => (e.message ?? '').contains('database') ? tr('cloud.noDatabase') : tr('family.badCode'),
+      'unavailable' || 'deadline-exceeded' => tr('cloud.offline'),
+      'unauthenticated' => tr('cloud.unauthenticated'),
+      _ => tr('cloud.generic', {'code': e.code}),
+    };
   }
   return tr('cloud.generic', {'code': e.toString()});
 }
@@ -163,7 +155,7 @@ class SyncService {
         await _photos(toUid).doc(p).set({...data, 'recipeId': moved.id}).timeout(_timeout);
       }
     }
-    final tomb = _tombstone(r, now, admin);
+    final tomb = r.tombstone(at: now, by: admin.displayName, byUid: admin.key)..bookId = null;
     final batch = _db.batch()
       ..set(_recipes(toUid).doc(moved.id), moved.toJson())
       ..set(_recipes(from).doc(r.id), tomb.toJson());
@@ -172,19 +164,6 @@ class SyncService {
       _photos(from).doc(p).delete().catchError((_) {});
     }
   }
-
-  Recipe _tombstone(Recipe r, int now, Session by) => Recipe(
-        id: r.id,
-        category: r.category,
-        title: r.title,
-        createdBy: r.createdBy,
-        createdByName: r.createdByName,
-        createdAt: r.createdAt,
-        updatedAt: now,
-        updatedBy: by.displayName,
-        updatedByUid: by.key,
-        deleted: true,
-      );
 
   Future<void> deleteAllData(Session s, List<FamilyGroup> groups) async {
     final uid = s.key;
@@ -224,19 +203,11 @@ class SyncService {
       });
 
   Future<void> setRole(String groupId, String uid, GroupRole role) {
-    final Map<String, dynamic> change;
-    switch (role) {
-      case GroupRole.admin:
-        change = {'admins': FieldValue.arrayUnion([uid]), 'viewers': FieldValue.arrayRemove([uid])};
-        break;
-      case GroupRole.editor:
-        change = {'admins': FieldValue.arrayRemove([uid]), 'viewers': FieldValue.arrayRemove([uid])};
-        break;
-      case GroupRole.viewer:
-        change = {'admins': FieldValue.arrayRemove([uid]), 'viewers': FieldValue.arrayUnion([uid])};
-        break;
-    }
-    return _books.doc(groupId).update(change).timeout(_timeout);
+    FieldValue put(bool on) => on ? FieldValue.arrayUnion([uid]) : FieldValue.arrayRemove([uid]);
+    return _books
+        .doc(groupId)
+        .update({'admins': put(role == GroupRole.admin), 'viewers': put(role == GroupRole.viewer)})
+        .timeout(_timeout);
   }
 
   /// Elimina il gruppo: prima ricette e foto, poi il documento del gruppo.
@@ -273,12 +244,10 @@ class SyncService {
     stop();
     _listenRecipes(personalId, onRecipes, localRecipes, pushRecipe);
     _groupsSub = _books.where('members', arrayContains: session.key).snapshots().listen((snap) {
-      final groups = <FamilyGroup>[];
-      for (final d in snap.docs) {
-        final data = d.data();
-        if (data['personal'] == true) continue;
-        groups.add(FamilyGroup.fromDoc(d.id, data));
-      }
+      final groups = [
+        for (final d in snap.docs)
+          if (d.data()['personal'] != true) FamilyGroup.fromDoc(d.id, d.data()),
+      ];
       final wanted = {personalId, ...groups.map((g) => g.id)};
       for (final id in _recipeSubs.keys.toList()) {
         if (!wanted.contains(id)) {

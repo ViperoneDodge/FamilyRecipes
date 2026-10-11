@@ -77,9 +77,7 @@ class L10n {
 
 String tr(String key, [Map<String, Object?>? args]) {
   var s = L10n._cur[key] ?? L10n._en[key] ?? L10n._it[key] ?? key;
-  if (args != null) {
-    args.forEach((k, v) => s = s.replaceAll('{$k}', '$v'));
-  }
+  args?.forEach((k, v) => s = s.replaceAll('{$k}', '$v'));
   return s;
 }
 

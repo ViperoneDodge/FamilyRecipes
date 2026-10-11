@@ -23,8 +23,7 @@ class AuthService {
   bool get cloudAvailable => FirebaseConfig.isConfigured;
 
   String _hash(String password, String salt) {
-    var bytes = utf8.encode('$salt:$password');
-    var digest = sha256.convert(bytes);
+    var digest = sha256.convert(utf8.encode('$salt:$password'));
     for (var i = 0; i < 5000; i++) {
       digest = sha256.convert([...digest.bytes, ...utf8.encode(salt)]);
     }
@@ -67,58 +66,39 @@ class AuthService {
         email: user.email,
       );
 
-  String _firebaseError(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'invalid-email':
-        return tr('auth.invalidEmail');
-      case 'user-not-found':
-      case 'wrong-password':
-      case 'invalid-credential':
-        return tr('auth.badCredentials');
-      case 'email-already-in-use':
-        return tr('auth.emailInUse');
-      case 'weak-password':
-        return tr('auth.weakPass');
-      case 'network-request-failed':
-        return tr('auth.network');
-      case 'operation-not-allowed':
-        return tr('auth.emailDisabled');
-      case 'too-many-requests':
-        return tr('auth.tooMany');
-      case 'user-disabled':
-        return tr('auth.userDisabled');
-      default:
-        return tr('auth.generic', {'code': e.code});
-    }
-  }
+  String _firebaseError(FirebaseAuthException e) => switch (e.code) {
+        'invalid-email' => tr('auth.invalidEmail'),
+        'user-not-found' || 'wrong-password' || 'invalid-credential' => tr('auth.badCredentials'),
+        'email-already-in-use' => tr('auth.emailInUse'),
+        'weak-password' => tr('auth.weakPass'),
+        'network-request-failed' => tr('auth.network'),
+        'operation-not-allowed' => tr('auth.emailDisabled'),
+        'too-many-requests' => tr('auth.tooMany'),
+        'user-disabled' => tr('auth.userDisabled'),
+        _ => tr('auth.generic', {'code': e.code}),
+      };
 
-  Future<Session> registerCloud(String email, String password) async {
+  /// Esegue una chiamata a Firebase Auth traducendo gli errori in [AuthException].
+  Future<T> _firebase<T>(Future<T> Function() call) async {
     try {
-      final c = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email.trim(), password: password);
-      return _fromUser(c.user!);
+      return await call();
     } on FirebaseAuthException catch (e) {
       throw AuthException(_firebaseError(e));
     }
   }
 
-  Future<Session> loginCloud(String email, String password) async {
-    try {
-      final c = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email.trim(), password: password);
-      return _fromUser(c.user!);
-    } on FirebaseAuthException catch (e) {
-      throw AuthException(_firebaseError(e));
-    }
-  }
+  Future<Session> registerCloud(String email, String password) => _firebase(() async {
+        final c = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email.trim(), password: password);
+        return _fromUser(c.user!);
+      });
 
-  Future<void> resetPassword(String email) async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
-    } on FirebaseAuthException catch (e) {
-      throw AuthException(_firebaseError(e));
-    }
-  }
+  Future<Session> loginCloud(String email, String password) => _firebase(() async {
+        final c = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email.trim(), password: password);
+        return _fromUser(c.user!);
+      });
+
+  Future<void> resetPassword(String email) =>
+      _firebase(() => FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim()));
 
   GoogleSignIn _google() => GoogleSignIn(
         scopes: const ['email'],
@@ -129,8 +109,7 @@ class AuthService {
 
   Future<Session> loginGoogle() async {
     try {
-      final g = _google();
-      final account = await g.signIn();
+      final account = await _google().signIn();
       if (account == null) throw AuthException(tr('auth.googleCancelled'));
       final auth = await account.authentication;
       final cred = GoogleAuthProvider.credential(

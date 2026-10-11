@@ -22,8 +22,8 @@ class PushService {
       if (Platform.isIOS) {
         await m.requestPermission(alert: true, badge: true, sound: true);
       }
-      token = await m.getToken();
-      if (token != null) await _save(token!);
+      final t = token = await m.getToken();
+      if (t != null) await _save(t);
       _tokenSub ??= m.onTokenRefresh.listen((t) {
         token = t;
         _save(t);
@@ -35,8 +35,7 @@ class PushService {
           n?.body ?? msg.data['body']?.toString(),
         );
       });
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   Future<void> _save(String t) async {

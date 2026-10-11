@@ -10,36 +10,28 @@ String newId([int length = 16]) {
 
 enum RecipeCategory { aperitivi, antipasti, primi, secondi, contorni, dolci, liquori, conserve, menu }
 
-RecipeCategory categoryFrom(String? s) {
-  for (final c in RecipeCategory.values) {
-    if (c.name == s) return c;
-  }
-  return RecipeCategory.primi;
-}
+RecipeCategory categoryFrom(String? s) => RecipeCategory.values.asNameMap()[s] ?? RecipeCategory.primi;
 
 String categoryLabel(RecipeCategory c) => tr('cat.${c.name}');
 
 enum Difficulty { veryEasy, easy, medium, hard }
 
-Difficulty difficultyFrom(String? s) {
-  for (final d in Difficulty.values) {
-    if (d.name == s) return d;
-  }
-  return Difficulty.easy;
-}
+Difficulty difficultyFrom(String? s) => Difficulty.values.asNameMap()[s] ?? Difficulty.easy;
 
 String difficultyLabel(Difficulty d) => tr('diff.${d.name}');
 
 enum Cost { veryLow, low, medium, high }
 
-Cost costFrom(String? s) {
-  for (final c in Cost.values) {
-    if (c.name == s) return c;
-  }
-  return Cost.low;
-}
+Cost costFrom(String? s) => Cost.values.asNameMap()[s] ?? Cost.low;
 
 String costLabel(Cost c) => tr('cost.${c.name}');
+
+/// Elenco JSON come testi (vuoto se manca).
+List<String> _strings(Object? l) => ((l as List?) ?? const []).map((e) => e.toString()).toList();
+
+/// Elenco JSON di oggetti (vuoto se manca).
+List<Map<String, dynamic>> _maps(Object? l) =>
+    ((l as List?) ?? const []).map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
 String fmtMinutes(int m) {
   if (m <= 0) return '—';
@@ -83,7 +75,7 @@ class RecipeStep {
   factory RecipeStep.fromJson(Map<String, dynamic> j) => RecipeStep(
         id: j['id'] as String?,
         text: j['text'] as String? ?? '',
-        photos: ((j['photos'] as List?) ?? const []).map((e) => e.toString()).toList(),
+        photos: _strings(j['photos']),
       );
 }
 
@@ -189,9 +181,6 @@ class Recipe {
         'bookId': bookId,
       };
 
-  static List<Map<String, dynamic>> _maps(Object? l) =>
-      ((l as List?) ?? const []).map((e) => Map<String, dynamic>.from(e as Map)).toList();
-
   factory Recipe.fromJson(Map<String, dynamic> j) => Recipe(
         id: j['id'] as String?,
         category: categoryFrom(j['category'] as String?),
@@ -206,7 +195,7 @@ class Recipe {
         ingredients: _maps(j['ingredients']).map(Ingredient.fromJson).toList(),
         steps: _maps(j['steps']).map(RecipeStep.fromJson).toList(),
         tips: j['tips'] as String? ?? '',
-        courses: ((j['courses'] as List?) ?? const []).map((e) => e.toString()).toList(),
+        courses: _strings(j['courses']),
         updatedAt: (j['updatedAt'] as num?)?.toInt() ?? 0,
         updatedBy: j['updatedBy'] as String? ?? '',
         updatedByUid: j['updatedByUid'] as String? ?? '',
@@ -219,6 +208,21 @@ class Recipe {
 
   Recipe copy() => Recipe.fromJson(toJson());
 
+  /// Lapide della ricetta eliminata: restano solo i dati che servono alla sincronizzazione.
+  Recipe tombstone({required int at, required String by, required String byUid}) => Recipe(
+        id: id,
+        category: category,
+        title: title,
+        createdBy: createdBy,
+        createdByName: createdByName,
+        createdAt: createdAt,
+        updatedAt: at,
+        updatedBy: by,
+        updatedByUid: byUid,
+        deleted: true,
+        bookId: bookId,
+      );
+
   /// Testo usato dalla ricerca.
   String get searchText => [
         title,
@@ -230,16 +234,7 @@ class Recipe {
 
 enum GroupRole { admin, editor, viewer }
 
-String groupRoleLabel(GroupRole r) {
-  switch (r) {
-    case GroupRole.admin:
-      return tr('role.admin');
-    case GroupRole.editor:
-      return tr('role.editor');
-    case GroupRole.viewer:
-      return tr('role.viewer');
-  }
-}
+String groupRoleLabel(GroupRole r) => tr('role.${r.name}');
 
 class FamilyGroup {
   final String id;
@@ -285,8 +280,8 @@ class FamilyGroup {
         ownerUid: j['ownerUid'] as String? ?? '',
         members: Map<String, dynamic>.from((j['members'] as Map?) ?? {})
             .map((k, v) => MapEntry(k, v.toString())),
-        admins: ((j['admins'] as List?) ?? const []).map((e) => e.toString()).toSet(),
-        viewers: ((j['viewers'] as List?) ?? const []).map((e) => e.toString()).toSet(),
+        admins: _strings(j['admins']).toSet(),
+        viewers: _strings(j['viewers']).toSet(),
       );
 
   /// Costruisce il gruppo dal documento Firestore `books/{id}`.
@@ -301,8 +296,8 @@ class FamilyGroup {
       name: (data['name'] as String?) ?? tr('family.defaultName'),
       ownerUid: (data['ownerUid'] as String?) ?? '',
       members: members,
-      admins: ((data['admins'] as List?) ?? const []).map((e) => e.toString()).toSet(),
-      viewers: ((data['viewers'] as List?) ?? const []).map((e) => e.toString()).toSet(),
+      admins: _strings(data['admins']).toSet(),
+      viewers: _strings(data['viewers']).toSet(),
     );
   }
 }
@@ -325,12 +320,7 @@ class UserData {
         groups = groups ?? [],
         uploaded = uploaded ?? {};
 
-  FamilyGroup? groupById(String? id) {
-    for (final g in groups) {
-      if (g.id == id) return g;
-    }
-    return null;
-  }
+  FamilyGroup? groupById(String? id) => groups.where((g) => g.id == id).firstOrNull;
 
   Map<String, dynamic> toJson() => {
         'recipes': recipes.map((r) => r.toJson()).toList(),
@@ -340,16 +330,10 @@ class UserData {
       };
 
   factory UserData.fromJson(Map<String, dynamic> j) => UserData(
-        recipes: (j['recipes'] as List?)
-                ?.map((e) => Recipe.fromJson(Map<String, dynamic>.from(e as Map)))
-                .toList() ??
-            [],
+        recipes: _maps(j['recipes']).map(Recipe.fromJson).toList(),
         personalBookId: j['personalBookId'] as String?,
-        groups: (j['groups'] as List?)
-                ?.map((e) => FamilyGroup.fromJson(Map<String, dynamic>.from(e as Map)))
-                .toList() ??
-            [],
-        uploaded: ((j['uploaded'] as List?) ?? const []).map((e) => e.toString()).toSet(),
+        groups: _maps(j['groups']).map(FamilyGroup.fromJson).toList(),
+        uploaded: _strings(j['uploaded']).toSet(),
       );
 }
 

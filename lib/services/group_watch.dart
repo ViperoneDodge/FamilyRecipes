@@ -97,15 +97,7 @@ class GroupActivity {
 
   String get text {
     final w = who.isEmpty ? tr('groupAct.someone') : who;
-    final args = {'who': w, 'recipe': recipe, 'category': categoryLabel(category)};
-    switch (action) {
-      case GroupAction.added:
-        return tr('groupAct.added', args);
-      case GroupAction.edited:
-        return tr('groupAct.edited', args);
-      case GroupAction.deleted:
-        return tr('groupAct.deleted', args);
-    }
+    return tr('groupAct.${action.name}', {'who': w, 'recipe': recipe, 'category': categoryLabel(category)});
   }
 }
 
@@ -122,12 +114,14 @@ List<GroupActivity> findActivities({
     if (r.updatedAt <= since) continue;
     final mine = r.updatedByUid.isNotEmpty ? r.updatedByUid == me : r.updatedBy == myName;
     if (mine) continue;
+    final known = existed(r.id);
+    // Una ricetta mai vista e già eliminata non interessa.
+    if (r.deleted && !known) continue;
     final action = r.deleted
         ? GroupAction.deleted
-        : existed(r.id)
+        : known
             ? GroupAction.edited
             : GroupAction.added;
-    if (action == GroupAction.deleted && !existed(r.id)) continue;
     out.add(GroupActivity(groupName, r.updatedBy, r.displayTitle, r.category, action));
   }
   return out;
@@ -198,13 +192,7 @@ Future<void> _backgroundCheck() async {
   await L10n.load(L10n.resolve(settings?['lang'] as String?));
 
   if (!FirebaseConfig.isConfigured) return;
-  if (Firebase.apps.isEmpty) {
-    try {
-      await Firebase.initializeApp();
-    } catch (_) {
-      await Firebase.initializeApp(options: FirebaseConfig.options);
-    }
-  }
+  if (Firebase.apps.isEmpty) await FirebaseConfig.initialize();
   final user = FirebaseAuth.instance.currentUser;
   if (user == null || user.uid != w.uid) return;
 

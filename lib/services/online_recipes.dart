@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import '../l10n.dart';
 import '../models.dart';
+import 'http_get.dart';
 
 /// Ricetta da internet: da TheMealDB (www.themealdb.com, in inglese, da tradurre) oppure da un sito
 /// di ricette nella lingua dell'app ([site] non vuoto: GialloZafferano, Marmiton…), già nella lingua giusta.
@@ -94,52 +93,40 @@ class OnlineRecipe {
   bool get isPartial => instructions.isEmpty && ingredients.isEmpty;
 
   factory OnlineRecipe.fromJson(Map<String, dynamic> j) {
-    final ings = <Ingredient>[];
-    for (var i = 1; i <= 20; i++) {
-      final name = (j['strIngredient$i'] as String?)?.trim() ?? '';
-      if (name.isEmpty) continue;
-      ings.add(Ingredient(name: name, amount: (j['strMeasure$i'] as String?)?.trim() ?? ''));
-    }
+    String str(String key) => (j[key] as String?)?.trim() ?? '';
     return OnlineRecipe(
       id: '${j['idMeal'] ?? ''}',
-      title: (j['strMeal'] as String?)?.trim() ?? '',
-      category: (j['strCategory'] as String?)?.trim() ?? '',
-      area: (j['strArea'] as String?)?.trim() ?? '',
-      instructions: (j['strInstructions'] as String?)?.trim() ?? '',
-      thumb: (j['strMealThumb'] as String?)?.trim() ?? '',
-      source: (j['strSource'] as String?)?.trim() ?? '',
-      ingredients: ings,
+      title: str('strMeal'),
+      category: str('strCategory'),
+      area: str('strArea'),
+      instructions: str('strInstructions'),
+      thumb: str('strMealThumb'),
+      source: str('strSource'),
+      ingredients: [
+        for (var i = 1; i <= 20; i++)
+          if (str('strIngredient$i').isNotEmpty) Ingredient(name: str('strIngredient$i'), amount: str('strMeasure$i')),
+      ],
     );
   }
 
   /// Categoria del ricettario più vicina a quella di TheMealDB.
-  RecipeCategory get recipeCategory {
-    if (webCategory != null) return webCategory!;
-    switch (category.toLowerCase()) {
-      case 'dessert':
-        return RecipeCategory.dolci;
-      case 'starter':
-        return RecipeCategory.antipasti;
-      case 'side':
-        return RecipeCategory.contorni;
-      case 'pasta':
-      case 'breakfast':
-        return RecipeCategory.primi;
-      default:
-        return RecipeCategory.secondi;
-    }
-  }
+  RecipeCategory get recipeCategory =>
+      webCategory ??
+      switch (category.toLowerCase()) {
+        'dessert' => RecipeCategory.dolci,
+        'starter' => RecipeCategory.antipasti,
+        'side' => RecipeCategory.contorni,
+        'pasta' || 'breakfast' => RecipeCategory.primi,
+        _ => RecipeCategory.secondi,
+      };
 
   /// Passaggi: un paragrafo per passaggio, senza le righe "STEP 1".
   List<String> get steps {
     if (_steps != null) return _steps;
-    final out = <String>[];
-    for (final raw in instructions.split(RegExp(r'\r?\n'))) {
-      final t = raw.trim().replaceFirst(RegExp(r'^(step\s*\d+[:.)]?|\d+[.)])\s*', caseSensitive: false), '');
-      if (t.isEmpty) continue;
-      out.add(t);
-    }
-    return out;
+    return [
+      for (final raw in instructions.split(RegExp(r'\r?\n')))
+        raw.trim().replaceFirst(RegExp(r'^(step\s*\d+[:.)]?|\d+[.)])\s*', caseSensitive: false), ''),
+    ].where((t) => t.isNotEmpty).toList();
   }
 
   /// Riconoscimento della fonte, messo in fondo alla ricetta.
@@ -175,19 +162,8 @@ class OnlineRecipe {
 
 class OnlineRecipes {
   static const String _base = 'https://www.themealdb.com/api/json/v1/1';
-  static const Duration _timeout = Duration(seconds: 15);
 
-  static Future<dynamic> _get(String path) async {
-    final client = HttpClient()..connectionTimeout = _timeout;
-    try {
-      final req = await client.getUrl(Uri.parse('$_base/$path')).timeout(_timeout);
-      final res = await req.close().timeout(_timeout);
-      if (res.statusCode != 200) throw HttpException('HTTP ${res.statusCode}');
-      return jsonDecode(await res.transform(utf8.decoder).join().timeout(_timeout));
-    } finally {
-      client.close();
-    }
-  }
+  static Future<dynamic> _get(String path) async => jsonDecode(utf8.decode(await httpGet('$_base/$path')));
 
   static List<OnlineRecipe> parseMeals(dynamic j) {
     final meals = (j is Map ? j['meals'] : null) as List?;
@@ -196,15 +172,10 @@ class OnlineRecipes {
   }
 
   /// Una ricetta a caso.
-  static Future<OnlineRecipe?> random() async {
-    final list = parseMeals(await _get('random.php'));
-    return list.isEmpty ? null : list.first;
-  }
+  static Future<OnlineRecipe?> random() async => parseMeals(await _get('random.php')).firstOrNull;
 
-  static Future<OnlineRecipe?> lookup(String id) async {
-    final list = parseMeals(await _get('lookup.php?i=${Uri.encodeQueryComponent(id)}'));
-    return list.isEmpty ? null : list.first;
-  }
+  static Future<OnlineRecipe?> lookup(String id) async =>
+      parseMeals(await _get('lookup.php?i=${Uri.encodeQueryComponent(id)}')).firstOrNull;
 
   /// Ricette che contengono tutti gli ingredienti (nomi in inglese). TheMealDB gratuito cerca un
   /// ingrediente alla volta: si cerca il primo e si controllano gli altri nei dettagli.
@@ -225,20 +196,10 @@ class OnlineRecipes {
 
   static Future<Uint8List?> download(String url) async {
     if (url.isEmpty) return null;
-    final client = HttpClient()..connectionTimeout = _timeout;
     try {
-      final req = await client.getUrl(Uri.parse(url)).timeout(_timeout);
-      final res = await req.close().timeout(_timeout);
-      if (res.statusCode != 200) return null;
-      final b = BytesBuilder(copy: false);
-      await for (final chunk in res.timeout(_timeout)) {
-        b.add(chunk);
-      }
-      return b.takeBytes();
+      return await httpGet(url);
     } catch (_) {
       return null;
-    } finally {
-      client.close();
     }
   }
 }
