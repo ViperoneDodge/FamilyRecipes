@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../l10n.dart';
 import '../models.dart';
+import '../services/online_recipes.dart' show OnlineRecipe;
 import '../services/recipe_reader.dart';
 import '../services/web_recipes.dart';
 import '../theme.dart';
@@ -17,77 +18,72 @@ import 'suggest_screen.dart' show OnlineRecipeScreen;
 Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory? category}) async {
   final choice = await showModalBottomSheet<String>(
     context: context,
-    builder: (ctx) => SafeArea(
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-          child: Text(tr('recipe.new'), style: const TextStyle(fontFamily: handFont, fontSize: 26)),
-        ),
-        ListTile(
-          leading: const Icon(Icons.edit_note),
-          title: Text(tr('scan.write')),
-          subtitle: Text(tr('scan.writeInfo')),
-          onTap: () => Navigator.pop(ctx, 'write'),
-        ),
-        const Divider(height: 1),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-          child: Text(tr('scan.readTitle'), style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
-        ),
-        ListTile(
-          leading: const Icon(Icons.document_scanner_outlined),
-          title: Text(tr('scan.camera')),
-          subtitle: Text(tr('scan.cameraInfo')),
-          onTap: () => Navigator.pop(ctx, 'camera'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.photo_library_outlined),
-          title: Text(tr('scan.gallery')),
-          subtitle: Text(tr('scan.galleryInfo')),
-          onTap: () => Navigator.pop(ctx, 'gallery'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.picture_as_pdf_outlined),
-          title: Text(tr('scan.pdf')),
-          subtitle: Text(tr('scan.pdfInfo', {'n': RecipeReader.maxPdfPages})),
-          onTap: () => Navigator.pop(ctx, 'pdf'),
-        ),
-        ListTile(
-          leading: const Icon(Icons.link),
-          title: Text(tr('link.menu')),
-          subtitle: Text(tr('link.menuInfo')),
-          onTap: () => Navigator.pop(ctx, 'link'),
-        ),
-        const Divider(height: 1),
-        ListTile(
-          leading: const Icon(Icons.file_open_outlined),
-          title: Text(tr('import.menu')),
-          subtitle: Text(tr('import.menuInfo')),
-          onTap: () => Navigator.pop(ctx, 'import'),
-        ),
-        const SizedBox(height: 8),
-      ]),
-    ),
+    builder: (ctx) {
+      Widget option(String value, IconData icon, String title, String subtitle) => ListTile(
+            leading: Icon(icon),
+            title: Text(title),
+            subtitle: Text(subtitle),
+            onTap: () => Navigator.pop(ctx, value),
+          );
+      return SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(tr('recipe.new'), style: const TextStyle(fontFamily: handFont, fontSize: 26)),
+          ),
+          option('write', Icons.edit_note, tr('scan.write'), tr('scan.writeInfo')),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: Text(tr('scan.readTitle'), style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+          ),
+          option('camera', Icons.document_scanner_outlined, tr('scan.camera'), tr('scan.cameraInfo')),
+          option('gallery', Icons.photo_library_outlined, tr('scan.gallery'), tr('scan.galleryInfo')),
+          option('pdf', Icons.picture_as_pdf_outlined, tr('scan.pdf'),
+              tr('scan.pdfInfo', {'n': RecipeReader.maxPdfPages})),
+          option('link', Icons.link, tr('link.menu'), tr('link.menuInfo')),
+          const Divider(height: 1),
+          option('import', Icons.file_open_outlined, tr('import.menu'), tr('import.menuInfo')),
+          const SizedBox(height: 8),
+        ]),
+      );
+    },
   );
   if (choice == null || !context.mounted) return;
-  if (choice == 'write') {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => RecipeEditScreen(recipe: Recipe(category: category ?? RecipeCategory.primi, bookId: bookId)),
-    ));
-    return;
+  switch (choice) {
+    case 'write':
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => RecipeEditScreen(recipe: Recipe(category: category ?? RecipeCategory.primi, bookId: bookId)),
+      ));
+    case 'link':
+      final url = await _askLink(context);
+      if (url != null && context.mounted) await openRecipeLink(context, url);
+    case 'import':
+      await importRecipesFlow(context, bookId: bookId);
+    default:
+      final paths = await _pick(context, choice);
+      if (paths.isNotEmpty && context.mounted) {
+        await _readAndEdit(context, paths, bookId: bookId, category: category);
+      }
   }
-  if (choice == 'link') {
-    final url = await _askLink(context);
-    if (url != null && context.mounted) await openRecipeLink(context, url);
-    return;
-  }
-  if (choice == 'import') {
-    await importRecipesFlow(context, bookId: bookId);
-    return;
-  }
-  final paths = await _pick(context, choice);
-  if (paths.isEmpty || !context.mounted) return;
-  await _readAndEdit(context, paths, bookId: bookId, category: category);
+}
+
+/// Finestra "sto leggendo…" che non si può chiudere: la toglie chi l'ha aperta, con `pop`.
+void _showProgress(BuildContext context, String text) {
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        content: Row(children: [
+          const CircularProgressIndicator(),
+          const SizedBox(width: 18),
+          Expanded(child: Text(text)),
+        ]),
+      ),
+    ),
+  );
 }
 
 Future<List<String>> _pick(BuildContext context, String choice) async {
@@ -118,11 +114,10 @@ Future<List<String>> _pick(BuildContext context, String choice) async {
         return out;
       case 'gallery':
         final xs = await picker.pickMultiImage(maxWidth: 3000, maxHeight: 3000, imageQuality: 95);
-        return xs.map((x) => x.path).toList();
+        return [for (final x in xs) x.path];
       case 'pdf':
         final res = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: const ['pdf']);
-        final p = res?.files.single.path;
-        return p == null ? [] : [p];
+        return [if (res?.files.single.path case final p?) p];
     }
   } catch (e) {
     if (context.mounted) showSnack(context, tr('photo.error', {'error': e}));
@@ -132,20 +127,7 @@ Future<List<String>> _pick(BuildContext context, String choice) async {
 
 Future<void> _readAndEdit(BuildContext context, List<String> paths, {String? bookId, RecipeCategory? category}) async {
   final nav = Navigator.of(context);
-  showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (ctx) => PopScope(
-      canPop: false,
-      child: AlertDialog(
-        content: Row(children: [
-          const CircularProgressIndicator(),
-          const SizedBox(width: 18),
-          Expanded(child: Text(tr('scan.reading'))),
-        ]),
-      ),
-    ),
-  );
+  _showProgress(context, tr('scan.reading'));
   Recipe? r;
   Object? error;
   try {
@@ -159,13 +141,13 @@ Future<void> _readAndEdit(BuildContext context, List<String> paths, {String? boo
     showSnack(context, error == null ? tr('scan.nothing') : tr('scan.failed', {'error': error}));
     return;
   }
-  r.bookId = bookId;
-  if (category != null && r.category == RecipeCategory.secondi) r.category = category;
-  nav.push(MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: r!, notice: tr('scan.check'))));
+  final recipe = r..bookId = bookId;
+  if (category != null && recipe.category == RecipeCategory.secondi) recipe.category = category;
+  nav.push(MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: recipe, notice: tr('scan.check'))));
 }
 
 Future<String?> _askLink(BuildContext context) async {
-  String start = '';
+  var start = '';
   try {
     start = firstUrl((await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '') ?? '';
   } catch (_) {}
@@ -204,21 +186,8 @@ Future<void> openRecipeLink(BuildContext context, String text) async {
     return;
   }
   final nav = Navigator.of(context);
-  showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (ctx) => PopScope(
-      canPop: false,
-      child: AlertDialog(
-        content: Row(children: [
-          const CircularProgressIndicator(),
-          const SizedBox(width: 18),
-          Expanded(child: Text(tr('link.reading'))),
-        ]),
-      ),
-    ),
-  );
-  dynamic r;
+  _showProgress(context, tr('link.reading'));
+  OnlineRecipe? r;
   var failed = false;
   try {
     r = await WebRecipes.read(url);
@@ -231,5 +200,6 @@ Future<void> openRecipeLink(BuildContext context, String text) async {
     showSnack(context, failed ? tr('suggest.offline') : tr('link.none'));
     return;
   }
-  nav.push(MaterialPageRoute(builder: (_) => OnlineRecipeScreen(recipe: r)));
+  final recipe = r;
+  nav.push(MaterialPageRoute(builder: (_) => OnlineRecipeScreen(recipe: recipe)));
 }

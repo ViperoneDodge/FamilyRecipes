@@ -34,6 +34,8 @@ class _StepRow {
       : id = s.id,
         text = TextEditingController(text: s.text),
         photos = List.of(s.photos);
+
+  void dispose() => text.dispose();
 }
 
 class RecipeEditScreen extends StatefulWidget {
@@ -89,7 +91,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
       i.dispose();
     }
     for (final s in _steps) {
-      s.text.dispose();
+      s.dispose();
     }
     super.dispose();
   }
@@ -119,8 +121,11 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
   bool get _dirty => _normalized() != _initial || _added.isNotEmpty || widget.notice != null;
 
-  Future<void> _discardPhotos() async {
-    for (final p in _added) {
+  bool get _canSave => !_saving && !_busyPhoto;
+
+  /// Cancella le foto aggiunte in questa sessione, tranne quelle in [keep].
+  Future<void> _discardPhotos({Set<String> keep = const {}}) async {
+    for (final p in _added.difference(keep)) {
       await appState.photos.delete(p);
     }
     _added.clear();
@@ -134,11 +139,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
       return;
     }
     setState(() => _saving = true);
-    final used = r.photoIds;
-    for (final p in _added.where((p) => !used.contains(p)).toList()) {
-      await appState.photos.delete(p);
-    }
-    _added.clear();
+    await _discardPhotos(keep: r.photoIds);
     await appState.saveRecipe(r);
     if (mounted) Navigator.of(context).pop(true);
   }
@@ -160,13 +161,12 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
         ],
       ),
     );
-    if (res == 'save') {
-      await _save();
-      return false;
-    }
-    if (res == 'discard') {
-      await _discardPhotos();
-      return true;
+    switch (res) {
+      case 'save':
+        await _save();
+      case 'discard':
+        await _discardPhotos();
+        return true;
     }
     return false;
   }
@@ -290,6 +290,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
   @override
   Widget build(BuildContext context) {
     final nb = NotebookColors.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
@@ -305,7 +306,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             actions: [
               TextButton.icon(
                 style: TextButton.styleFrom(foregroundColor: nb.onCover),
-                onPressed: _saving || _busyPhoto ? null : _save,
+                onPressed: _canSave ? _save : null,
                 icon: _saving
                     ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.check),
@@ -318,15 +319,13 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(6, 8, 12, 60),
               children: [
-                if (widget.notice != null)
+                if (widget.notice case final notice?)
                   Card(
-                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                    color: scheme.tertiaryContainer,
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
-                      leading: Icon(Icons.document_scanner_outlined,
-                          color: Theme.of(context).colorScheme.onTertiaryContainer),
-                      title: Text(widget.notice!,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer)),
+                      leading: Icon(Icons.document_scanner_outlined, color: scheme.onTertiaryContainer),
+                      title: Text(notice, style: TextStyle(color: scheme.onTertiaryContainer)),
                     ),
                   ),
                 if (_isNew && appState.isCloud) _bookPicker(),
@@ -359,14 +358,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                 _ingredients(),
                 HandHeader(tr('recipe.steps'), icon: Icons.format_list_numbered),
                 for (var i = 0; i < _steps.length; i++) _stepCard(i),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: OutlinedButton.icon(
-                    onPressed: () => setState(() => _steps.add(_StepRow(RecipeStep()))),
-                    icon: const Icon(Icons.add),
-                    label: Text(tr('edit.addStep')),
-                  ),
-                ),
+                _addButton(tr('edit.addStep'), () => _steps.add(_StepRow(RecipeStep()))),
                 HandHeader(tr('recipe.tips'), icon: Icons.lightbulb_outline),
                 TextField(
                   controller: _tips,
@@ -377,7 +369,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
-                  onPressed: _saving || _busyPhoto ? null : _save,
+                  onPressed: _canSave ? _save : null,
                   icon: const Icon(Icons.check),
                   label: Text(tr('edit.saveRecipe')),
                 ),
@@ -466,49 +458,42 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     );
   }
 
+  /// Scelta fra pochi valori (difficoltà, costo), con le etichette rimpicciolite se non ci stanno.
+  Widget _segments<T>(List<T> values, String Function(T) label, T selected, ValueChanged<T> onChanged) =>
+      SegmentedButton<T>(
+        showSelectedIcon: false,
+        segments: [
+          for (final v in values)
+            ButtonSegment(value: v, label: FittedBox(fit: BoxFit.scaleDown, child: Text(label(v), maxLines: 1))),
+        ],
+        selected: {selected},
+        onSelectionChanged: (s) => setState(() => onChanged(s.first)),
+      );
+
+  Widget _minutesField(TextEditingController controller, String label, IconData icon) => Expanded(
+        child: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)],
+          decoration: InputDecoration(
+            labelText: label,
+            suffixText: tr('edit.minutes'),
+            prefixIcon: Icon(icon),
+          ),
+        ),
+      );
+
   Widget _infoFields() {
-    final digits = [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)];
     final label = TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Text(tr('recipe.difficulty'), style: label),
       const SizedBox(height: 4),
-      SegmentedButton<Difficulty>(
-        showSelectedIcon: false,
-        segments: [
-          for (final d in Difficulty.values)
-            ButtonSegment(
-                value: d, label: FittedBox(fit: BoxFit.scaleDown, child: Text(difficultyLabel(d), maxLines: 1))),
-        ],
-        selected: {r.difficulty},
-        onSelectionChanged: (s) => setState(() => r.difficulty = s.first),
-      ),
+      _segments(Difficulty.values, difficultyLabel, r.difficulty, (d) => r.difficulty = d),
       const SizedBox(height: 12),
       Row(children: [
-        Expanded(
-          child: TextField(
-            controller: _prep,
-            keyboardType: TextInputType.number,
-            inputFormatters: digits,
-            decoration: InputDecoration(
-              labelText: tr('recipe.prep'),
-              suffixText: tr('edit.minutes'),
-              prefixIcon: const Icon(Icons.timer_outlined),
-            ),
-          ),
-        ),
+        _minutesField(_prep, tr('recipe.prep'), Icons.timer_outlined),
         const SizedBox(width: 8),
-        Expanded(
-          child: TextField(
-            controller: _cook,
-            keyboardType: TextInputType.number,
-            inputFormatters: digits,
-            decoration: InputDecoration(
-              labelText: tr('recipe.cook'),
-              suffixText: tr('edit.minutes'),
-              prefixIcon: const Icon(Icons.local_fire_department_outlined),
-            ),
-          ),
-        ),
+        _minutesField(_cook, tr('recipe.cook'), Icons.local_fire_department_outlined),
       ]),
       const SizedBox(height: 12),
       Row(children: [
@@ -532,15 +517,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
       const SizedBox(height: 8),
       Text(tr('recipe.cost'), style: label),
       const SizedBox(height: 4),
-      SegmentedButton<Cost>(
-        showSelectedIcon: false,
-        segments: [
-          for (final c in Cost.values)
-            ButtonSegment(value: c, label: FittedBox(fit: BoxFit.scaleDown, child: Text(costLabel(c), maxLines: 1))),
-        ],
-        selected: {r.cost},
-        onSelectionChanged: (s) => setState(() => r.cost = s.first),
-      ),
+      _segments(Cost.values, costLabel, r.cost, (c) => r.cost = c),
     ]);
   }
 
@@ -548,8 +525,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     final courses = r.courses.map(appState.recipeById).whereType<Recipe>().toList();
     return [
       HandHeader(tr('recipe.courses'), icon: Icons.restaurant_menu),
-      Text(tr('edit.coursesHint'),
-          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      _hint(tr('edit.coursesHint')),
       const SizedBox(height: 6),
       for (final c in courses)
         Card(
@@ -574,8 +550,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
 
   Widget _ingredients() {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(tr('edit.ingredientsHint'),
-          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      _hint(tr('edit.ingredientsHint')),
       const SizedBox(height: 6),
       ReorderableListView(
         shrinkWrap: true,
@@ -625,16 +600,22 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             ),
         ],
       ),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: OutlinedButton.icon(
-          onPressed: () => setState(() => _ings.add(_IngRow(Ingredient()))),
-          icon: const Icon(Icons.add),
-          label: Text(tr('edit.addIngredient')),
-        ),
-      ),
+      _addButton(tr('edit.addIngredient'), () => _ings.add(_IngRow(Ingredient()))),
     ]);
   }
+
+  /// Pulsante "+ Aggiungi …" allineato a sinistra, sotto un elenco.
+  Widget _addButton(String label, VoidCallback add) => Align(
+        alignment: Alignment.centerLeft,
+        child: OutlinedButton.icon(
+          onPressed: () => setState(add),
+          icon: const Icon(Icons.add),
+          label: Text(label),
+        ),
+      );
+
+  Widget _hint(String text) =>
+      Text(text, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant));
 
   Widget _stepCard(int i) {
     final s = _steps[i];
@@ -672,7 +653,7 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
             IconButton(
               tooltip: tr('edit.removeStep'),
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => setState(() => _steps.removeAt(i).text.dispose()),
+              onPressed: () => setState(() => _steps.removeAt(i).dispose()),
             ),
           ]),
           const SizedBox(height: 6),
