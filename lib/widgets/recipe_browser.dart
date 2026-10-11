@@ -68,6 +68,16 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         .where((r) => _cat == null || r.category == _cat)
         .where((r) => q.isEmpty || r.searchText.contains(q))
         .toList();
+    // Con "Tutte" le ricette sono raggruppate per categoria, nell'ordine delle linguette; dentro ogni
+    // gruppo resta l'ordinamento scelto (alfabetico o più recenti).
+    final grouped = _cat == null;
+    if (grouped) {
+      final pos = {for (var i = 0; i < list.length; i++) list[i].id: i};
+      list.sort((a, b) {
+        final c = a.category.index.compareTo(b.category.index);
+        return c != 0 ? c : pos[a.id]!.compareTo(pos[b.id]!);
+      });
+    }
     final listView = RefreshIndicator(
       onRefresh: appState.retrySync,
       child: ListView(
@@ -114,15 +124,11 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
                         hint: widget.emptyHint == null ? null : tr('category.emptyHint'),
                       )
                     : EmptyState(icon: Icons.search_off, title: tr('search.none')),
-          for (final r in list)
-            RecipeCard(
-              recipe: r,
-              badge: widget.badgeFor?.call(r),
-              showCategory: _cat == null,
-              selected: r.id == widget.selectedId,
-              onTap: () => widget.onOpen(r, list),
-              onLongPress: widget.onLongPress == null ? null : () => widget.onLongPress!(r),
-            ),
+          for (var i = 0; i < list.length; i++) ...[
+            if (grouped && (i == 0 || list[i - 1].category != list[i].category))
+              HandHeader(categoryLabel(list[i].category), icon: categoryIcon(list[i].category)),
+            _card(list[i], list),
+          ],
           ...widget.footer,
         ],
       ),
@@ -151,6 +157,15 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         return listView;
     }
   }
+
+  Widget _card(Recipe r, List<Recipe> list) => RecipeCard(
+        recipe: r,
+        badge: widget.badgeFor?.call(r),
+        showCategory: false,
+        selected: r.id == widget.selectedId,
+        onTap: () => widget.onOpen(r, list),
+        onLongPress: widget.onLongPress == null ? null : () => widget.onLongPress!(r),
+      );
 
   Widget _categoryMenu(BuildContext context, List<Recipe> all) {
     final nb = NotebookColors.of(context);

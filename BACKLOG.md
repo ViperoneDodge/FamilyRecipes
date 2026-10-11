@@ -107,6 +107,10 @@ Pubblicata il 9 ottobre 2026:
 
 ## Prossima release
 
+- [x] **Ricette raggruppate per categoria**: con la linguetta "Tutte" (Le mie e ricettario del gruppo) le
+  ricette sono divise per categoria, con un titolo per ogni gruppo, nello stesso ordine delle linguette
+  (Aperitivi, Antipasti, Primi…); dentro ogni gruppo resta l'ordinamento scelto (alfabetico o più
+  recenti). Lo swipe tra le ricette segue lo stesso ordine.
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
   della scrittura a mano (ora riconosce bene soprattutto il testo stampato).
