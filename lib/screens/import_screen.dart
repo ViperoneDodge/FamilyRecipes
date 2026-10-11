@@ -75,7 +75,7 @@ Future<void> exportRecipesFlow(BuildContext context) async {
       files: [XFile(file.path, mimeType: 'application/json')],
       text: trn('export.shareText', list.length, {'name': name}),
     ));
-  } catch (e) {
+  } catch (_) {
     if (context.mounted) showSnack(context, tr('export.failed'));
   }
 }
@@ -105,7 +105,10 @@ class _ImportScreenState extends State<ImportScreen> {
   String _key(Recipe r) => '${r.category.name}|${r.title.trim().toLowerCase()}';
 
   Set<String> get _existing {
-    final list = _book == null ? appState.recipes.where(appState.isPersonal) : appState.groupRecipes(_book!);
+    final list = switch (_book) {
+      null => appState.recipes.where(appState.isPersonal),
+      final book => appState.groupRecipes(book),
+    };
     return {for (final r in list) _key(r)};
   }
 
@@ -128,15 +131,15 @@ class _ImportScreenState extends State<ImportScreen> {
     var ok = 0;
     for (final i in _selected.toList()..sort()) {
       final it = widget.items[i];
-      final r = it.recipe.copy();
-      r.id = newId();
-      r.bookId = _book;
-      try {
-        if (it.photo != null) {
-          r.coverPhoto = await appState.addPhoto(await compressPhoto(it.photo!));
+      final r = it.recipe.copy()
+        ..id = newId()
+        ..bookId = _book;
+      if (it.photo case final photo?) {
+        try {
+          r.coverPhoto = await appState.addPhoto(await compressPhoto(photo));
+        } catch (_) {
+          r.coverPhoto = null;
         }
-      } catch (_) {
-        r.coverPhoto = null;
       }
       try {
         await appState.saveRecipe(r);
@@ -217,13 +220,14 @@ class _ImportScreenState extends State<ImportScreen> {
       contentPadding: EdgeInsets.zero,
       value: _selected.contains(i),
       onChanged: _busy ? null : (v) => setState(() => v == true ? _selected.add(i) : _selected.remove(i)),
-      secondary: it.photo != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Image.memory(it.photo!, width: 48, height: 48, fit: BoxFit.cover, cacheWidth: 144,
-                  errorBuilder: (_, __, ___) => Icon(categoryIcon(r.category))),
-            )
-          : Icon(categoryIcon(r.category)),
+      secondary: switch (it.photo) {
+        final photo? => ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.memory(photo, width: 48, height: 48, fit: BoxFit.cover, cacheWidth: 144,
+                errorBuilder: (_, __, ___) => Icon(categoryIcon(r.category))),
+          ),
+        null => Icon(categoryIcon(r.category)),
+      },
       title: Text(r.displayTitle),
       subtitle: Text([
         categoryLabel(r.category),

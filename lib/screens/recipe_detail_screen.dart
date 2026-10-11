@@ -66,8 +66,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
   void _go(int dir) {
     if (_flip.isAnimating) return;
     final seq = _seq;
-    final j = seq.indexOf(_id) + dir;
-    if (j < 0 || j >= seq.length || seq.indexOf(_id) < 0) return;
+    final i = seq.indexOf(_id);
+    final j = i + dir;
+    if (i < 0 || j < 0 || j >= seq.length) return;
     setState(() {
       _other = seq[j];
       _dir = dir;
@@ -186,18 +187,11 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
               if (canEdit)
                 IconButton(tooltip: tr('common.edit'), icon: const Icon(Icons.edit), onPressed: () => _edit(r)),
               PopupMenuButton<String>(
-                onSelected: (v) {
-                  switch (v) {
-                    case 'move':
-                      moveRecipeSheet(context, r);
-                      break;
-                    case 'copy':
-                      copyToMine(context, r);
-                      break;
-                    case 'delete':
-                      _delete(r);
-                      break;
-                  }
+                onSelected: (v) => switch (v) {
+                  'move' => moveRecipeSheet(context, r),
+                  'copy' => copyToMine(context, r),
+                  'delete' => _delete(r),
+                  _ => null,
                 },
                 itemBuilder: (ctx) => [
                   if (appState.isCloud && canEdit)
@@ -246,11 +240,16 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
     ]);
   }
 
+  /// Stile del testo della ricetta (introduzione, ingredienti, passi, consigli).
+  static TextStyle _ink(NotebookColors nb) => TextStyle(color: nb.ink, fontSize: 16, height: 1.45);
+
   Widget _body(BuildContext context, Recipe r) {
     final nb = NotebookColors.of(context);
-    final ink = TextStyle(color: nb.ink, fontSize: 16, height: 1.45);
+    final ink = _ink(nb);
     final courses = r.courses.map(appState.recipeById).whereType<Recipe>().toList();
     final cover = r.coverPhoto;
+    final intro = r.intro.trim();
+    final tips = r.tips.trim();
     final seq = _seq;
     final pos = seq.indexOf(r.id);
     return ListView(
@@ -278,9 +277,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
           ),
         const SizedBox(height: 10),
         _InfoGrid(recipe: r),
-        if (r.intro.trim().isNotEmpty) ...[
+        if (intro.isNotEmpty) ...[
           const SizedBox(height: 12),
-          Text(r.intro.trim(), style: ink),
+          Text(intro, style: ink),
         ],
         if (r.category == RecipeCategory.menu && courses.isNotEmpty) ...[
           HandHeader(tr('recipe.courses'), icon: Icons.restaurant_menu),
@@ -310,7 +309,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
           HandHeader(tr('recipe.steps'), icon: Icons.format_list_numbered),
           for (var n = 0; n < r.steps.length; n++) _step(context, r, n),
         ],
-        if (r.tips.trim().isNotEmpty) ...[
+        if (tips.isNotEmpty) ...[
           HandHeader(tr('recipe.tips'), icon: Icons.lightbulb_outline),
           Container(
             padding: const EdgeInsets.all(12),
@@ -319,10 +318,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
               borderRadius: BorderRadius.circular(6),
               border: Border.all(color: nb.line),
             ),
-            child: Text(r.tips.trim(), style: ink),
+            child: Text(tips, style: ink),
           ),
         ],
-        if (r.ingredients.isEmpty && r.steps.isEmpty && r.intro.trim().isEmpty && courses.isEmpty)
+        if (r.ingredients.isEmpty && r.steps.isEmpty && intro.isEmpty && courses.isEmpty)
           EmptyState(icon: Icons.edit_note, title: tr('recipe.emptyBody')),
       ],
     );
@@ -330,6 +329,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
 
   Widget _step(BuildContext context, Recipe r, int n) {
     final s = r.steps[n];
+    final text = s.text.trim();
     final nb = NotebookColors.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Padding(
@@ -346,8 +346,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (s.text.trim().isNotEmpty)
-              Text(s.text.trim(), style: TextStyle(color: nb.ink, fontSize: 16, height: 1.45)),
+            if (text.isNotEmpty) Text(text, style: _ink(nb)),
             if (s.photos.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8),

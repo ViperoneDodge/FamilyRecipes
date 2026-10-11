@@ -7,6 +7,7 @@ import 'package:image/image.dart' as img;
 
 import '../l10n.dart';
 
+/// Apre il ritaglio a schermo intero: restituisce il JPEG ritagliato, o `null` se si annulla.
 Future<Uint8List?> cropPhoto(
   BuildContext context,
   Uint8List bytes, {
@@ -43,10 +44,14 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
   bool _busy = false;
   String? _error;
 
+  /// Proporzione scelta con i chip quando non è imposta (0 = quella della foto).
   double _freeAspect = 0;
 
+  /// Riquadro di ritaglio e scala della foto al suo interno, dall'ultimo layout.
   Size _frame = Size.zero;
   double _baseScale = 1;
+
+  /// Riquadro per cui la foto è stata centrata: `null` la ricentra al prossimo layout.
   Size? _lastFrame;
 
   @override
@@ -71,12 +76,9 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     super.dispose();
   }
 
-  double get _aspect {
-    if (widget.aspect != null) return widget.aspect!;
-    if (_freeAspect > 0) return _freeAspect;
-    final i = _img!;
-    return i.width / i.height;
-  }
+  double get _aspect => widget.aspect ?? (_freeAspect > 0 ? _freeAspect : _img!.width / _img!.height);
+
+  bool get _ready => _img != null && !_busy;
 
   Future<void> _rotate() async {
     final src = _img;
@@ -96,13 +98,6 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     });
   }
 
-  void _setAspect(double a) {
-    setState(() {
-      _freeAspect = a;
-      _lastFrame = null;
-    });
-  }
-
   void _centerIfNeeded(Size frame, Size child) {
     if (_lastFrame == frame) return;
     _lastFrame = frame;
@@ -118,27 +113,21 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     if (src == null || _busy) return;
     setState(() => _busy = true);
     try {
+      // Dal riquadro sullo schermo al rettangolo corrispondente nella foto.
       final m = _ctrl.value;
-      final zoom = m.getMaxScaleOnAxis();
-      final tx = m.getTranslation().x;
-      final ty = m.getTranslation().y;
-      final k = 1 / (zoom * _baseScale);
-      var sx = -tx * k;
-      var sy = -ty * k;
-      var sw = _frame.width * k;
-      var sh = _frame.height * k;
-      sx = sx.clamp(0.0, src.width.toDouble()).toDouble();
-      sy = sy.clamp(0.0, src.height.toDouble()).toDouble();
-      sw = math.min(sw, src.width - sx);
-      sh = math.min(sh, src.height - sy);
+      final t = m.getTranslation();
+      final k = 1 / (m.getMaxScaleOnAxis() * _baseScale);
+      final sx = (-t.x * k).clamp(0.0, src.width.toDouble());
+      final sy = (-t.y * k).clamp(0.0, src.height.toDouble());
+      final sw = math.min(_frame.width * k, src.width - sx);
+      final sh = math.min(_frame.height * k, src.height - sy);
 
       final scaleOut = math.min(1.0, widget.maxSide / math.max(sw, sh));
       final ow = math.max(1, (sw * scaleOut).round());
       final oh = math.max(1, (sh * scaleOut).round());
 
       final rec = ui.PictureRecorder();
-      final c = Canvas(rec);
-      c.drawImageRect(
+      Canvas(rec).drawImageRect(
         src,
         Rect.fromLTWH(sx, sy, sw, sh),
         Rect.fromLTWH(0, 0, ow.toDouble(), oh.toDouble()),
@@ -147,7 +136,8 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
       final out = await rec.endRecording().toImage(ow, oh);
       final data = await out.toByteData(format: ui.ImageByteFormat.rawRgba);
       if (data == null) throw Exception('crop');
-      final jpg = await compute(_encodeJpg, _Raw(data.buffer.asUint8List(), ow, oh, widget.quality));
+      final jpg =
+          await compute(_encodeJpg, (rgba: data.buffer.asUint8List(), w: ow, h: oh, quality: widget.quality));
       if (mounted) Navigator.of(context).pop(jpg);
     } catch (e) {
       if (mounted) {
@@ -171,25 +161,24 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
           IconButton(
             tooltip: tr('crop.rotate'),
             icon: const Icon(Icons.rotate_90_degrees_cw_outlined),
-            onPressed: src == null || _busy ? null : _rotate,
+            onPressed: _ready ? _rotate : null,
           ),
           IconButton(
             tooltip: tr('crop.reset'),
             icon: const Icon(Icons.fit_screen_outlined),
-            onPressed: src == null || _busy ? null : () => setState(() => _lastFrame = null),
+            onPressed: _ready ? () => setState(() => _lastFrame = null) : null,
           ),
         ],
       ),
       body: SafeArea(
         child: Column(children: [
           Expanded(
-            child: _error != null
-                ? Center(
-                    child: Text(tr('photo.error', {'error': _error}),
-                        style: const TextStyle(color: Colors.white)))
-                : src == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : LayoutBuilder(builder: (context, box) => _editor(src, box)),
+            child: switch ((_error, src)) {
+              (final error?, _) =>
+                Center(child: Text(tr('photo.error', {'error': error}), style: const TextStyle(color: Colors.white))),
+              (_, null) => const Center(child: CircularProgressIndicator()),
+              (_, final src?) => LayoutBuilder(builder: (context, box) => _editor(src, box)),
+            },
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
@@ -220,7 +209,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: src == null || _busy ? null : _confirm,
+                  onPressed: _ready ? _confirm : null,
                   icon: _busy
                       ? const SizedBox(
                           width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
@@ -235,14 +224,16 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
     );
   }
 
-  Widget _aspectChip(String label, double a) {
-    final sel = _freeAspect == a;
-    return ChoiceChip(
-      label: Text(label),
-      selected: sel,
-      onSelected: _busy ? null : (_) => _setAspect(a),
-    );
-  }
+  Widget _aspectChip(String label, double a) => ChoiceChip(
+        label: Text(label),
+        selected: _freeAspect == a,
+        onSelected: _busy
+            ? null
+            : (_) => setState(() {
+                  _freeAspect = a;
+                  _lastFrame = null;
+                }),
+      );
 
   Widget _editor(ui.Image src, BoxConstraints box) {
     const pad = 20.0;
@@ -255,18 +246,15 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
       fh = maxH;
       fw = fh * a;
     }
-    final frame = Size(fw, fh);
-    final base = math.max(fw / src.width, fh / src.height);
-    final child = Size(src.width * base, src.height * base);
-    _frame = frame;
-    _baseScale = base;
-    _centerIfNeeded(frame, child);
+    _frame = Size(fw, fh);
+    _baseScale = math.max(fw / src.width, fh / src.height);
+    final child = Size(src.width * _baseScale, src.height * _baseScale);
+    _centerIfNeeded(_frame, child);
 
     return Center(
       child: Stack(clipBehavior: Clip.none, children: [
-        SizedBox(
-          width: fw,
-          height: fh,
+        SizedBox.fromSize(
+          size: _frame,
           child: ClipRect(
             child: InteractiveViewer(
               transformationController: _ctrl,
@@ -274,19 +262,14 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
               minScale: 1,
               maxScale: 8,
               boundaryMargin: EdgeInsets.zero,
-              child: SizedBox(
-                width: child.width,
-                height: child.height,
+              child: SizedBox.fromSize(
+                size: child,
                 child: RawImage(image: src, fit: BoxFit.fill, filterQuality: FilterQuality.medium),
               ),
             ),
           ),
         ),
-        Positioned.fill(
-          child: IgnorePointer(
-            child: CustomPaint(painter: _GridPainter()),
-          ),
-        ),
+        Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: _GridPainter()))),
       ]),
     );
   }
@@ -315,13 +298,8 @@ class _GridPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _Raw {
-  final Uint8List rgba;
-  final int w;
-  final int h;
-  final int quality;
-  _Raw(this.rgba, this.w, this.h, this.quality);
-}
+/// Pixel RGBA grezzi da comprimere in JPEG (in un isolate, con `compute`).
+typedef _Raw = ({Uint8List rgba, int w, int h, int quality});
 
 Uint8List _encodeJpg(_Raw r) {
   final im = img.Image.fromBytes(
