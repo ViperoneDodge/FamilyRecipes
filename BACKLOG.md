@@ -110,3 +110,8 @@ Pubblicata il 9 ottobre 2026:
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
   della scrittura a mano (ora riconosce bene soprattutto il testo stampato).
+
+- [ ] **Versioni dei pacchetti bloccate**: salvare `pubspec.lock` nel repository (toglierlo dal `.gitignore`)
+  così ogni build usa esattamente le versioni provate. Nella 1.5.0 la build è fallita perché GitHub ha preso
+  da solo `image` 4.11.0, appena uscita e incompatibile con `archive` 4.0.9; per ora `image` è bloccato
+  sotto la 4.11.0 nel `pubspec.yaml`. Dopo, aggiornare i pacchetti solo di proposito, con i test.
