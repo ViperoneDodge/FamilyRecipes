@@ -38,7 +38,6 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
             builder: (context, _) => LayoutBuilder(builder: (context, box) {
               final logo = (box.maxWidth * 0.7).clamp(180.0, 340.0).clamp(0.0, box.maxHeight * 0.55).toDouble();
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Spacer(flex: 3),
                   Opacity(
