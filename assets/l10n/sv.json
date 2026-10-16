@@ -217,6 +217,7 @@
  "import.progress": "Importerar {n} av {tot}…",
  "import.title": "Importera recept",
  "intro.tagline": "Familjens receptbok",
+ "link.check": "Receptet har lästs från webbsidan: kontrollera namn, ingredienser, mängder och steg innan du sparar.",
  "link.info": "Klistra in adressen till receptsidan eller skanna dess QR-kod. Du kan också använda Dela → FamilyRecipes i webbläsaren.",
  "link.menu": "Från en länk eller QR-kod",
  "link.menuInfo": "Ett recept från en webbplats: klistra in länken, skanna en QR-kod eller använd Dela i webbläsaren",

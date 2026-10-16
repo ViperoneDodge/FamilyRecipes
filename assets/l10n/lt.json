@@ -217,6 +217,7 @@
  "import.progress": "Importuojama {n} iš {tot}…",
  "import.title": "Receptų importas",
  "intro.tagline": "Šeimos receptų knygelė",
+ "link.check": "Receptas nuskaitytas iš tinklalapio: prieš išsaugodamas patikrink pavadinimą, ingredientus, kiekius ir žingsnius.",
  "link.info": "Įklijuok recepto puslapio adresą arba nuskenuok jo QR kodą. Taip pat gali naudoti Bendrinti → FamilyRecipes naršyklėje.",
  "link.menu": "Iš nuorodos arba QR kodo",
  "link.menuInfo": "Receptas iš svetainės: įklijuok nuorodą, nuskenuok QR kodą arba naudok Bendrinti naršyklėje",

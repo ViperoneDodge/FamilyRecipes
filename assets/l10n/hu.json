@@ -217,6 +217,7 @@
  "import.progress": "Importálás: {n} / {tot}…",
  "import.title": "Receptek importálása",
  "intro.tagline": "A családi receptfüzet",
+ "link.check": "A weboldalról beolvasott recept: mentés előtt ellenőrizd a nevet, a hozzávalókat, a mennyiségeket és a lépéseket.",
  "link.info": "Illeszd be a receptoldal címét, vagy olvasd be a QR-kódját. A böngészőben a Megosztás → FamilyRecipes lehetőséget is használhatod.",
  "link.menu": "Linkről vagy QR-kódról",
  "link.menuInfo": "Recept egy weboldalról: illeszd be a linket, olvass be egy QR-kódot, vagy használd a böngésző Megosztás funkcióját",

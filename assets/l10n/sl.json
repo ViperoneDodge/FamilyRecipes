@@ -217,6 +217,7 @@
  "import.progress": "Uvažam {n} od {tot}…",
  "import.title": "Uvoz receptov",
  "intro.tagline": "Družinska kuharska knjiga",
+ "link.check": "Recept je prebran s spletne strani: preveri naslov, sestavine, količine in korake, preden shraniš.",
  "link.info": "Prilepi naslov strani z receptom ali skeniraj njeno kodo QR. Uporabiš lahko tudi Deli → FamilyRecipes iz brskalnika.",
  "link.menu": "Iz povezave ali kode QR",
  "link.menuInfo": "Recept s spletne strani: prilepi povezavo, skeniraj kodo QR ali uporabi Deli iz brskalnika",

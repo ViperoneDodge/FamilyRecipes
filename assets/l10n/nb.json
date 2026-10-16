@@ -217,6 +217,7 @@
  "import.progress": "Importerer {n} av {tot}…",
  "import.title": "Importer oppskrifter",
  "intro.tagline": "Familiens oppskriftsbok",
+ "link.check": "Oppskrift lest fra nettsiden: sjekk tittel, ingredienser, mengder og trinn før du lagrer.",
  "link.info": "Lim inn adressen til oppskriftssiden, eller skann QR-koden dens. Du kan også bruke Del → FamilyRecipes i nettleseren.",
  "link.menu": "Fra en lenke eller QR-kode",
  "link.menuInfo": "En oppskrift fra et nettsted: lim inn lenken, skann en QR-kode eller bruk Del i nettleseren",

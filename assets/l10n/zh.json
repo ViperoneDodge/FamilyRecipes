@@ -217,6 +217,7 @@
  "import.progress": "正在导入第 {n} 个，共 {tot} 个…",
  "import.title": "导入食谱",
  "intro.tagline": "家庭食谱本",
+ "link.check": "已从网页中读取食谱：保存前请检查标题、食材、用量和步骤。",
  "link.info": "粘贴食谱页面的网址或扫描其二维码。你也可以在浏览器中使用 分享 → FamilyRecipes。",
  "link.menu": "从链接或二维码添加",
  "link.menuInfo": "网站上的食谱：粘贴链接、扫描二维码，或在浏览器中使用“分享”",

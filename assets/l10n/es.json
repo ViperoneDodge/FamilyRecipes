@@ -217,6 +217,7 @@
  "import.progress": "Importando {n} de {tot}…",
  "import.title": "Importar recetas",
  "intro.tagline": "El recetario de la familia",
+ "link.check": "Receta leída de la página web: revisa el título, los ingredientes, las cantidades y los pasos antes de guardar.",
  "link.info": "Pega la dirección de la página de la receta o escanea su QR. También puedes usar Compartir → FamilyRecipes desde el navegador.",
  "link.menu": "Desde un enlace o un QR",
  "link.menuInfo": "Una receta de una web: pega el enlace, escanea un QR o usa Compartir desde el navegador",

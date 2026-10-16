@@ -217,6 +217,7 @@
  "import.progress": "Se importă {n} din {tot}…",
  "import.title": "Importă rețete",
  "intro.tagline": "Caietul de rețete al familiei",
+ "link.check": "Rețetă citită de pe pagina web: verifică titlul, ingredientele, cantitățile și pașii înainte de a salva.",
  "link.info": "Lipește adresa paginii cu rețeta sau scanează codul ei QR. Poți folosi și Distribuiți → FamilyRecipes din browser.",
  "link.menu": "Dintr-un link sau un QR",
  "link.menuInfo": "O rețetă de pe un site: lipește linkul, scanează un QR sau folosește Distribuiți din browser",

@@ -217,6 +217,7 @@
  "import.progress": "{n}/{tot} içe aktarılıyor…",
  "import.title": "Tarifleri içe aktar",
  "intro.tagline": "Aile tarif defteri",
+ "link.check": "Tarif web sayfasından okundu: kaydetmeden önce başlığı, malzemeleri, miktarları ve adımları kontrol et.",
  "link.info": "Tarif sayfasının adresini yapıştır veya QR kodunu tara. Tarayıcıdan Paylaş → FamilyRecipes seçeneğini de kullanabilirsin.",
  "link.menu": "Bağlantıdan veya QR koddan",
  "link.menuInfo": "Bir web sitesinden tarif: bağlantıyı yapıştır, bir QR kod tara veya tarayıcıdan Paylaş'ı kullan",

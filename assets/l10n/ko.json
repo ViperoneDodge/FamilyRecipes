@@ -217,6 +217,7 @@
  "import.progress": "{tot}개 중 {n}개 가져오는 중…",
  "import.title": "레시피 가져오기",
  "intro.tagline": "가족 레시피북",
+ "link.check": "웹 페이지에서 레시피를 읽었어요. 저장하기 전에 제목, 재료, 양, 단계를 확인해 주세요.",
  "link.info": "레시피 페이지 주소를 붙여 넣거나 QR을 스캔하세요. 브라우저에서 공유 → FamilyRecipes를 사용할 수도 있어요.",
  "link.menu": "링크 또는 QR로 추가",
  "link.menuInfo": "웹사이트의 레시피: 링크를 붙여 넣거나 QR을 스캔하거나 브라우저의 공유를 이용하세요",

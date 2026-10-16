@@ -217,6 +217,7 @@
  "import.progress": "Importē {n} no {tot}…",
  "import.title": "Importēt receptes",
  "intro.tagline": "Ģimenes recepšu grāmata",
+ "link.check": "Recepte nolasīta no tīmekļa lapas: pārbaudi nosaukumu, sastāvdaļas, daudzumus un soļus pirms saglabāšanas.",
  "link.info": "Ielīmē receptes lapas adresi vai noskenē tās QR kodu. Vari arī izmantot Kopīgot → FamilyRecipes no pārlūka.",
  "link.menu": "No saites vai QR koda",
  "link.menuInfo": "Recepte no tīmekļa vietnes: ielīmē saiti, noskenē QR kodu vai izmanto Kopīgot no pārlūka",

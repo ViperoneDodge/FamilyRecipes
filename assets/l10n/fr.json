@@ -217,6 +217,7 @@
  "import.progress": "Importation de {n} sur {tot}…",
  "import.title": "Importer des recettes",
  "intro.tagline": "Le carnet de recettes de famille",
+ "link.check": "Recette lue sur la page web : vérifie le titre, les ingrédients, les quantités et les étapes avant d'enregistrer.",
  "link.info": "Colle l'adresse de la page de la recette ou scanne son QR. Tu peux aussi utiliser Partager → FamilyRecipes depuis le navigateur.",
  "link.menu": "Depuis un lien ou un QR",
  "link.menuInfo": "Une recette d'un site web : colle le lien, scanne un QR ou utilise Partager depuis le navigateur",

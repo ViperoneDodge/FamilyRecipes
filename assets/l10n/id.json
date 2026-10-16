@@ -217,6 +217,7 @@
  "import.progress": "Mengimpor {n} dari {tot}…",
  "import.title": "Impor resep",
  "intro.tagline": "Buku resep keluarga",
+ "link.check": "Resep dibaca dari halaman web: periksa judul, bahan, takaran, dan langkah sebelum menyimpan.",
  "link.info": "Tempel alamat halaman resep atau pindai QR-nya. Kamu juga bisa memakai Bagikan → FamilyRecipes dari browser.",
  "link.menu": "Dari tautan atau QR",
  "link.menuInfo": "Resep dari situs web: tempel tautannya, pindai QR, atau pakai Bagikan dari browser",

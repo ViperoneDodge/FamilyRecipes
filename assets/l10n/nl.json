@@ -217,6 +217,7 @@
  "import.progress": "{n} van {tot} importeren…",
  "import.title": "Recepten importeren",
  "intro.tagline": "Het receptenboek van de familie",
+ "link.check": "Recept gelezen van de webpagina: controleer titel, ingrediënten, hoeveelheden en stappen voordat je opslaat.",
  "link.info": "Plak het adres van de receptpagina of scan de QR ervan. Je kunt ook Delen → FamilyRecipes in de browser gebruiken.",
  "link.menu": "Via een link of QR",
  "link.menuInfo": "Een recept van een website: plak de link, scan een QR of gebruik Delen in de browser",

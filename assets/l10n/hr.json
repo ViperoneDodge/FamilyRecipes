@@ -217,6 +217,7 @@
  "import.progress": "Uvozim {n} od {tot}…",
  "import.title": "Uvoz recepata",
  "intro.tagline": "Obiteljska kuharica",
+ "link.check": "Recept je pročitan s web-stranice: provjeri naslov, sastojke, količine i korake prije spremanja.",
  "link.info": "Zalijepi adresu stranice s receptom ili skeniraj njezin QR. Možeš upotrijebiti i Dijeli → FamilyRecipes iz preglednika.",
  "link.menu": "Iz poveznice ili QR-a",
  "link.menuInfo": "Recept s web-stranice: zalijepi poveznicu, skeniraj QR ili upotrijebi Dijeli iz preglednika",

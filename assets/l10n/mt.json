@@ -217,6 +217,7 @@
  "import.progress": "Qed nimporta {n} minn {tot}…",
  "import.title": "Importa riċetti",
  "intro.tagline": "Il-ktieb tar-riċetti tal-familja",
+ "link.check": "Riċetta moqrija mill-paġna web: iċċekkja t-titlu, l-ingredjenti, il-kwantitajiet u l-passi qabel ma tissalva.",
  "link.info": "Waħħal l-indirizz tal-paġna tar-riċetta jew skennja l-QR tagħha. Tista' tuża wkoll Aqsam → FamilyRecipes mill-browser.",
  "link.menu": "Minn link jew QR",
  "link.menuInfo": "Riċetta minn sit web: waħħal il-link, skennja QR jew uża Aqsam mill-browser",

@@ -217,6 +217,7 @@
  "import.progress": "Flyt inn {n} af {tot}…",
  "import.title": "Flytja inn uppskriftir",
  "intro.tagline": "Uppskriftabók fjölskyldunnar",
+ "link.check": "Uppskrift lesin af vefsíðunni: athugaðu titil, hráefni, magn og skref áður en þú vistar.",
  "link.info": "Límdu inn slóð uppskriftasíðunnar eða skannaðu QR-kóða hennar. Þú getur líka notað Deila → FamilyRecipes í vafranum.",
  "link.menu": "Af tengli eða QR-kóða",
  "link.menuInfo": "Uppskrift af vefsíðu: límdu inn tengilinn, skannaðu QR-kóða eða notaðu Deila í vafranum",

@@ -217,6 +217,7 @@
  "import.progress": "Tuodaan {n}/{tot}…",
  "import.title": "Tuo reseptejä",
  "intro.tagline": "Perheen keittokirja",
+ "link.check": "Resepti luettu verkkosivulta: tarkista otsikko, ainesosat, määrät ja vaiheet ennen tallentamista.",
  "link.info": "Liitä reseptisivun osoite tai skannaa sen QR-koodi. Voit myös käyttää selaimessa Jaa → FamilyRecipes.",
  "link.menu": "Linkistä tai QR-koodista",
  "link.menuInfo": "Resepti verkkosivulta: liitä linkki, skannaa QR-koodi tai käytä selaimen Jaa-toimintoa",

@@ -217,6 +217,7 @@
  "import.progress": "Importiere {n} von {tot}…",
  "import.title": "Rezepte importieren",
  "intro.tagline": "Das Familienkochbuch",
+ "link.check": "Rezept von der Webseite gelesen: prüfe Titel, Zutaten, Mengen und Schritte vor dem Speichern.",
  "link.info": "Füge die Adresse der Rezeptseite ein oder scanne ihren QR. Du kannst auch im Browser Teilen → FamilyRecipes verwenden.",
  "link.menu": "Aus einem Link oder QR",
  "link.menuInfo": "Ein Rezept von einer Website: Link einfügen, QR scannen oder im Browser Teilen verwenden",

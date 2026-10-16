@@ -217,6 +217,7 @@
  "import.progress": "Đang nhập {n}/{tot}…",
  "import.title": "Nhập công thức",
  "intro.tagline": "Sổ công thức gia đình",
+ "link.check": "Đã đọc công thức từ trang web: hãy kiểm tra tiêu đề, nguyên liệu, định lượng và các bước trước khi lưu.",
  "link.info": "Dán địa chỉ trang công thức hoặc quét mã QR của trang. Bạn cũng có thể dùng Chia sẻ → FamilyRecipes từ trình duyệt.",
  "link.menu": "Từ liên kết hoặc mã QR",
  "link.menuInfo": "Công thức từ một trang web: dán liên kết, quét mã QR hoặc dùng Chia sẻ từ trình duyệt",

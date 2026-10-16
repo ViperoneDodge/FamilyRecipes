@@ -217,6 +217,7 @@
  "import.progress": "Importuji {n} z {tot}…",
  "import.title": "Import receptů",
  "intro.tagline": "Rodinná kuchařka",
+ "link.check": "Recept přečtený z webové stránky: před uložením zkontroluj název, suroviny, množství a kroky.",
  "link.info": "Vlož adresu stránky s receptem nebo naskenuj její QR kód. Můžeš také použít Sdílet → FamilyRecipes z prohlížeče.",
  "link.menu": "Z odkazu nebo QR kódu",
  "link.menuInfo": "Recept z webu: vlož odkaz, naskenuj QR kód nebo použij Sdílet z prohlížeče",

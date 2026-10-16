@@ -217,6 +217,7 @@
  "import.progress": "Impordin {n}/{tot}…",
  "import.title": "Retseptide import",
  "intro.tagline": "Pere retseptiraamat",
+ "link.check": "Retsept loeti veebilehelt: kontrolli enne salvestamist pealkirja, koostisosi, koguseid ja samme.",
  "link.info": "Kleebi retseptilehe aadress või skanni selle QR-kood. Võid kasutada ka brauseris Jaga → FamilyRecipes.",
  "link.menu": "Lingilt või QR-koodilt",
  "link.menuInfo": "Retsept veebisaidilt: kleebi link, skanni QR-kood või kasuta brauseris Jaga",

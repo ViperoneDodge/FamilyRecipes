@@ -217,6 +217,7 @@
  "import.progress": "Importuję {n} z {tot}…",
  "import.title": "Import przepisów",
  "intro.tagline": "Rodzinna książka kucharska",
+ "link.check": "Przepis odczytany ze strony internetowej: sprawdź tytuł, składniki, ilości i kroki przed zapisaniem.",
  "link.info": "Wklej adres strony z przepisem lub zeskanuj jej kod QR. Możesz też użyć Udostępnij → FamilyRecipes w przeglądarce.",
  "link.menu": "Z linku lub kodu QR",
  "link.menuInfo": "Przepis ze strony internetowej: wklej link, zeskanuj kod QR lub użyj Udostępnij w przeglądarce",
