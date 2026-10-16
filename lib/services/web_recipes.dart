@@ -8,6 +8,7 @@ import '../l10n.dart';
 import '../models.dart';
 import 'http_get.dart';
 import 'online_recipes.dart';
+import 'recipe_text_parser.dart';
 import 'recipe_words.dart';
 
 /// Un sito di ricette nella lingua dell'app: ricerca per parole e lettura della ricetta dalla pagina.
@@ -117,24 +118,54 @@ class WebRecipes {
       recipeYield:all('recipeYield')[0],prepTime:all('prepTime')[0],cookTime:all('cookTime')[0],totalTime:all('totalTime')[0],
       recipeCategory:all('recipeCategory')[0]}));
   }
-  var m=document.querySelector('meta[property="og:site_name"]');
-  return JSON.stringify({ld:ld,site:m?m.content:''});
+  var meta=function(p){var e=document.querySelector('meta[property="'+p+'"]');return e?e.content:'';};
+  var main=document.querySelector('article')||document.querySelector('main')||document.body;
+  var found=ld.some(function(t){return /"Recipe"/.test(t);});
+  // R = ricetta trovata, C = pagina caricata (senza dati strutturati), W = ancora in caricamento
+  var state=found?'R':(document.readyState==='complete'?'C':'W');
+  return state+JSON.stringify({ld:ld,site:meta('og:site_name'),title:meta('og:title')||document.title,
+    image:meta('og:image'),text:(main&&main.innerText||'').slice(0,30000)});
 })()''';
 
   /// Piano B per i siti che rifiutano le richieste dirette (protezioni anti-robot) o che creano la
   /// ricetta solo nel browser: la pagina si apre in un browser invisibile del telefono e si legge da lì.
   static Future<OnlineRecipe?> readInBrowser(String url) async {
     final raw = await _web.invokeMethod<String>('readPage', {'url': url, 'script': _pageScript});
-    if (raw == null || raw == 'null') return null;
-    dynamic data = jsonDecode(raw);
-    if (data is String) data = jsonDecode(data); // il browser restituisce la stringa racchiusa tra virgolette
+    if (raw == null || raw == 'null') throw const HttpException('pagina non caricata');
+    return fromBrowserResult(raw, url);
+  }
+
+  /// Risultato dello script nel browser: la ricetta dai dati strutturati oppure, se la pagina non li ha,
+  /// dal suo testo (lo stesso riconoscimento delle ricette fotografate). null se non c'è una ricetta.
+  static OnlineRecipe? fromBrowserResult(String raw, String url) {
+    dynamic v = jsonDecode(raw); // il browser restituisce la stringa racchiusa tra virgolette
+    if (v is! String || v.length < 2) return null;
+    final data = jsonDecode(v.substring(1));
     if (data is! Map) return null;
     final site = '${data['site'] ?? ''}'.replaceAll('"', '');
     final html = StringBuffer(site.isEmpty ? '' : '<meta property="og:site_name" content="$site">');
     for (final b in (data['ld'] as List? ?? const [])) {
       html.write('<script type="application/ld+json">$b</script>');
     }
-    return parsePage(html.toString(), url);
+    final structured = parsePage(html.toString(), url);
+    if (structured != null && !structured.isPartial) return structured;
+    final r = RecipeTextParser.parse('${data['text'] ?? ''}');
+    if (r.ingredients.isEmpty || r.steps.isEmpty) return structured;
+    final title = clean('${data['title'] ?? ''}').replaceFirst(RegExp(r'\s*[|–-][^|–-]*$'), '');
+    return OnlineRecipe(
+      id: url,
+      title: title.isNotEmpty ? title : r.title,
+      source: url,
+      thumb: _resolve(url, '${data['image'] ?? ''}'),
+      ingredients: r.ingredients,
+      steps: [for (final s in r.steps) s.text],
+      site: site.isNotEmpty ? site : (Uri.tryParse(url)?.host.replaceFirst('www.', '') ?? ''),
+      intro: r.intro,
+      prepMinutes: r.prepMinutes,
+      cookMinutes: r.cookMinutes,
+      servings: r.servings,
+      webCategory: RecipeWords.guessCategory(title.isNotEmpty ? title : r.title),
+    );
   }
 
   /// Toglie dal link i parametri di tracciamento delle pubblicità (gclid, utm_…, fbclid…).

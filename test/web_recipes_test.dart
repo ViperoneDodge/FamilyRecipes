@@ -38,7 +38,10 @@ const _photos = '''
   {"@type":"HowToStep","text":"Impastate.","image":[{"@type":"ImageObject","url":"/p2.jpg"}]},
   {"@type":"HowToStep","text":"Infornate."}]}</script>''';
 
-const _microdataResult = r'''{"ld":["{\"@type\":\"Recipe\",\"name\":\"Tiramisù\",\"image\":\"https://img.example.org/t.jpg\",\"recipeIngredient\":[\"500 g di mascarpone\",\"4 uova\"],\"recipeInstructions\":[\"Separate i tuorli.\\n\\nMontate il mascarpone.\"],\"recipeYield\":\"6 persone\",\"prepTime\":\"PT40M\"}"],"site":"Galbani"}''';
+const _microdataResult = r'''R{"ld":["{\"@type\":\"Recipe\",\"name\":\"Tiramisù\",\"image\":\"https://img.example.org/t.jpg\",\"recipeIngredient\":[\"500 g di mascarpone\",\"4 uova\"],\"recipeInstructions\":[\"Separate i tuorli.\\n\\nMontate il mascarpone.\"],\"recipeYield\":\"6 persone\",\"prepTime\":\"PT40M\"}"],"site":"Galbani","title":"","image":"","text":"Tiramisù\n500 g di mascarpone\n4 uova\n\nSeparate i tuorli.\n\nMontate il mascarpone."}''';
+
+// Pagina senza dati strutturati: solo testo (risultato reale dello script in Chromium).
+const _plainResult = r'''C{"ld":[],"site":"Galbani","title":"Tiramisù classico | Galbani","image":"/img/tiramisu.jpg","text":"Tiramisù classico\n\nIl dolce al cucchiaio più amato.\n\nDosi per 6 persone\n\nIngredienti\n500 g di mascarpone\n4 uova\n100 g di zucchero\n300 g di savoiardi\ncaffè q.b.\nPreparazione\nSeparate i tuorli dagli albumi e montate i tuorli con lo zucchero.\nAggiungete il mascarpone e mescolate fino a ottenere una crema liscia.\nBagnate i savoiardi nel caffè e alternate strati di biscotti e crema."}''';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -114,7 +117,7 @@ void main() {
     const channel = MethodChannel('familyrecipes/web');
     final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     // Come Android: il risultato di evaluateJavascript è la stringa JSON racchiusa tra virgolette.
-    String answer(Map data) => jsonEncode(jsonEncode(data));
+    String answer(Map data) => jsonEncode('R${jsonEncode(data)}');
     messenger.setMockMethodCallHandler(channel, (call) async {
       expect(call.method, 'readPage');
       return answer({
@@ -142,8 +145,19 @@ void main() {
     expect([m.title, m.site, m.servings, m.prepMinutes, m.thumb], ['Tiramisù', 'Galbani', 6, 40, 'https://img.example.org/t.jpg']);
     expect(m.ingredients.map((i) => '${i.name}|${i.amount}'), ['Mascarpone|500 g', 'Uova|4']);
     expect(m.steps, ['Separate i tuorli.', 'Montate il mascarpone.']);
-    messenger.setMockMethodCallHandler(channel, (call) async => 'null');
+    // Solo testo: riconosciuto come una ricetta fotografata, con titolo e foto dalla pagina.
+    messenger.setMockMethodCallHandler(channel, (call) async => jsonEncode(_plainResult));
+    final t = (await WebRecipes.readInBrowser('https://www.galbani.it/ricette/tiramisu'))!;
+    expect([t.title, t.site, t.servings, t.thumb], ['Tiramisù classico', 'Galbani', 6, 'https://www.galbani.it/img/tiramisu.jpg']);
+    expect(t.ingredients.map((i) => i.name).toList(), containsAll(['Mascarpone', 'Uova', 'Zucchero', 'Savoiardi']));
+    expect(t.steps.length, 3);
+    expect(t.steps.first, startsWith('Separate i tuorli'));
+    expect(t.recipeCategory, RecipeCategory.dolci);
+    // Pagina caricata ma senza ricetta: null; pagina mai caricata: errore di rete.
+    messenger.setMockMethodCallHandler(channel, (call) async => jsonEncode('C{"ld":[],"text":"Chi siamo. Contatti."}'));
     expect(await WebRecipes.readInBrowser('https://example.org'), isNull);
+    messenger.setMockMethodCallHandler(channel, (call) async => null);
+    expect(WebRecipes.readInBrowser('https://example.org'), throwsA(isA<Exception>()));
     messenger.setMockMethodCallHandler(channel, null);
   });
 }

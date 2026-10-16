@@ -238,12 +238,14 @@ class MainActivity : FlutterActivity() {
         if (i?.action == Intent.ACTION_SEND && i.type?.startsWith("text/") == true) i.getStringExtra(Intent.EXTRA_TEXT) else null
 
     // Apre la pagina in un browser invisibile (come la vede l'utente: passa le protezioni anti-robot
-    // dei siti) ed esegue [script], che raccoglie i dati della ricetta; risponde una volta sola.
+    // dei siti) ed esegue ogni 2 secondi [script], che raccoglie i dati della ricetta e inizia con
+    // R (ricetta trovata), C (pagina caricata) o W (in caricamento). Risponde una volta sola.
     private fun readPage(url: String, script: String, result: MethodChannel.Result) {
         val handler = Handler(Looper.getMainLooper())
         val web = WebView(this)
         var done = false
         var last: String? = null
+        var loaded = 0
         fun finish(value: String?) {
             if (done) return
             done = true
@@ -255,16 +257,25 @@ class MainActivity : FlutterActivity() {
         }
         web.settings.javaScriptEnabled = true
         web.settings.domStorageEnabled = true
-        web.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView, loaded: String?) {
-                handler.postDelayed({
-                    if (!done) view.evaluateJavascript(script) { v ->
-                        if (v != null && v.contains("Recipe")) finish(v) else last = v
+        web.settings.userAgentString = web.settings.userAgentString.replace("; wv", "")
+        web.webViewClient = WebViewClient()
+        val poll = object : Runnable {
+            override fun run() {
+                if (done) return
+                web.evaluateJavascript(script) { v ->
+                    if (v != null && v != "null") {
+                        last = v
+                        when {
+                            v.startsWith("\\"R") -> finish(v)
+                            v.startsWith("\\"C") -> if (++loaded >= 2) finish(v)
+                        }
                     }
-                }, 1500)
+                }
+                handler.postDelayed(this, 2000)
             }
         }
-        handler.postDelayed({ finish(last) }, 25000)
+        handler.postDelayed(poll, 2500)
+        handler.postDelayed({ finish(last) }, 30000)
         web.loadUrl(url)
     }
 }

@@ -136,6 +136,15 @@ Pubblicata il 9 ottobre 2026:
   (dati schema.org in JSON-LD oppure microdati). Dal link si tolgono i parametri di tracciamento
   delle pubblicità (gclid, gad_…, utm_…).
 
+## Versione 1.6.2
+
+- [x] **Pagine di ricette senza dati strutturati** (es. Galbani): se la pagina non ha schema.org, la si legge
+  dal testo con lo stesso riconoscimento delle ricette fotografate (ingredienti, preparazione, dosi, tempi),
+  con titolo e foto della pagina. Il browser del telefono controlla la pagina ogni 2 secondi e si ferma
+  appena è pronta; messaggio giusto se la pagina si apre ma la ricetta non c'è.
+- [x] **Link non più ricordato**: aprendo "Da un link o un QR" il campo è vuoto; il link copiato si mette
+  con Incolla.
+
 ## Prossima release
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura

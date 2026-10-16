@@ -162,9 +162,8 @@ Future<String?> _askLink(BuildContext context) async {
     }
   }
 
-  final start = await clipboardUrl();
-  if (!context.mounted) return null;
-  final ctrl = TextEditingController(text: start);
+  // Il campo parte vuoto (niente link rimasto dall'ultima volta): per quello copiato c'è Incolla.
+  final ctrl = TextEditingController();
   const scan = '\u0000qr';
   final res = await showDialog<String>(
     context: context,
@@ -175,7 +174,7 @@ Future<String?> _askLink(BuildContext context) async {
         const SizedBox(height: 10),
         TextField(
           controller: ctrl,
-          autofocus: start.isEmpty,
+          autofocus: true,
           keyboardType: TextInputType.url,
           decoration: InputDecoration(
             hintText: 'https://…',
@@ -233,10 +232,8 @@ Future<void> openRecipeLink(BuildContext context, String text) async {
   if (r == null || r.isPartial) {
     try {
       final b = await WebRecipes.readInBrowser(url);
-      if (b != null) {
-        r = b;
-        failed = false;
-      }
+      failed = false; // la pagina si è aperta: se manca la ricetta non è un problema di rete
+      if (b != null) r = b;
     } catch (_) {}
   }
   nav.pop();
