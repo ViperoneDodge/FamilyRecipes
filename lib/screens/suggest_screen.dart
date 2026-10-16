@@ -584,7 +584,7 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
     if (!mounted) return;
     setState(() => _saving = false);
     await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => RecipeEditScreen(recipe: recipe, newPhotos: added),
+      builder: (_) => RecipeEditScreen(recipe: recipe, newPhotos: added, notice: tr('link.check')),
     ));
   }
 

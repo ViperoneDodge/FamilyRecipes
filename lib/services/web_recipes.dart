@@ -152,7 +152,7 @@ class WebRecipes {
     final r = RecipeTextParser.parse('${data['text'] ?? ''}');
     if (r.ingredients.isEmpty || r.steps.isEmpty) return structured;
     final title = clean('${data['title'] ?? ''}').replaceFirst(RegExp(r'\s*[|–-][^|–-]*$'), '');
-    return OnlineRecipe(
+    return tidy(OnlineRecipe(
       id: url,
       title: title.isNotEmpty ? title : r.title,
       source: url,
@@ -165,6 +165,68 @@ class WebRecipes {
       cookMinutes: r.cookMinutes,
       servings: r.servings,
       webCategory: RecipeWords.guessCategory(title.isNotEmpty ? title : r.title),
+    ));
+  }
+
+  // ---- Pulizia: niente pubblicità né nomi del marchio ----
+
+  /// Frasi promozionali dei siti (inviti ad acquistare, iscriversi, condividere, altri articoli…).
+  static final RegExp _promo = RegExp(
+      r'\b(?:scopri|acquista|compralo|comprala|iscriviti|seguici|condividi|clicca|scarica)\b|newsletter|leggi anche|'
+      r'potrebbe interessarti|ricette correlate|altre ricette|pubblicit|sponsor|cookie policy|tutti i diritti|'
+      r'disponibile (?:nei|in) (?:negozi|supermercat)|shop now|buy now|subscribe|sign up|follow us|'
+      r'\bdécouvrez\b|\bachetez\b|abonnez|\bentdecke\b|jetzt kaufen|abonnier|\bdescubre\b|compra ya|suscr',
+      caseSensitive: false);
+
+  /// Ricetta senza pubblicità: toglie le frasi promozionali dai passaggi e dalla presentazione, il nome
+  /// del sito/marchio e i simboli ® ™ da ingredienti e passaggi, e accorcia la presentazione.
+  static OnlineRecipe tidy(OnlineRecipe r) {
+    // Il nome del sito e il nome del dominio (galbani.it → galbani), mai le singole parole di un nome
+    // composto ("BBC Good Food" non deve togliere "food").
+    final host = Uri.tryParse(r.source)?.host.split('.') ?? const <String>[];
+    final brands = <String>{
+      if (r.site.trim().length >= 4) r.site.trim(),
+      if (host.length >= 2 && host[host.length - 2].length >= 4) host[host.length - 2],
+    };
+    String noBrand(String t) {
+      var x = t.replaceAll(RegExp(r'[®™©]'), '');
+      for (final b in brands) {
+        x = x.replaceAll(RegExp('\\b${RegExp.escape(b)}\\b', caseSensitive: false), '');
+      }
+      return x.replaceAll(RegExp(r'\s{2,}'), ' ').replaceAllMapped(RegExp(r'\s+([,.;:])'), (m) => m[1]!).trim();
+    }
+
+    List<String> sentences(String t) => t.split(RegExp(r'(?<=[.!?])\s+')).where((x) => x.trim().isNotEmpty).toList();
+    String clean(String t) => sentences(t).where((x) => !_promo.hasMatch(x)).map(noBrand).join(' ').trim();
+
+    final steps = <String>[];
+    final images = <String>[];
+    for (var i = 0; i < r.steps.length; i++) {
+      final t = clean(r.steps[i]);
+      if (t.isEmpty) continue;
+      steps.add(t);
+      images.add(r.stepImage(i));
+    }
+    final intro = sentences(clean(r.intro)).take(2).join(' ');
+    return OnlineRecipe(
+      id: r.id,
+      title: noBrand(r.title),
+      category: r.category,
+      area: r.area,
+      thumb: r.thumb,
+      source: r.source,
+      ingredients: [
+        for (final i in r.ingredients)
+          if (noBrand(i.name) case final n when n.isNotEmpty && !_promo.hasMatch(i.name)) Ingredient(name: n, amount: i.amount),
+      ],
+      steps: steps,
+      stepImages: images,
+      site: r.site,
+      intro: intro,
+      prepMinutes: r.prepMinutes,
+      cookMinutes: r.cookMinutes,
+      servings: r.servings,
+      webCategory: r.webCategory,
     );
   }
 
@@ -220,7 +282,7 @@ class WebRecipes {
         continue;
       }
       final node = _findRecipe(data);
-      if (node != null) return _toRecipe(node, url, _siteName(html, url));
+      if (node != null) return tidy(_toRecipe(node, url, _siteName(html, url)));
     }
     return null;
   }

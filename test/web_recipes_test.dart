@@ -1,5 +1,6 @@
 import 'package:familyrecipes/l10n.dart';
 import 'package:familyrecipes/models.dart';
+import 'package:familyrecipes/services/online_recipes.dart';
 import 'package:familyrecipes/services/web_recipes.dart';
 import 'dart:convert';
 
@@ -159,5 +160,39 @@ void main() {
     messenger.setMockMethodCallHandler(channel, (call) async => null);
     expect(WebRecipes.readInBrowser('https://example.org'), throwsA(isA<Exception>()));
     messenger.setMockMethodCallHandler(channel, null);
+  });
+
+  test('pulizia: niente pubblicità né marchio', () {
+    final r = WebRecipes.tidy(OnlineRecipe(
+      id: 'https://www.galbani.it/ricette/tiramisu',
+      source: 'https://www.galbani.it/ricette/tiramisu',
+      site: 'Galbani',
+      title: 'Tiramisù Galbani®',
+      intro: 'Il tiramisù è il dolce più amato. Preparalo con il Mascarpone Galbani. Scopri tutti i nostri prodotti! '
+          'Perfetto per le feste.',
+      ingredients: [
+        Ingredient(name: 'Mascarpone Galbani®', amount: '500 g'),
+        Ingredient(name: 'Uova', amount: '4'),
+        Ingredient(name: 'Scopri la linea Galbani', amount: ''),
+      ],
+      steps: [
+        'Montate i tuorli con lo zucchero. Aggiungete il Mascarpone Galbani e mescolate.',
+        'Iscriviti alla newsletter per altre ricette!',
+        'Scoprite la pentola e lasciate raffreddare.',
+      ],
+      stepImages: ['a.jpg', 'b.jpg', ''],
+    ));
+    expect(r.title, 'Tiramisù');
+    expect(r.ingredients.map((i) => '${i.name}|${i.amount}'), ['Mascarpone|500 g', 'Uova|4']);
+    expect(r.steps, [
+      'Montate i tuorli con lo zucchero. Aggiungete il Mascarpone e mescolate.',
+      'Scoprite la pentola e lasciate raffreddare.',
+    ]);
+    expect([r.stepImage(0), r.stepImage(1)], ['a.jpg', '']);
+    expect(r.intro, 'Il tiramisù è il dolce più amato. Preparalo con il Mascarpone.');
+    // Un nome composto non toglie le sue parole dal testo.
+    final b = WebRecipes.tidy(OnlineRecipe(id: 'x', source: 'https://www.bbcgoodfood.com/recipes/x', site: 'BBC Good Food',
+        title: 'Good soup', steps: ['Serve the food hot.']));
+    expect([b.title, b.steps.single], ['Good soup', 'Serve the food hot.']);
   });
 }

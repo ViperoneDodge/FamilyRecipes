@@ -146,6 +146,15 @@ Pubblicata il 9 ottobre 2026:
   con Incolla.
 
 ## Prossima release
+
+- [x] **Invito a ricontrollare** le ricette prese da internet: l'editor si apre con l'avviso "Ricetta letta
+  dalla pagina web: ricontrolla titolo, ingredienti, dosi e passaggi prima di salvare".
+- [x] **Ricette senza pubblicità né marchio**: dalle ricette lette dai siti si tolgono le frasi promozionali
+  (scopri, acquista, iscriviti alla newsletter, leggi anche, ricette correlate…), il nome del sito/marchio e
+  i simboli ® ™ da titolo, ingredienti e passaggi ("Mascarpone Galbani®" → "Mascarpone"); la presentazione
+  si accorcia a due frasi.
+- [ ] Riassunto vero dei passaggi lunghi (riscrittura più breve): servirebbe un'intelligenza artificiale
+  online (es. Claude), con una chiave e un costo per ricetta; da valutare.
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
   della scrittura a mano (ora riconosce bene soprattutto il testo stampato).

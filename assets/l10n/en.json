@@ -217,6 +217,7 @@
  "import.progress": "Importing {n} of {tot}…",
  "import.title": "Import recipes",
  "intro.tagline": "Your family cookbook",
+ "link.check": "Recipe read from the web page: check the title, ingredients, quantities and steps before saving.",
  "link.info": "Paste the address of the recipe page or scan its QR. You can also use Share → FamilyRecipes from the browser.",
  "link.menu": "From a link or QR",
  "link.menuInfo": "A recipe from a website: paste the link, scan a QR or use Share from the browser",

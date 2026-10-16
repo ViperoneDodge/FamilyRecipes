@@ -217,6 +217,7 @@
  "import.progress": "Importo {n} di {tot}…",
  "import.title": "Importa ricette",
  "intro.tagline": "Il ricettario di famiglia",
+ "link.check": "Ricetta letta dalla pagina web: ricontrolla titolo, ingredienti, dosi e passaggi prima di salvare.",
  "link.info": "Incolla l'indirizzo della pagina della ricetta oppure inquadra il suo QR. Puoi anche usare Condividi → FamilyRecipes dal browser.",
  "link.menu": "Da un link o un QR",
  "link.menuInfo": "La ricetta di un sito, come GialloZafferano: incolla il link, inquadra un QR o usa Condividi dal browser",
