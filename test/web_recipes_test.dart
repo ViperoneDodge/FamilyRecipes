@@ -1,6 +1,9 @@
 import 'package:familyrecipes/l10n.dart';
 import 'package:familyrecipes/models.dart';
 import 'package:familyrecipes/services/web_recipes.dart';
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // Pagine di esempio costruite sul formato schema.org/Recipe usato dai siti di ricette.
@@ -34,6 +37,8 @@ const _photos = '''
  "recipeInstructions":[{"@type":"HowToStep","text":"Sbucciate le mele.","image":"https://example.org/p1.jpg"},
   {"@type":"HowToStep","text":"Impastate.","image":[{"@type":"ImageObject","url":"/p2.jpg"}]},
   {"@type":"HowToStep","text":"Infornate."}]}</script>''';
+
+const _microdataResult = r'''{"ld":["{\"@type\":\"Recipe\",\"name\":\"Tiramisù\",\"image\":\"https://img.example.org/t.jpg\",\"recipeIngredient\":[\"500 g di mascarpone\",\"4 uova\"],\"recipeInstructions\":[\"Separate i tuorli.\\n\\nMontate il mascarpone.\"],\"recipeYield\":\"6 persone\",\"prepTime\":\"PT40M\"}"],"site":"Galbani"}''';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -94,5 +99,51 @@ void main() {
     final rec = r.toRecipe();
     expect(rec.steps.length, 3);
     expect(rec.prepMinutes, 70);
+  });
+
+  test('link senza parametri di tracciamento', () {
+    expect(
+        WebRecipes.cleanUrl('https://www.galbani.it/ricette/tiramisu?gclsrc=aw.ds&gad_source=1&gad_campaignid=2059539802'
+            '&gbraid=0AAAAADs2qd8&gclid=CjwKCAjw88HWBhA3'),
+        'https://www.galbani.it/ricette/tiramisu');
+    expect(WebRecipes.cleanUrl('https://example.org/r?id=5&utm_source=x'), 'https://example.org/r?id=5');
+    expect(WebRecipes.cleanUrl('https://example.org/r'), 'https://example.org/r');
+  });
+
+  test('piano B: ricetta letta dal browser del telefono (JSON-LD e microdati)', () async {
+    const channel = MethodChannel('familyrecipes/web');
+    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    // Come Android: il risultato di evaluateJavascript è la stringa JSON racchiusa tra virgolette.
+    String answer(Map data) => jsonEncode(jsonEncode(data));
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      expect(call.method, 'readPage');
+      return answer({
+        'site': 'Galbani',
+        'ld': [
+          jsonEncode({
+            '@type': 'Recipe',
+            'name': 'Tiramisù',
+            'recipeIngredient': ['Mascarpone 500 g', 'Uova 4'],
+            'recipeInstructions': 'Separate i tuorli.\nMontate il mascarpone.',
+            'recipeYield': '6',
+          }),
+        ],
+      });
+    });
+    final r = (await WebRecipes.readInBrowser('https://www.galbani.it/ricette/tiramisu'))!;
+    expect(r.title, 'Tiramisù');
+    expect(r.site, 'Galbani');
+    expect(r.servings, 6);
+    expect(r.ingredients.map((i) => '${i.name}|${i.amount}'), ['Mascarpone|500 g', 'Uova|4']);
+    expect(r.steps, ['Separate i tuorli.', 'Montate il mascarpone.']);
+    // Microdati: risultato reale dello script eseguito in Chromium su una pagina con itemprop.
+    messenger.setMockMethodCallHandler(channel, (call) async => jsonEncode(_microdataResult));
+    final m = (await WebRecipes.readInBrowser('https://www.galbani.it/ricette/tiramisu'))!;
+    expect([m.title, m.site, m.servings, m.prepMinutes, m.thumb], ['Tiramisù', 'Galbani', 6, 40, 'https://img.example.org/t.jpg']);
+    expect(m.ingredients.map((i) => '${i.name}|${i.amount}'), ['Mascarpone|500 g', 'Uova|4']);
+    expect(m.steps, ['Separate i tuorli.', 'Montate il mascarpone.']);
+    messenger.setMockMethodCallHandler(channel, (call) async => 'null');
+    expect(await WebRecipes.readInBrowser('https://example.org'), isNull);
+    messenger.setMockMethodCallHandler(channel, null);
   });
 }

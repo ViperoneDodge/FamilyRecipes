@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
+
 import '../l10n.dart';
 import '../models.dart';
 import 'http_get.dart';
@@ -82,8 +84,13 @@ class WebRecipes {
       url,
       userAgent: browserUserAgent,
       headers: {
-        HttpHeaders.acceptHeader: 'text/html,application/xhtml+xml',
-        HttpHeaders.acceptLanguageHeader: L10n.code,
+        HttpHeaders.acceptHeader: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        HttpHeaders.acceptLanguageHeader: '${L10n.code},en;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
       },
       maxBytes: 4 * 1024 * 1024,
     );
@@ -92,6 +99,53 @@ class WebRecipes {
 
   /// Legge la ricetta da una pagina web qualsiasi che ha i dati schema.org/Recipe.
   static Future<OnlineRecipe?> read(String url) async => parsePage(await fetch(url), url);
+
+  static const MethodChannel _web = MethodChannel('familyrecipes/web');
+
+  /// Raccoglie dalla pagina aperta nel browser i dati schema.org/Recipe: i blocchi JSON-LD e, se il sito
+  /// usa i microdati (itemprop), un blocco equivalente costruito da quelli.
+  static const String _pageScript = r'''
+(function(){
+  var ld=[];
+  document.querySelectorAll('script[type="application/ld+json"]').forEach(function(s){ld.push(s.textContent);});
+  var r=document.querySelector('[itemtype*="schema.org/Recipe"]');
+  if(r){
+    var all=function(p){return Array.prototype.map.call(r.querySelectorAll('[itemprop="'+p+'"]'),function(e){
+      return (e.getAttribute('content')||e.getAttribute('src')||e.getAttribute('href')||e.innerText||'').trim();});};
+    ld.push(JSON.stringify({'@type':'Recipe',name:all('name')[0],description:all('description')[0],image:all('image')[0],
+      recipeIngredient:all('recipeIngredient').concat(all('ingredients')),recipeInstructions:all('recipeInstructions'),
+      recipeYield:all('recipeYield')[0],prepTime:all('prepTime')[0],cookTime:all('cookTime')[0],totalTime:all('totalTime')[0],
+      recipeCategory:all('recipeCategory')[0]}));
+  }
+  var m=document.querySelector('meta[property="og:site_name"]');
+  return JSON.stringify({ld:ld,site:m?m.content:''});
+})()''';
+
+  /// Piano B per i siti che rifiutano le richieste dirette (protezioni anti-robot) o che creano la
+  /// ricetta solo nel browser: la pagina si apre in un browser invisibile del telefono e si legge da lì.
+  static Future<OnlineRecipe?> readInBrowser(String url) async {
+    final raw = await _web.invokeMethod<String>('readPage', {'url': url, 'script': _pageScript});
+    if (raw == null || raw == 'null') return null;
+    dynamic data = jsonDecode(raw);
+    if (data is String) data = jsonDecode(data); // il browser restituisce la stringa racchiusa tra virgolette
+    if (data is! Map) return null;
+    final site = '${data['site'] ?? ''}'.replaceAll('"', '');
+    final html = StringBuffer(site.isEmpty ? '' : '<meta property="og:site_name" content="$site">');
+    for (final b in (data['ld'] as List? ?? const [])) {
+      html.write('<script type="application/ld+json">$b</script>');
+    }
+    return parsePage(html.toString(), url);
+  }
+
+  /// Toglie dal link i parametri di tracciamento delle pubblicità (gclid, utm_…, fbclid…).
+  static String cleanUrl(String url) {
+    final u = Uri.tryParse(url);
+    if (u == null || u.queryParameters.isEmpty) return url;
+    bool tracking(String k) =>
+        k.startsWith('utm_') || k.startsWith('gad_') || const {'gclid', 'gclsrc', 'gbraid', 'wbraid', 'fbclid', 'dclid', 'msclkid', 'mc_cid', 'mc_eid'}.contains(k);
+    final q = {for (final e in u.queryParameters.entries) if (!tracking(e.key)) e.key: e.value};
+    return (q.isEmpty ? u.replace(query: '') : u.replace(queryParameters: q)).toString().replaceFirst(RegExp(r'\?$'), '');
+  }
 
   /// Indirizzi delle ricette nei risultati di una ricerca.
   static List<String> links(RecipeSite s, String html) => {

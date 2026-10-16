@@ -195,6 +195,10 @@ print("Patched", man)
 main_activity = """package it.familyrecipes.familyrecipes
 
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -216,6 +220,12 @@ class MainActivity : FlutterActivity() {
                 }
             }
         }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "familyrecipes/web").setMethodCallHandler { call, result ->
+            val url = call.argument<String>("url")
+            val script = call.argument<String>("script")
+            if (call.method == "readPage" && url != null && script != null) readPage(url, script, result)
+            else result.notImplemented()
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -226,6 +236,37 @@ class MainActivity : FlutterActivity() {
 
     private fun sharedText(i: Intent?): String? =
         if (i?.action == Intent.ACTION_SEND && i.type?.startsWith("text/") == true) i.getStringExtra(Intent.EXTRA_TEXT) else null
+
+    // Apre la pagina in un browser invisibile (come la vede l'utente: passa le protezioni anti-robot
+    // dei siti) ed esegue [script], che raccoglie i dati della ricetta; risponde una volta sola.
+    private fun readPage(url: String, script: String, result: MethodChannel.Result) {
+        val handler = Handler(Looper.getMainLooper())
+        val web = WebView(this)
+        var done = false
+        var last: String? = null
+        fun finish(value: String?) {
+            if (done) return
+            done = true
+            result.success(value)
+            handler.post {
+                web.stopLoading()
+                web.destroy()
+            }
+        }
+        web.settings.javaScriptEnabled = true
+        web.settings.domStorageEnabled = true
+        web.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView, loaded: String?) {
+                handler.postDelayed({
+                    if (!done) view.evaluateJavascript(script) { v ->
+                        if (v != null && v.contains("Recipe")) finish(v) else last = v
+                    }
+                }, 1500)
+            }
+        }
+        handler.postDelayed({ finish(last) }, 25000)
+        web.loadUrl(url)
+    }
 }
 """
 activities = list((APP / "src" / "main").rglob("MainActivity.kt"))

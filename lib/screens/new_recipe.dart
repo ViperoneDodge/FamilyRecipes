@@ -213,11 +213,12 @@ Future<String?> _askLink(BuildContext context) async {
 /// Legge la ricetta dalla pagina di un sito (link scritto o condiviso dal browser) e la mostra,
 /// pronta da salvare nel ricettario.
 Future<void> openRecipeLink(BuildContext context, String text) async {
-  final url = firstUrl(text);
-  if (url == null) {
+  final found = firstUrl(text);
+  if (found == null) {
     showSnack(context, tr('link.none'));
     return;
   }
+  final url = WebRecipes.cleanUrl(found);
   final nav = Navigator.of(context);
   _showProgress(context, tr('link.reading'));
   OnlineRecipe? r;
@@ -227,9 +228,20 @@ Future<void> openRecipeLink(BuildContext context, String text) async {
   } catch (_) {
     failed = true;
   }
+  // Se il sito rifiuta la lettura diretta o non ha la ricetta nella pagina scaricata, la si apre nel
+  // browser del telefono (piano B).
+  if (r == null || r.isPartial) {
+    try {
+      final b = await WebRecipes.readInBrowser(url);
+      if (b != null) {
+        r = b;
+        failed = false;
+      }
+    } catch (_) {}
+  }
   nav.pop();
   if (!context.mounted) return;
-  if (r == null) {
+  if (r == null || r.isPartial) {
     showSnack(context, failed ? tr('suggest.offline') : tr('link.none'));
     return;
   }

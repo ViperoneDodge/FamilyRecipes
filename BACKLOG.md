@@ -128,6 +128,14 @@ Pubblicata il 9 ottobre 2026:
   singoli passaggi** vengono scaricate e rimpicciolite come quelle scattate; immagini con indirizzo relativo
   riconosciute. Prima di salvare si controlla tutto nell'editor.
 
+## Versione 1.6.1
+
+- [x] **Link che davano errore** (es. galbani.it): molti siti di grandi marchi rifiutano le richieste che non
+  arrivano da un browser. Ora l'app si presenta come un browser e, se il sito rifiuta lo stesso o la ricetta
+  non c'è nella pagina scaricata, apre la pagina nel browser invisibile del telefono e la legge da lì
+  (dati schema.org in JSON-LD oppure microdati). Dal link si tolgono i parametri di tracciamento
+  delle pubblicità (gclid, gad_…, utm_…).
+
 ## Prossima release
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura
