@@ -25,6 +25,9 @@ class OnlineRecipe {
   final int servings;
   final RecipeCategory? webCategory;
 
+  /// Foto dei passaggi dai siti ('' = nessuna), una per ogni elemento di [steps].
+  final List<String> stepImages;
+
   /// Versione in inglese, se questa è una traduzione.
   final OnlineRecipe? original;
   final String? _categoryText;
@@ -46,6 +49,7 @@ class OnlineRecipe {
     this.cookMinutes = 0,
     this.servings = 4,
     this.webCategory,
+    this.stepImages = const [],
     this.original,
     String? categoryText,
     String? areaText,
@@ -55,6 +59,9 @@ class OnlineRecipe {
         _steps = steps;
 
   bool get translated => original != null;
+
+  /// Foto del passaggio [i] ('' = nessuna).
+  String stepImage(int i) => i < stepImages.length ? stepImages[i] : '';
 
   /// Da un sito nella lingua dell'app: niente traduzione.
   bool get fromSite => site.isNotEmpty;
@@ -197,7 +204,7 @@ class OnlineRecipes {
   static Future<Uint8List?> download(String url) async {
     if (url.isEmpty) return null;
     try {
-      return await httpGet(url);
+      return await httpGet(url, userAgent: browserUserAgent, maxBytes: 15 * 1024 * 1024);
     } catch (_) {
       return null;
     }

@@ -26,6 +26,15 @@ const _graph = '''
  "recipeInstructions":[{"@type":"HowToSection","name":"Pâte","itemListElement":[{"@type":"HowToStep","text":"Mélanger."}]},
    {"@type":"HowToSection","name":"Cuisson","itemListElement":[{"@type":"HowToStep","text":"Cuire 40 min."}]}]}]}</script>''';
 
+// Passaggi con foto, immagini relative e solo il tempo totale.
+const _photos = '''
+<script type="application/ld+json">{"@type":"Recipe","name":"Torta di mele","totalTime":"PT1H10M",
+ "image":"/img/torta.jpg","recipeYield":"8",
+ "recipeIngredient":["3 mele","200 g di farina"],
+ "recipeInstructions":[{"@type":"HowToStep","text":"Sbucciate le mele.","image":"https://example.org/p1.jpg"},
+  {"@type":"HowToStep","text":"Impastate.","image":[{"@type":"ImageObject","url":"/p2.jpg"}]},
+  {"@type":"HowToStep","text":"Infornate."}]}</script>''';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() => L10n.load('it'));
@@ -74,5 +83,16 @@ void main() {
         'https://ricette.giallozafferano.it/Farinata.html');
     expect(WebRecipes.minutes('PT1H30M'), 90);
     expect(WebRecipes.minutes('P0DT0H45M'), 45);
+  });
+
+  test('foto dei passaggi, immagini relative e tempo totale', () {
+    final r = WebRecipes.parsePage(_photos, 'https://example.org/ricette/torta.html')!;
+    expect(r.thumb, 'https://example.org/img/torta.jpg');
+    expect(r.steps, ['Sbucciate le mele.', 'Impastate.', 'Infornate.']);
+    expect([for (var i = 0; i < 3; i++) r.stepImage(i)], ['https://example.org/p1.jpg', 'https://example.org/p2.jpg', '']);
+    expect([r.prepMinutes, r.cookMinutes, r.servings], [70, 0, 8]);
+    final rec = r.toRecipe();
+    expect(rec.steps.length, 3);
+    expect(rec.prepMinutes, 70);
   });
 }

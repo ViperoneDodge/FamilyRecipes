@@ -12,6 +12,7 @@ import 'admin_screen.dart';
 import 'family_screen.dart';
 import 'import_screen.dart';
 import 'login_screen.dart';
+import 'new_recipe.dart' show recipeFromLinkFlow;
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -53,6 +54,13 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: Text(tr('import.menuInfo')),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => importRecipesFlow(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.qr_code_2),
+                  title: Text(tr('link.menu')),
+                  subtitle: Text(tr('link.menuInfo')),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => recipeFromLinkFlow(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.ios_share),

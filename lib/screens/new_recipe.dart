@@ -10,6 +10,7 @@ import '../services/recipe_reader.dart';
 import '../services/web_recipes.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import '../widgets/group_qr.dart' show scanQr;
 import 'import_screen.dart';
 import 'recipe_edit_screen.dart';
 import 'suggest_screen.dart' show OnlineRecipeScreen;
@@ -41,7 +42,7 @@ Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory
           option('gallery', Icons.photo_library_outlined, tr('scan.gallery'), tr('scan.galleryInfo')),
           option('pdf', Icons.picture_as_pdf_outlined, tr('scan.pdf'),
               tr('scan.pdfInfo', {'n': RecipeReader.maxPdfPages})),
-          option('link', Icons.link, tr('link.menu'), tr('link.menuInfo')),
+          option('link', Icons.qr_code_2, tr('link.menu'), tr('link.menuInfo')),
           const Divider(height: 1),
           option('import', Icons.file_open_outlined, tr('import.menu'), tr('import.menuInfo')),
           const SizedBox(height: 8),
@@ -56,8 +57,7 @@ Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory
         builder: (_) => RecipeEditScreen(recipe: Recipe(category: category ?? RecipeCategory.primi, bookId: bookId)),
       ));
     case 'link':
-      final url = await _askLink(context);
-      if (url != null && context.mounted) await openRecipeLink(context, url);
+      await recipeFromLinkFlow(context);
     case 'import':
       await importRecipesFlow(context, bookId: bookId);
     default:
@@ -146,13 +146,26 @@ Future<void> _readAndEdit(BuildContext context, List<String> paths, {String? boo
   nav.push(MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: recipe, notice: tr('scan.check'))));
 }
 
+/// Ricetta da internet: chiede il link (scritto, incollato o da QR) e apre la ricetta letta.
+Future<void> recipeFromLinkFlow(BuildContext context) async {
+  final url = await _askLink(context);
+  if (url != null && context.mounted) await openRecipeLink(context, url);
+}
+
+/// Chiede il link di una ricetta: scritto, incollato dagli appunti o letto da un QR.
 Future<String?> _askLink(BuildContext context) async {
-  var start = '';
-  try {
-    start = firstUrl((await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '') ?? '';
-  } catch (_) {}
+  Future<String> clipboardUrl() async {
+    try {
+      return firstUrl((await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '') ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  final start = await clipboardUrl();
   if (!context.mounted) return null;
   final ctrl = TextEditingController(text: start);
+  const scan = '\u0000qr';
   final res = await showDialog<String>(
     context: context,
     builder: (ctx) => AlertDialog(
@@ -164,8 +177,25 @@ Future<String?> _askLink(BuildContext context) async {
           controller: ctrl,
           autofocus: start.isEmpty,
           keyboardType: TextInputType.url,
-          decoration: const InputDecoration(hintText: 'https://…', prefixIcon: Icon(Icons.link)),
+          decoration: InputDecoration(
+            hintText: 'https://…',
+            prefixIcon: const Icon(Icons.link),
+            suffixIcon: IconButton(
+              tooltip: tr('link.paste'),
+              icon: const Icon(Icons.content_paste),
+              onPressed: () async {
+                final u = await clipboardUrl();
+                if (u.isNotEmpty) ctrl.text = u;
+              },
+            ),
+          ),
           onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.pop(ctx, scan),
+          icon: const Icon(Icons.qr_code_scanner),
+          label: Text(tr('link.scan')),
         ),
       ]),
       actions: [
@@ -174,6 +204,9 @@ Future<String?> _askLink(BuildContext context) async {
       ],
     ),
   );
+  if (res == scan && context.mounted) {
+    return scanQr(context, title: tr('link.qrTitle'), parse: (raw) => firstUrl(raw ?? ''), notFound: tr('link.qrNone'));
+  }
   return res == null ? null : firstUrl(res);
 }
 

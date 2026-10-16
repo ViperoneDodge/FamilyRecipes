@@ -122,29 +122,43 @@ class _GroupQrCardState extends State<GroupQrCard> {
   }
 }
 
-Future<String?> scanGroupQr(BuildContext context) =>
-    Navigator.of(context).push<String>(MaterialPageRoute(builder: (_) => const _QrScanScreen()));
+Future<String?> scanGroupQr(BuildContext context) => scanQr(context,
+    title: tr('family.scanQr'), parse: codeFromQr, notFound: tr('family.qrNotFound'));
 
-Future<String?> groupQrFromImage(BuildContext context) async {
+Future<String?> groupQrFromImage(BuildContext context) =>
+    qrFromImage(context, parse: codeFromQr, notFound: tr('family.qrNotFound'));
+
+/// Inquadra un QR con la fotocamera (o lo legge da una foto) e restituisce ciò che [parse] ne ricava.
+Future<String?> scanQr(BuildContext context,
+        {required String title, required String? Function(String? raw) parse, required String notFound}) =>
+    Navigator.of(context).push<String>(
+        MaterialPageRoute(builder: (_) => _QrScanScreen(title: title, parse: parse, notFound: notFound)));
+
+/// Legge un QR da una foto della galleria.
+Future<String?> qrFromImage(BuildContext context,
+    {required String? Function(String? raw) parse, required String notFound}) async {
   final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
   if (picked == null) return null;
   final controller = MobileScannerController(autoStart: false, formats: const [BarcodeFormat.qrCode]);
   try {
     final capture = await controller.analyzeImage(picked.path, formats: const [BarcodeFormat.qrCode]);
     for (final b in capture?.barcodes ?? const <Barcode>[]) {
-      final code = codeFromQr(b.rawValue);
-      if (code != null) return code;
+      final v = parse(b.rawValue);
+      if (v != null) return v;
     }
   } catch (_) {
   } finally {
     await controller.dispose();
   }
-  if (context.mounted) showSnack(context, tr('family.qrNotFound'));
+  if (context.mounted) showSnack(context, notFound);
   return null;
 }
 
 class _QrScanScreen extends StatefulWidget {
-  const _QrScanScreen();
+  final String title;
+  final String? Function(String? raw) parse;
+  final String notFound;
+  const _QrScanScreen({required this.title, required this.parse, required this.notFound});
 
   @override
   State<_QrScanScreen> createState() => _QrScanScreenState();
@@ -163,20 +177,20 @@ class _QrScanScreenState extends State<_QrScanScreen> {
   void _onDetect(BarcodeCapture capture) {
     if (_done) return;
     for (final b in capture.barcodes) {
-      final code = codeFromQr(b.rawValue);
-      if (code != null) {
+      final v = widget.parse(b.rawValue);
+      if (v != null) {
         _done = true;
-        Navigator.of(context).pop(code);
+        Navigator.of(context).pop(v);
         return;
       }
     }
   }
 
   Future<void> _fromImage() async {
-    final code = await groupQrFromImage(context);
-    if (code != null && mounted && !_done) {
+    final v = await qrFromImage(context, parse: widget.parse, notFound: widget.notFound);
+    if (v != null && mounted && !_done) {
       _done = true;
-      Navigator.of(context).pop(code);
+      Navigator.of(context).pop(v);
     }
   }
 
@@ -184,7 +198,7 @@ class _QrScanScreenState extends State<_QrScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr('family.scanQr')),
+        title: Text(widget.title),
         actions: [
           IconButton(
             tooltip: tr('family.qrFromImage'),

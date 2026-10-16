@@ -5,6 +5,10 @@ import 'dart:typed_data';
 /// Attesa massima per collegarsi e per ogni pezzo della risposta.
 const Duration httpTimeout = Duration(seconds: 15);
 
+/// Come un browser del telefono: alcuni siti di ricette rifiutano i programmi sconosciuti.
+const String browserUserAgent =
+    'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36';
+
 /// Scarica [url] con una GET; errore se la risposta non è 200.
 /// Con [maxBytes] smette di leggere appena li supera (pagine enormi).
 Future<Uint8List> httpGet(String url, {String? userAgent, Map<String, String> headers = const {}, int? maxBytes}) async {

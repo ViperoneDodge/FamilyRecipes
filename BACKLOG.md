@@ -118,6 +118,16 @@ Pubblicata il 9 ottobre 2026:
   aiuti, un solo download HTTP per TheMealDB e siti di ricette, una sola "lapide" per le ricette eliminate,
   switch expression); nessun cambiamento visibile, schermate di prova identiche pixel per pixel.
 
+## Versione 1.6.0
+
+- [x] **Ricetta da internet con link o QR**: *Nuova ricetta → Da un link o un QR* (anche in Impostazioni):
+  si scrive o si incolla il link (pulsante Incolla, e il link copiato viene proposto da solo) oppure si
+  inquadra un QR con la fotocamera o da una foto; resta anche *Condividi → FamilyRecipes* dal browser.
+- [x] **Importati tutti i dati della ricetta**: titolo, presentazione, categoria, tempi (anche solo il tempo
+  totale), dosi, ingredienti con quantità, passaggi divisi, consigli e fonte; **foto del piatto e foto dei
+  singoli passaggi** vengono scaricate e rimpicciolite come quelle scattate; immagini con indirizzo relativo
+  riconosciute. Prima di salvare si controlla tutto nell'editor.
+
 ## Prossima release
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
   (più preciso della lettura dall'immagine); proporre la foto letta come foto del piatto; lettura

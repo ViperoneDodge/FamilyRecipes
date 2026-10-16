@@ -80,7 +80,7 @@ class WebRecipes {
   static Future<String> fetch(String url) async {
     final bytes = await httpGet(
       url,
-      userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+      userAgent: browserUserAgent,
       headers: {
         HttpHeaders.acceptHeader: 'text/html,application/xhtml+xml',
         HttpHeaders.acceptLanguageHeader: L10n.code,
@@ -169,12 +169,19 @@ class WebRecipes {
 
   static OnlineRecipe _toRecipe(Map<String, dynamic> j, String url, String site) {
     final title = clean(_text(j['name']));
+    String img(dynamic v) => _resolve(url, _image(v));
     final steps = <String>[];
+    final stepImages = <String>[]; // foto di ogni passaggio ('' = nessuna), allineate a steps
+    void add(String t, [String image = '']) {
+      steps.add(t);
+      stepImages.add(image);
+    }
+
     void addSteps(dynamic s) {
       if (s is String) {
         for (final p in clean(s, keepLines: true).split(RegExp(r'\n\s*\n|\n'))) {
           final t = p.trim().replaceFirst(RegExp(r'^\d+[.)]\s*'), '');
-          if (t.isNotEmpty) steps.add(t);
+          if (t.isNotEmpty) add(t);
         }
       } else if (s is List) {
         for (final x in s) {
@@ -185,7 +192,7 @@ class WebRecipes {
           addSteps(s['itemListElement']);
         } else {
           final t = clean(_text(s['text'] ?? s['name']));
-          if (t.isNotEmpty) steps.add(t);
+          if (t.isNotEmpty) add(t, img(s['image']));
         }
       }
     }
@@ -197,19 +204,23 @@ class WebRecipes {
     ];
     final cat = clean(_text(_first(j['recipeCategory'])));
     final cuisine = clean(_text(_first(j['recipeCuisine'])));
+    var prep = minutes(_text(j['prepTime']));
+    final cook = minutes(_text(j['cookTime']));
+    if (prep == 0 && cook == 0) prep = minutes(_text(j['totalTime']));
     return OnlineRecipe(
       id: url,
       title: title,
       category: cat,
       area: cuisine,
-      thumb: _image(j['image']),
+      thumb: img(j['image']),
       source: url,
       ingredients: ingredients,
       steps: steps,
+      stepImages: stepImages,
       site: site,
       intro: clean(_text(j['description'])),
-      prepMinutes: minutes(_text(j['prepTime'])),
-      cookMinutes: minutes(_text(j['cookTime'])),
+      prepMinutes: prep,
+      cookMinutes: cook,
       servings: servings(j['recipeYield']),
       webCategory: RecipeWords.categoryFromLabel(cat) ?? RecipeWords.guessCategory(title),
     );
@@ -218,6 +229,12 @@ class WebRecipes {
   static List _list(dynamic v) => v is List ? v : (v == null ? const [] : [v]);
   static dynamic _first(dynamic v) => v is List ? (v.isEmpty ? null : v.first) : v;
   static String _text(dynamic v) => v == null ? '' : (v is Map ? '${v['name'] ?? v['text'] ?? ''}' : '$v');
+
+  /// Indirizzo completo di un'immagine anche se la pagina lo dà relativo ("/img/x.jpg").
+  static String _resolve(String page, String src) {
+    if (src.isEmpty || src.startsWith('http')) return src;
+    return Uri.tryParse(page)?.resolve(src).toString() ?? src;
+  }
 
   static String _image(dynamic v) {
     v = _first(v);

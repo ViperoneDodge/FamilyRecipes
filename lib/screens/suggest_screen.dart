@@ -560,14 +560,27 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
     setState(() => _saving = true);
     final recipe = _shown.toRecipe();
     final added = <String>{};
-    try {
-      final bytes = await OnlineRecipes.download(_r.thumb);
-      if (bytes != null) {
+    final done = <String, String?>{};
+    // Foto del piatto e dei passaggi, scaricate e rimpicciolite come quelle scattate (una volta sola).
+    Future<String?> photo(String url) async {
+      if (done.containsKey(url)) return done[url];
+      try {
+        final bytes = await OnlineRecipes.download(url);
+        if (bytes == null) return null;
         final id = await appState.addPhoto(await compressPhoto(bytes));
-        recipe.coverPhoto = id;
         added.add(id);
+        return done[url] = id;
+      } catch (_) {
+        return null;
       }
-    } catch (_) {}
+    }
+
+    recipe.coverPhoto = await photo(_r.thumb);
+    for (var i = 0; i < recipe.steps.length; i++) {
+      if (_r.stepImage(i).isEmpty) continue;
+      final id = await photo(_r.stepImage(i));
+      if (id != null) recipe.steps[i].photos.add(id);
+    }
     if (!mounted) return;
     setState(() => _saving = false);
     await Navigator.of(context).push(MaterialPageRoute(
@@ -670,7 +683,23 @@ class _OnlineRecipeScreenState extends State<OnlineRecipeScreen> {
                             style: TextStyle(fontFamily: handFont, fontSize: 19, color: scheme.onPrimary, height: 1)),
                       ),
                       const SizedBox(width: 10),
-                      Expanded(child: Text(r.steps[n], style: ink)),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(r.steps[n], style: ink),
+                          if (_r.stepImage(n).isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: AspectRatio(
+                                  aspectRatio: 4 / 3,
+                                  child: Image.network(_r.stepImage(n),
+                                      fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                                ),
+                              ),
+                            ),
+                        ]),
+                      ),
                     ]),
                   ),
               ],
