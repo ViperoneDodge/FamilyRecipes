@@ -145,7 +145,7 @@ Pubblicata il 9 ottobre 2026:
 - [x] **Link non più ricordato**: aprendo "Da un link o un QR" il campo è vuoto; il link copiato si mette
   con Incolla.
 
-## Prossima release
+## Versione 1.7.0
 
 - [x] **Preferiti e pagina iniziale**: nuova scheda *Preferiti* (prima nella barra in basso) con le ricette
   preferite e le linguette delle categorie, raggruppate come in Le mie. In Impostazioni → *Pagina iniziale*
@@ -162,6 +162,9 @@ Pubblicata il 9 ottobre 2026:
   (scopri, acquista, iscriviti alla newsletter, leggi anche, ricette correlate…), il nome del sito/marchio e
   i simboli ® ™ da titolo, ingredienti e passaggi ("Mascarpone Galbani®" → "Mascarpone"); la presentazione
   si accorcia a due frasi.
+
+## Prossima release
+
 - [ ] Riassunto vero dei passaggi lunghi (riscrittura più breve): servirebbe un'intelligenza artificiale
   online (es. Claude), con una chiave e un costo per ricetta; da valutare.
 - [ ] **Lettura da foto o PDF, migliorie**: se il PDF contiene già il testo usarlo direttamente
