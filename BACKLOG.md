@@ -147,6 +147,15 @@ Pubblicata il 9 ottobre 2026:
 
 ## Prossima release
 
+- [x] **Preferiti e pagina iniziale**: nuova scheda *Preferiti* (prima nella barra in basso) con le ricette
+  preferite e le linguette delle categorie, raggruppate come in Le mie. In Impostazioni → *Pagina iniziale*
+  si sceglie se l'app si apre su Le mie o su Preferiti.
+  - Ricette: stella nella ricetta, oppure tenendo premuta una ricetta (Le mie, Gruppi, Preferiti) →
+    *Aggiungi ai preferiti* (nello stesso menu resta *Sposta in un gruppo*).
+  - Gruppi interi: tenendo premuto il gruppo nella pagina Gruppi oppure con l'interruttore nelle impostazioni
+    del gruppo; i gruppi preferiti compaiono in alto nei Preferiti e si tolgono con la ×.
+  - I preferiti restano sul telefono (non si sincronizzano tra dispositivi).
+
 - [x] **Invito a ricontrollare** le ricette prese da internet: l'editor si apre con l'avviso "Ricetta letta
   dalla pagina web: ricontrolla titolo, ingredienti, dosi e passaggi prima di salvare".
 - [x] **Ricette senza pubblicità né marchio**: dalle ricette lette dai siti si tolgono le frasi promozionali
