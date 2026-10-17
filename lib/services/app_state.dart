@@ -43,6 +43,13 @@ class AppState extends ChangeNotifier {
   /// true = prima le più recenti, false = in ordine alfabetico.
   bool sortNewestFirst = false;
 
+  /// Preferiti (su questo telefono): ricette scelte una per una e gruppi interi.
+  Set<String> favRecipes = {};
+  Set<String> favGroups = {};
+
+  /// L'app si apre sulla pagina dei Preferiti invece che su Le mie.
+  bool startOnFavorites = false;
+
   String? langPref;
 
   // ---- Ricette visibili ----
@@ -109,6 +116,10 @@ class AppState extends ChangeNotifier {
     theme = ThemeSettings.fromJson(settings);
     langPref = settings?['lang'] as String?;
     sortNewestFirst = settings?['sortNewest'] == true;
+    Set<String> ids(Object? v) => {for (final e in (v as List?) ?? const []) '$e'};
+    favRecipes = ids(settings?['favRecipes']);
+    favGroups = ids(settings?['favGroups']);
+    startOnFavorites = settings?['start'] == 'favorites';
     photos.downloader = (book, id) => isCloud ? sync.downloadPhoto(book, id) : Future.value(null);
     notifyListeners();
     try {
@@ -410,7 +421,35 @@ class AppState extends ChangeNotifier {
         ...theme.toJson(),
         if (langPref != null) 'lang': langPref,
         'sortNewest': sortNewestFirst,
+        'favRecipes': favRecipes.toList(),
+        'favGroups': favGroups.toList(),
+        if (startOnFavorites) 'start': 'favorites',
       });
+
+  // ---- Preferiti ----
+
+  /// Nei preferiti da sola o perché il suo gruppo è tra i preferiti.
+  bool isFavorite(Recipe r) => favRecipes.contains(r.id) || (r.bookId != null && favGroups.contains(r.bookId));
+
+  List<Recipe> get favoriteRecipes => sortedForList(recipes.where(isFavorite));
+
+  Future<void> toggleFavorite(Recipe r) async {
+    if (!favRecipes.remove(r.id)) favRecipes.add(r.id);
+    notifyListeners();
+    await _writeSettings();
+  }
+
+  Future<void> toggleFavoriteGroup(String groupId) async {
+    if (!favGroups.remove(groupId)) favGroups.add(groupId);
+    notifyListeners();
+    await _writeSettings();
+  }
+
+  Future<void> setStartOnFavorites(bool on) async {
+    startOnFavorites = on;
+    notifyListeners();
+    await _writeSettings();
+  }
 
   Future<void> setLanguage(String? code) async {
     langPref = code;

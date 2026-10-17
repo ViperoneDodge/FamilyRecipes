@@ -204,6 +204,13 @@ void main() {
           await tester.drag(find.byType(ListView).first, const Offset(0, -300));
         });
         await shot(tester, const RecipeDetailScreen(recipeId: 'r9'), '09_menu');
+        appState.favRecipes = {'r1', 'r3'};
+        appState.favGroups = {'FAM7Q2K9XW'};
+        await shot(tester, const HomeScreen(), '19_favorites', then: () async {
+          await tester.tap(find.byIcon(Icons.star_outline).first);
+        });
+        appState.favRecipes = {};
+        appState.favGroups = {};
         const seq = ['r1', 'r2', 'r3'];
         await shot(tester, const RecipeDetailScreen(recipeId: 'r1', sequence: seq), '16_flip_next', settle: false,
             then: () async {

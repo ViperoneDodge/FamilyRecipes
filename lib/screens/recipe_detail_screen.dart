@@ -180,6 +180,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
             title: Text(categoryLabel(r.category)),
             actions: [
               IconButton(
+                tooltip: appState.isFavorite(r) ? tr('fav.remove') : tr('fav.add'),
+                icon: Icon(appState.isFavorite(r) ? Icons.star : Icons.star_outline,
+                    color: appState.isFavorite(r) ? Colors.amber.shade600 : null),
+                onPressed: () => toggleFavoriteWithSnack(context, r),
+              ),
+              IconButton(
                 tooltip: tr('pdf.exportRecipe'),
                 icon: const Icon(Icons.picture_as_pdf_outlined),
                 onPressed: () => exportPdf(context, r.displayTitle, [r]),

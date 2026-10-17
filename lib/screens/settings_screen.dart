@@ -351,6 +351,23 @@ class SettingsScreen extends StatelessWidget {
           ],
         ),
       ),
+      _label(tr('start.title')),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: SegmentedButton<bool>(
+          showSelectedIcon: false,
+          segments: [
+            ButtonSegment(value: false, icon: const Icon(Icons.edit_note), label: Text(tr('tab.mine'))),
+            ButtonSegment(value: true, icon: const Icon(Icons.star_outline), label: Text(tr('tab.fav'))),
+          ],
+          selected: {appState.startOnFavorites},
+          onSelectionChanged: (sel) => appState.setStartOnFavorites(sel.first),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+        child: Text(tr('start.info'), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      ),
       _label(tr('tabs.title')),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

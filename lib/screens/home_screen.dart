@@ -25,6 +25,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _tab = 0;
   RecipeCategory? _myCategory;
+  RecipeCategory? _favCategory;
+
+  // Schede: 0 Le mie, 1 Gruppi, 2 Suggerimento, 3 Preferiti (prima nella barra).
+  static const int _favTab = 3;
 
   String? _selectedId;
   List<String> _selectedSeq = const [];
@@ -33,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    if (appState.startOnFavorites) _tab = _favTab;
     // Link di una ricetta condiviso dal browser ("Condividi → FamilyRecipes").
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ShareReceiver.listen((text) {
@@ -136,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListenableBuilder(
       listenable: appState,
       builder: (context, _) {
-        final titles = [tr('book.mine'), tr('tab.family'), tr('tab.suggest')];
+        final titles = [tr('book.mine'), tr('tab.family'), tr('tab.suggest'), tr('fav.title')];
         final body = switch (_tab) {
           1 => FamilyTab(
               onOpen: _openDetail,
@@ -144,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
               selectedId: _twoPane ? _selectedId : null,
             ),
           2 => SuggestTab(onOpen: _openDetail),
+          _favTab => _favoritesTab(),
           _ => _myTab(),
         };
         final mine = appState.myRecipes;
@@ -242,6 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: SafeArea(
         top: false,
         child: Row(children: [
+          item(_favTab, Icons.star_outline, Icons.star, tr('tab.fav')),
           item(0, Icons.edit_note_outlined, Icons.edit_note, tr('tab.mine')),
           item(1, Icons.groups_outlined, Icons.groups, tr('tab.family')),
           item(2, Icons.soup_kitchen_outlined, Icons.soup_kitchen, tr('tab.tonight')),
@@ -260,6 +267,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return best < 0 ? s : '${s.substring(0, best)}\n${s.substring(best + 1)}';
   }
 
+  /// Preferiti: le ricette scelte e quelle dei gruppi preferiti, con le linguette delle categorie.
+  Widget _favoritesTab() {
+    final groups = appState.data.groups.where((g) => appState.favGroups.contains(g.id)).toList();
+    return RecipeBrowser(
+      key: const ValueKey('fav'),
+      recipes: appState.favoriteRecipes,
+      initialCategory: _favCategory,
+      onCategoryChanged: (c) => _favCategory = c,
+      selectedId: _twoPane ? _selectedId : null,
+      onOpen: _openDetail,
+      onLongPress: (r) => recipeActionsSheet(context, r),
+      badgeFor: (r) => appState.isPersonal(r) ? null : appState.bookLabel(r),
+      emptyTitle: tr('fav.empty'),
+      emptyHint: tr('fav.emptyHint'),
+      header: [
+        if (groups.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final g in groups)
+                InputChip(
+                  avatar: const Icon(Icons.groups_outlined, size: 18),
+                  label: Text(g.name),
+                  deleteButtonTooltipMessage: tr('fav.groupRemove'),
+                  onDeleted: () => toggleFavoriteGroupWithSnack(context, g),
+                ),
+            ]),
+          ),
+      ],
+    );
+  }
+
   Widget _myTab() {
     final all = appState.myRecipes;
     final hasGroupRecipes = appState.recipes.any((r) => !appState.isMine(r));
@@ -270,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onCategoryChanged: (c) => _myCategory = c,
       selectedId: _twoPane ? _selectedId : null,
       onOpen: _openDetail,
-      onLongPress: (r) => moveRecipeSheet(context, r),
+      onLongPress: (r) => recipeActionsSheet(context, r),
       badgeFor: (r) => appState.isPersonal(r) ? null : appState.bookLabel(r),
       emptyTitle: tr('home.empty'),
       emptyHint: tr('home.emptyHint'),

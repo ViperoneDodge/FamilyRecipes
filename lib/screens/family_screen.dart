@@ -103,10 +103,12 @@ class FamilyTab extends StatelessWidget {
         InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () => _push(context, GroupBookScreen(groupId: g.id)),
+          onLongPress: () => toggleFavoriteGroupWithSnack(context, g),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 6),
             child: Row(children: [
-              Icon(Icons.groups_outlined, color: nb.accent),
+              Icon(appState.favGroups.contains(g.id) ? Icons.star : Icons.groups_outlined,
+                  color: appState.favGroups.contains(g.id) ? Colors.amber.shade700 : nb.accent),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -135,7 +137,7 @@ class FamilyTab extends StatelessWidget {
               recipe: r,
               selected: r.id == selectedId,
               onTap: () => onOpen(r),
-              onLongPress: () => moveRecipeSheet(context, r),
+              onLongPress: () => recipeActionsSheet(context, r),
             )),
         Wrap(spacing: 4, children: [
           if (list.length > _preview)
@@ -185,7 +187,7 @@ class GroupBookScreen extends StatelessWidget {
                       recipes: list,
                       onOpen: (r, shown) =>
                           _push(context, RecipeDetailScreen(recipeId: r.id, sequence: [for (final x in shown) x.id])),
-                      onLongPress: (r) => moveRecipeSheet(context, r),
+                      onLongPress: (r) => recipeActionsSheet(context, r),
                       emptyTitle: tr('family.noRecipes'),
                       emptyHint: appState.canAddTo(g.id) ? tr('family.noRecipesHint') : null,
                     ),
@@ -282,6 +284,62 @@ Future<void> exportPdf(BuildContext context, String title, List<Recipe> recipes)
   } catch (e) {
     if (context.mounted) showSnack(context, tr('pdf.error', {'error': e}));
   }
+}
+
+/// Tenendo premuta una ricetta: aggiungerla o toglierla dai preferiti, oppure spostarla in un gruppo.
+Future<void> recipeActionsSheet(BuildContext context, Recipe r) async {
+  HapticFeedback.mediumImpact();
+  final own = appState.favRecipes.contains(r.id);
+  final viaGroup = !own && appState.isFavorite(r);
+  final choice = await showModalBottomSheet<String>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Text(r.displayTitle, style: const TextStyle(fontFamily: handFont, fontSize: 24)),
+        ),
+        ListTile(
+          leading: Icon(own || viaGroup ? Icons.star : Icons.star_outline, color: Colors.amber.shade700),
+          title: Text(own ? tr('fav.remove') : tr('fav.add')),
+          subtitle: viaGroup ? Text(tr('fav.viaGroup', {'name': appState.bookLabel(r)})) : null,
+          enabled: !viaGroup,
+          onTap: () => Navigator.pop(ctx, 'fav'),
+        ),
+        if (appState.isCloud)
+          ListTile(
+            leading: const Icon(Icons.drive_file_move_outlined),
+            title: Text(tr('recipe.moveMenu')),
+            onTap: () => Navigator.pop(ctx, 'move'),
+          ),
+        const SizedBox(height: 8),
+      ]),
+    ),
+  );
+  if (!context.mounted) return;
+  switch (choice) {
+    case 'fav':
+      await toggleFavoriteWithSnack(context, r);
+    case 'move':
+      await moveRecipeSheet(context, r);
+  }
+}
+
+Future<void> toggleFavoriteWithSnack(BuildContext context, Recipe r) async {
+  if (!appState.favRecipes.contains(r.id) && appState.isFavorite(r)) {
+    showSnack(context, tr('fav.viaGroup', {'name': appState.bookLabel(r)}));
+    return;
+  }
+  final adding = !appState.favRecipes.contains(r.id);
+  await appState.toggleFavorite(r);
+  if (context.mounted) showSnack(context, tr(adding ? 'fav.added' : 'fav.removed', {'name': r.displayTitle}));
+}
+
+Future<void> toggleFavoriteGroupWithSnack(BuildContext context, FamilyGroup g) async {
+  HapticFeedback.mediumImpact();
+  final adding = !appState.favGroups.contains(g.id);
+  await appState.toggleFavoriteGroup(g.id);
+  if (context.mounted) showSnack(context, tr(adding ? 'fav.groupAdded' : 'fav.groupRemoved', {'name': g.name}));
 }
 
 Future<void> moveRecipeSheet(BuildContext context, Recipe r) async {
@@ -455,6 +513,14 @@ class GroupScreen extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(8, 8, 10, 32),
                 children: [
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    secondary: Icon(Icons.star, color: Colors.amber.shade700),
+                    title: Text(tr('fav.groupSwitch')),
+                    subtitle: Text(tr('fav.groupSwitchInfo')),
+                    value: appState.favGroups.contains(g.id),
+                    onChanged: (_) => toggleFavoriteGroupWithSnack(context, g),
+                  ),
                   HandHeader(tr('family.inviteCode'), icon: Icons.key),
                   Card(
                     child: Padding(
