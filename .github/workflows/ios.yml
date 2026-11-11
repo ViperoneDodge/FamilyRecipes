@@ -46,39 +46,47 @@ jobs:
 
       # Firma e caricamento su TestFlight: solo se nei Secrets ci sono le chiavi di App Store Connect
       # (APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8 = contenuto del file .p8, APPLE_TEAM_ID).
+      # Certificato di distribuzione e profilo App Store li crea qui la chiave API (codemagic-cli-tools):
+      # non servono iPhone registrati né certificati salvati. Il certificato viene revocato alla fine
+      # (Apple ne consente pochi): le build già caricate restano valide.
       - name: Firma e carica su TestFlight
         env:
-          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
-          ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
-          KEY_P8: ${{ secrets.APPSTORE_KEY_P8 }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APPSTORE_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APPSTORE_KEY_P8 }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          if [ -z "$KEY_ID" ] || [ -z "$ISSUER_ID" ] || [ -z "$KEY_P8" ] || [ -z "$TEAM_ID" ]; then
+          if [ -z "$APP_STORE_CONNECT_KEY_IDENTIFIER" ] || [ -z "$APP_STORE_CONNECT_ISSUER_ID" ] || [ -z "$APP_STORE_CONNECT_PRIVATE_KEY" ]; then
             echo "Chiavi di App Store Connect non configurate: app compilata ma non firmata né caricata."
             exit 0
           fi
-          KEY_PATH="$RUNNER_TEMP/AuthKey_$KEY_ID.p8"
-          printf '%s\n' "$KEY_P8" > "$KEY_PATH"
-          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH"
-                -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID")
-          flutter build ios --release --config-only --no-codesign --build-number=${{ github.run_number }}
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release \
-            -archivePath "$RUNNER_TEMP/Runner.xcarchive" -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic "${AUTH[@]}" archive
-          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key><string>app-store-connect</string>
-            <key>destination</key><string>upload</string>
-            <key>teamID</key><string>$TEAM_ID</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>uploadSymbols</key><true/>
-          </dict>
-          </plist>
-          EOF
-          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" "${AUTH[@]}"
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/cm"
+          "$RUNNER_TEMP/cm/bin/pip" install -q codemagic-cli-tools
+          export PATH="$RUNNER_TEMP/cm/bin:$PATH"
+          ssh-keygen -t rsa -b 2048 -m PEM -f "$RUNNER_TEMP/cert_key" -q -N ""
+          export CERTIFICATE_PRIVATE_KEY="$(cat "$RUNNER_TEMP/cert_key")"
+          keychain initialize
+          app-store-connect fetch-signing-files it.familyrecipes.familyrecipes \
+            --type IOS_APP_STORE --platform IOS --create --delete-stale-profiles
+          keychain add-certificates
+          xcode-project use-profiles --project ios/Runner.xcodeproj
+          flutter build ipa --release --build-number=${{ github.run_number }} \
+            --export-options-plist="$HOME/export_options.plist"
+          app-store-connect publish --path "$(ls build/ios/ipa/*.ipa | head -1)"
           echo "Caricata su App Store Connect: tra qualche minuto compare in TestFlight."
+
+      - name: Revoca il certificato temporaneo
+        if: always()
+        env:
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APPSTORE_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          [ -f "$RUNNER_TEMP/cert_key" ] && [ -x "$RUNNER_TEMP/cm/bin/app-store-connect" ] || exit 0
+          export PATH="$RUNNER_TEMP/cm/bin:$PATH"
+          ids=$(app-store-connect certificates list --type DISTRIBUTION IOS_DISTRIBUTION \
+                --certificate-key "@file:$RUNNER_TEMP/cert_key" --json \
+                | python3 -c 'import json,sys; print(" ".join(c["id"] for c in json.load(sys.stdin)))') || exit 0
+          for id in $ids; do app-store-connect certificates delete "$id" --ignore-not-found || true; done
+          keychain use-login || true
