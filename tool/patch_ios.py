@@ -146,7 +146,7 @@ print("Patched", podfile)
 
 # ---- Icona: App Store vuole un'unica immagine 1024×1024 senza trasparenza ----
 icon_set = RUNNER / "Assets.xcassets" / "AppIcon.appiconset"
-src = ROOT / "tool" / "icons" / "ios" / "Icon-1024.png"
+src = ROOT / "tool" / "branding" / "ios-icon-1024.png"
 if src.exists():
     shutil.rmtree(icon_set, ignore_errors=True)
     icon_set.mkdir(parents=True)

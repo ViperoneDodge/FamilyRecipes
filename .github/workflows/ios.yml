@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   ios:
-    runs-on: macos-15
+    runs-on: macos-26  # Xcode 26: necessario per i pacchetti attuali e per caricare sull App Store
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +21,9 @@ jobs:
           flutter-version: '3.38.x'
           channel: stable
           cache: true
+
+      - name: Versione di Xcode
+        run: xcodebuild -version
 
       - name: Prepara il progetto iOS
         run: |
