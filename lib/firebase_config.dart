@@ -17,10 +17,12 @@ class FirebaseConfig {
 
   // ---- iPhone ----
   // Dalla console Firebase → Impostazioni progetto → app iOS (it.familyrecipes.familyrecipes):
-  // GOOGLE_APP_ID e CLIENT_ID del file GoogleService-Info.plist. Finché sono vuoti, su iPhone l'app
+  // API_KEY, GOOGLE_APP_ID e CLIENT_ID del file GoogleService-Info.plist. Finché sono vuoti, su iPhone l'app
   // funziona solo in locale. tool/patch_ios.py legge CLIENT_ID da qui per lo schema URL di Google.
-  static const String iosAppId = '';
-  static const String iosClientId = '';
+  static const String iosApiKey = 'AIzaSyD5qdmzpxdYby-N6SE2wZ2hQM6TAbsMn8M';
+  static const String iosAppId = '1:524842949858:ios:8d851ac1fb98d4de0b12bb';
+  static const String iosClientId =
+      '524842949858-rs203bkcajijr453acnggdgn69jj7fbb.apps.googleusercontent.com';
   static const String iosBundleId = 'it.familyrecipes.familyrecipes';
 
   static bool get _ios {
@@ -35,7 +37,7 @@ class FirebaseConfig {
       apiKey.isNotEmpty && projectId.isNotEmpty && (_ios ? iosAppId.isNotEmpty : appId.isNotEmpty);
 
   static FirebaseOptions get options => FirebaseOptions(
-        apiKey: apiKey,
+        apiKey: _ios ? iosApiKey : apiKey,
         appId: _ios ? iosAppId : appId,
         messagingSenderId: messagingSenderId,
         projectId: projectId,

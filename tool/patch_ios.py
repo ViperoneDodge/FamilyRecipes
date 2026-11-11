@@ -14,7 +14,7 @@ if not RUNNER.exists():
     raise SystemExit("Cartella ios/Runner mancante: esegui prima flutter create")
 
 cfg = (ROOT / "lib" / "firebase_config.dart").read_text()
-ios_client_id = re.search(r"iosClientId = '([^']*)'", cfg).group(1)
+ios_client_id = re.search(r"iosClientId =\s*'([^']*)'", cfg).group(1)
 langs = re.findall(r"'([a-z]{2})': '", (ROOT / "lib" / "l10n.dart").read_text())
 
 
