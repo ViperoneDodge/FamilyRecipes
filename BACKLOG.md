@@ -163,7 +163,23 @@ Pubblicata il 9 ottobre 2026:
   i simboli ® ™ da titolo, ingredienti e passaggi ("Mascarpone Galbani®" → "Mascarpone"); la presentazione
   si accorcia a due frasi.
 
+## Versione 1.8.0 (prima versione per gli store)
+
+- [x] **iPhone**: progetto iOS preparato da `tool/patch_ios.py` (nome, permessi, 36 lingue, solo verticale,
+  solo iPhone, iOS 15.5+, icona senza trasparenza, notifiche push e Accedi con Apple) e workflow
+  *Compila app iPhone* su GitHub (Mac di GitHub): compila sempre, firma e carica su TestFlight se ci sono
+  le chiavi di App Store Connect.
+- [x] **Accedi con Apple** su iPhone (obbligatorio per l'App Store quando c'è l'accesso con Google);
+  cancellando l'account si revoca anche l'accesso Apple.
+- [x] Firebase e accesso con Google configurabili anche per iPhone (`lib/firebase_config.dart`).
+- [x] **Materiali per gli store** in `store/` (schermate Android e iPhone in italiano e inglese, icona 512,
+  copertina 1024×500) e guida `STORE.md` con testi delle schede, questionari e passi da fare.
+- [x] Informativa privacy aggiornata (Apple, App Store).
+
 ## Prossima release
+
+- [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per
+  i siti di ricette protetti, versione iPad.
 
 - [ ] Riassunto vero dei passaggi lunghi (riscrittura più breve): servirebbe un'intelligenza artificiale
   online (es. Claude), con una chiave e un costo per ricetta; da valutare.

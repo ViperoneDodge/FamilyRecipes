@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -102,6 +103,8 @@ class AuthService {
 
   GoogleSignIn _google() => GoogleSignIn(
         scopes: const ['email'],
+        // Su iPhone serve l'ID client iOS; su Android basta quello web (serverClientId).
+        clientId: Platform.isIOS && FirebaseConfig.iosClientId.isNotEmpty ? FirebaseConfig.iosClientId : null,
         serverClientId: FirebaseConfig.googleWebClientId.isEmpty
             ? null
             : FirebaseConfig.googleWebClientId,
@@ -127,6 +130,40 @@ class AuthService {
     }
   }
 
+  /// "Accedi con Apple": su iPhone è obbligatorio quando c'è l'accesso con Google (regola App Store 4.8).
+  bool get appleAvailable {
+    try {
+      return Platform.isIOS && cloudAvailable;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  AppleAuthProvider _apple() => AppleAuthProvider()
+    ..addScope('email')
+    ..addScope('name');
+
+  Future<Session> loginApple() async {
+    try {
+      final c = await FirebaseAuth.instance.signInWithProvider(_apple());
+      final user = c.user!;
+      // Apple dà il nome solo al primo accesso: lo si salva sul profilo.
+      final name = c.additionalUserInfo?.profile?['name'];
+      if ((user.displayName ?? '').isEmpty && name is Map) {
+        final full = [name['firstName'], name['lastName']].whereType<String>().join(' ').trim();
+        if (full.isNotEmpty) await user.updateDisplayName(full);
+      }
+      return _fromUser(FirebaseAuth.instance.currentUser ?? user);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'canceled' || e.code == 'web-context-canceled') throw AuthException(tr('auth.appleCancelled'));
+      throw AuthException(_firebaseError(e));
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(tr('auth.appleFailed', {'error': e}));
+    }
+  }
+
   bool cloudSessionValid(Session s) {
     if (!cloudAvailable) return false;
     final u = FirebaseAuth.instance.currentUser;
@@ -137,6 +174,12 @@ class AuthService {
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) return;
     try {
+      // Con Apple, cancellando l'account va revocato anche l'accesso dato all'app (regola App Store).
+      if (u.providerData.any((p) => p.providerId == 'apple.com')) {
+        final c = await u.reauthenticateWithProvider(_apple());
+        final code = c.additionalUserInfo?.authorizationCode;
+        if (code != null) await FirebaseAuth.instance.revokeTokenWithAuthorizationCode(code);
+      }
       await u.delete();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') throw AuthException(tr('account.relogin'));

@@ -119,6 +119,8 @@ Future<void> precacheAll(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+String _outDir = 'out';
+
 Future<void> shot(WidgetTester tester, Widget home, String name, {Future<void> Function()? then, bool settle = true}) async {
   await tester.runAsync(() async {
     for (final p in ['COVER1', 'COVER2', 'STEP1', 'STEP2']) {
@@ -152,7 +154,7 @@ Future<void> shot(WidgetTester tester, Widget home, String name, {Future<void> F
       await precacheAll(tester);
     }
   }
-  await expectLater(find.byType(MaterialApp), matchesGoldenFile('out/${L10n.code}/$name.png'));
+  await expectLater(find.byType(MaterialApp), matchesGoldenFile('$_outDir/${L10n.code}/$name.png'));
 }
 
 void main() {
@@ -169,6 +171,11 @@ void main() {
   debugDefaultTargetPlatformOverride = TargetPlatform.linux;
   appState = AppState();
   debugDefaultTargetPlatformOverride = null;
+  // SHOTS=ios: schermate per l'App Store (iPhone 6,7", 1290×2796) in out_ios/.
+  final ios = Platform.environment['SHOTS'] == 'ios';
+  _outDir = ios ? 'out_ios' : 'out';
+  final phone = ios ? const Size(1290, 2796) : const Size(1080, 1920);
+  final ratio = ios ? 3.0 : 2.625;
   for (final lang in ['it', 'en']) {
     group(lang, () {
       setUp(() async {
@@ -177,8 +184,8 @@ void main() {
       });
       testWidgets('screens', (tester) async {
         await tester.runAsync(loadFonts);
-        tester.view.physicalSize = const Size(1080, 1920);
-        tester.view.devicePixelRatio = 2.625;
+        tester.view.physicalSize = phone;
+        tester.view.devicePixelRatio = ratio;
         addTearDown(tester.view.reset);
         debugDisableShadows = false;
 
@@ -269,8 +276,8 @@ void main() {
         await shot(tester, const HomeScreen(), '13_tablet_right', then: () async {
           await tester.tap(find.text('Arrosto di vitello al latte').first);
         });
-        tester.view.physicalSize = const Size(1080, 1920);
-        tester.view.devicePixelRatio = 2.625;
+        tester.view.physicalSize = phone;
+        tester.view.devicePixelRatio = ratio;
         appState.theme = ThemeSettings();
         await tester.runAsync(() async {
           Future<Uint8List?> photo(Recipe r, String p) => appState.photos.load(p);

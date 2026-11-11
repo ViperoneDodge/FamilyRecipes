@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:firebase_core/firebase_core.dart';
 
 /// Valori del progetto Firebase (da `google-services.json`).
@@ -13,15 +15,33 @@ class FirebaseConfig {
   static const String googleWebClientId =
       '524842949858-l83kjtgbi8kt1sukjjclacuk78v5q722.apps.googleusercontent.com';
 
-  static bool get isConfigured =>
-      apiKey.isNotEmpty && appId.isNotEmpty && projectId.isNotEmpty;
+  // ---- iPhone ----
+  // Dalla console Firebase → Impostazioni progetto → app iOS (it.familyrecipes.familyrecipes):
+  // GOOGLE_APP_ID e CLIENT_ID del file GoogleService-Info.plist. Finché sono vuoti, su iPhone l'app
+  // funziona solo in locale. tool/patch_ios.py legge CLIENT_ID da qui per lo schema URL di Google.
+  static const String iosAppId = '';
+  static const String iosClientId = '';
+  static const String iosBundleId = 'it.familyrecipes.familyrecipes';
 
-  static FirebaseOptions get options => const FirebaseOptions(
+  static bool get _ios {
+    try {
+      return Platform.isIOS;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static bool get isConfigured =>
+      apiKey.isNotEmpty && projectId.isNotEmpty && (_ios ? iosAppId.isNotEmpty : appId.isNotEmpty);
+
+  static FirebaseOptions get options => FirebaseOptions(
         apiKey: apiKey,
-        appId: appId,
+        appId: _ios ? iosAppId : appId,
         messagingSenderId: messagingSenderId,
         projectId: projectId,
         storageBucket: storageBucket,
+        iosClientId: iosClientId.isEmpty ? null : iosClientId,
+        iosBundleId: iosBundleId,
       );
 
   /// Avvia Firebase con `google-services.json` o, se manca, con i valori qui sopra.

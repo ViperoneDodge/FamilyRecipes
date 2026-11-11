@@ -1,0 +1,76 @@
+name: Compila app iPhone
+
+# Si avvia a mano (Actions → Compila app iPhone → Run workflow): i Mac di GitHub costano
+# 10 volte i minuti di Linux. Senza le chiavi di App Store Connect controlla solo che l'app
+# compili; con le chiavi nei Secrets firma l'app e la carica su TestFlight.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.x'
+          channel: stable
+          cache: true
+
+      - name: Prepara il progetto iOS
+        run: |
+          flutter create --org it.familyrecipes --project-name familyrecipes --platforms ios .
+          rm -f test/widget_test.dart
+          python3 tool/patch_ios.py
+          flutter pub get
+
+      - name: Test
+        run: flutter test
+
+      # Controllo che l'app compili per iPhone, senza firma.
+      - name: Compila (senza firma)
+        run: flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
+
+      # Firma e caricamento su TestFlight: solo se nei Secrets ci sono le chiavi di App Store Connect
+      # (APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8 = contenuto del file .p8, APPLE_TEAM_ID).
+      - name: Firma e carica su TestFlight
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          KEY_P8: ${{ secrets.APPSTORE_KEY_P8 }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -z "$KEY_ID" ] || [ -z "$ISSUER_ID" ] || [ -z "$KEY_P8" ] || [ -z "$TEAM_ID" ]; then
+            echo "Chiavi di App Store Connect non configurate: app compilata ma non firmata né caricata."
+            exit 0
+          fi
+          KEY_PATH="$RUNNER_TEMP/AuthKey_$KEY_ID.p8"
+          printf '%s\n' "$KEY_P8" > "$KEY_PATH"
+          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH"
+                -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID")
+          flutter build ios --release --config-only --build-number=${{ github.run_number }}
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release \
+            -archivePath "$RUNNER_TEMP/Runner.xcarchive" -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic "${AUTH[@]}" archive
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" "${AUTH[@]}"
+          echo "Caricata su App Store Connect: tra qualche minuto compare in TestFlight."
