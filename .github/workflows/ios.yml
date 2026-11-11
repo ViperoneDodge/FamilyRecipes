@@ -35,9 +35,14 @@ jobs:
       - name: Test
         run: flutter test
 
-      # Controllo che l'app compili per iPhone, senza firma.
+      # Controllo che l'app compili per iPhone, senza firma (solo se non ci sono le chiavi:
+      # con le chiavi la compilazione la fa l'archivio firmato qui sotto).
       - name: Compila (senza firma)
-        run: flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+        run: |
+          if [ -n "$KEY_ID" ]; then echo "Chiavi presenti: compila il passo successivo."; exit 0; fi
+          flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
 
       # Firma e caricamento su TestFlight: solo se nei Secrets ci sono le chiavi di App Store Connect
       # (APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8 = contenuto del file .p8, APPLE_TEAM_ID).
@@ -56,7 +61,7 @@ jobs:
           printf '%s\n' "$KEY_P8" > "$KEY_PATH"
           AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY_PATH"
                 -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID")
-          flutter build ios --release --config-only --build-number=${{ github.run_number }}
+          flutter build ios --release --config-only --no-codesign --build-number=${{ github.run_number }}
           cd ios
           xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release \
             -archivePath "$RUNNER_TEMP/Runner.xcarchive" -destination 'generic/platform=iOS' \
