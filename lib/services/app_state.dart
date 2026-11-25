@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 
@@ -6,6 +8,7 @@ import '../l10n.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'auth_service.dart';
+import 'backup_service.dart';
 import 'group_watch.dart';
 import 'local_store.dart';
 import 'notification_service.dart';
@@ -93,8 +96,7 @@ class AppState extends ChangeNotifier {
 
   List<Recipe> get allRecipes => sortedForList(recipes);
 
-  List<Recipe> groupRecipes(String groupId) =>
-      sortedForList(recipes.where((r) => r.bookId == groupId));
+  List<Recipe> groupRecipes(String groupId) => sortedForList(recipes.where((r) => r.bookId == groupId));
 
   String bookLabel(Recipe r) =>
       isPersonal(r) ? tr('book.mine') : (data.groupById(r.bookId)?.name ?? tr('family.defaultName'));
@@ -635,5 +637,69 @@ class AppState extends ChangeNotifier {
     data.groupById(id)?.name = name;
     await _persist();
     notifyListeners();
+  }
+
+  // ---- Backup ----
+
+  /// Tutte le ricette visibili (mie e dei gruppi), con le foto e i preferiti, in un file di backup.
+  Future<Uint8List> backupBytes(String reason, DateTime at) async {
+    final list = data.recipes.where((r) => !r.deleted).toList();
+    final ph = <String, Uint8List>{};
+    for (final r in list) {
+      for (final p in r.photoIds) {
+        if (ph.containsKey(p)) continue;
+        try {
+          final b = await photos.load(p, bookId: bookOf(r)).timeout(const Duration(seconds: 30));
+          if (b != null) ph[p] = b;
+        } catch (_) {}
+      }
+    }
+    final fav = Set<String>.of(favRecipes);
+    return Isolate.run(() => BackupService.encode(recipes: list, photos: ph, favorites: fav, reason: reason, at: at));
+  }
+
+  /// Copia sul telefono (si tengono le ultime [BackupService.keep]); null se non riesce.
+  Future<File?> backupNow([String reason = 'manual', File? protect]) async {
+    final s = session;
+    if (s == null) return null;
+    try {
+      final at = DateTime.now();
+      return await BackupService.save(s.storageKey, await backupBytes(reason, at), at, protect: protect);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Riporta le ricette del backup com'erano allora; quelle aggiunte dopo restano. Le ricette di gruppi
+  /// che non ci sono più tornano tra le mie; quelle dei gruppi in cui si è in sola lettura si saltano.
+  Future<int> restoreBackup(BackupData b, {File? from}) async {
+    await backupNow('restore', from);
+    var n = 0;
+    final seen = <String>{};
+    for (final src in b.recipes) {
+      if (!seen.add(src.id)) continue;
+      final old = data.recipes.where((x) => x.id == src.id).firstOrNull;
+      String? book = src.bookId;
+      if (book == data.personalBookId || (book != null && data.groupById(book) == null)) book = null;
+      if (old != null && !old.deleted) book = isPersonal(old) ? null : old.bookId;
+      if (!canAddTo(book)) continue;
+      for (final p in src.photoIds) {
+        final bytes = b.photos[p];
+        if (bytes != null && !await photos.exists(p)) await photos.put(p, bytes);
+      }
+      final r = src.copy()
+        ..bookId = book
+        ..deleted = false;
+      try {
+        await saveRecipe(r);
+        if (b.favorites.contains(src.id)) favRecipes.add(r.id);
+        n++;
+      } catch (_) {}
+    }
+    if (n > 0) {
+      await _writeSettings();
+      notifyListeners();
+    }
+    return n;
   }
 }

@@ -9,6 +9,7 @@ import '../theme.dart';
 import '../version.dart';
 import '../widgets/common.dart';
 import 'admin_screen.dart';
+import 'backup_screen.dart';
 import 'family_screen.dart';
 import 'import_screen.dart';
 import 'login_screen.dart';
@@ -25,174 +26,223 @@ class SettingsScreen extends StatelessWidget {
         final s = appState.session;
         final scheme = Theme.of(context).colorScheme;
         void push(Widget page) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+        final nb = NotebookColors.of(context);
+        Widget tab(IconData icon, String label) => Tab(
+              height: 58,
+              icon: Icon(icon, size: 22),
+              child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1)),
+            );
+        Widget page(List<Widget> children) =>
+            ListView(padding: const EdgeInsets.only(top: 6, right: 4), children: children);
         return TableclothBackground(
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: AppBar(title: Text(tr('settings.title'))),
-            body: NotebookPage(
-              child: ListView(padding: const EdgeInsets.only(right: 4), children: [
-                _header(context, tr('settings.account')),
-                ListTile(
-                  leading: Icon(appState.isCloud ? Icons.cloud : Icons.phone_android),
-                  title: Text(s?.displayName ?? ''),
-                  subtitle: Text([
-                    if (appState.isCloud && s?.email != null && s!.email != s.displayName) s.email!,
-                    appState.isCloud ? tr('settings.accountCloud') : tr('settings.accountLocal'),
-                  ].join('\n')),
+          child: DefaultTabController(
+            length: 5,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                title: Text(tr('settings.title')),
+                bottom: TabBar(
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                  labelColor: nb.onCover,
+                  unselectedLabelColor: nb.onCover.withValues(alpha: 0.7),
+                  indicatorColor: nb.onCover,
+                  indicatorWeight: 3,
+                  dividerColor: Colors.transparent,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  tabs: [
+                    tab(Icons.palette_outlined, tr('settings.appearance')),
+                    tab(Icons.menu_book_outlined, tr('admin.recipes')),
+                    tab(Icons.groups_outlined, tr('settings.groups')),
+                    tab(Icons.notifications_outlined, tr('settings.notifications')),
+                    tab(Icons.person_outline, tr('settings.account')),
+                  ],
                 ),
-                if (!appState.isCloud && appState.auth.cloudAvailable)
-                  ListTile(
-                    leading: const Icon(Icons.cloud_upload_outlined),
-                    title: Text(tr('upgrade.button')),
-                    subtitle: Text(tr('upgrade.settingsInfo')),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => push(const LoginScreen(upgrade: true)),
-                  ),
-                ListTile(
-                  leading: const Icon(Icons.file_open_outlined),
-                  title: Text(tr('import.title')),
-                  subtitle: Text(tr('import.menuInfo')),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => importRecipesFlow(context),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.qr_code_2),
-                  title: Text(tr('link.menu')),
-                  subtitle: Text(tr('link.menuInfo')),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => recipeFromLinkFlow(context),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.ios_share),
-                  title: Text(tr('export.title')),
-                  subtitle: Text(tr('export.info')),
-                  onTap: () => exportRecipesFlow(context),
-                ),
-                _header(context, tr('settings.language')),
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: Text(appState.langPref == null
-                      ? '${tr('settings.langAuto')} (${L10n.names[L10n.code]})'
-                      : (L10n.names[appState.langPref] ?? appState.langPref!)),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _chooseLanguage(context),
-                ),
-                ..._appearance(context),
-                _header(context, tr('settings.notifications')),
-                const _NotifyStatus(),
-                if (appState.isCloud)
-                  SwitchListTile(
-                    secondary: const Icon(Icons.notifications_active_outlined),
-                    title: Text(tr('settings.groupAlerts')),
-                    subtitle: Text(tr('settings.groupAlertsInfo')),
-                    value: appState.groupAlerts,
-                    onChanged: appState.setGroupAlerts,
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Text(tr('settings.alertsNeedCloud'), style: TextStyle(color: scheme.onSurfaceVariant)),
-                  ),
-                ListTile(
-                  leading: const Icon(Icons.notifications_outlined),
-                  title: Text(tr('settings.testNow')),
-                  subtitle: Text(tr('settings.testNowInfo')),
-                  onTap: () async {
-                    await appState.notifications.requestPermission();
-                    await appState.notifications.showTest();
-                  },
-                ),
-                if (appState.isCloud)
-                  ListTile(
-                    leading: Icon(
-                      appState.push.registered ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
-                      color: appState.push.registered ? Colors.green.shade700 : Colors.orange.shade800,
+              ),
+              body: NotebookPage(
+                child: TabBarView(children: [
+                  page([
+                    _header(context, tr('settings.language')),
+                    ListTile(
+                      leading: const Icon(Icons.language),
+                      title: Text(appState.langPref == null
+                          ? '${tr('settings.langAuto')} (${L10n.names[L10n.code]})'
+                          : (L10n.names[appState.langPref] ?? appState.langPref!)),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => _chooseLanguage(context),
                     ),
-                    title: Text(appState.push.registered ? tr('settings.pushOk') : tr('settings.pushNo')),
-                    subtitle: Text(appState.push.registered ? tr('settings.pushOkInfo') : tr('settings.pushNoInfo')),
-                    onTap: () async {
-                      if (appState.push.registered) {
-                        Clipboard.setData(ClipboardData(text: appState.push.token!));
-                        showSnack(context, tr('settings.pushCopied'));
-                        return;
-                      }
-                      await appState.startPush();
-                      if (context.mounted && !appState.push.registered) showSnack(context, tr('settings.pushFailed'));
-                    },
-                  ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child:
-                      Text(tr('settings.batteryHint'), style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-                ),
-                _header(context, tr('settings.groups')),
-                if (!appState.isCloud)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      appState.auth.cloudAvailable ? tr('settings.groupsNeedCloud') : tr('family.cloudOff'),
-                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ..._appearance(context),
+                  ]),
+                  page([
+                    _header(context, tr('admin.recipes')),
+                    ListTile(
+                      leading: const Icon(Icons.file_open_outlined),
+                      title: Text(tr('import.title')),
+                      subtitle: Text(tr('import.menuInfo')),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => importRecipesFlow(context),
                     ),
-                  )
-                else
-                  ..._familySection(context, push),
-                _header(context, tr('support.title')),
-                if (appState.isAdmin)
-                  ListTile(
-                    leading: Icon(Icons.admin_panel_settings_outlined, color: scheme.primary),
-                    title: Text(tr('admin.title')),
-                    subtitle: Text(tr('admin.subtitle')),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => push(const AdminScreen()),
-                  ),
-                ListTile(
-                  leading: const Icon(Icons.bug_report_outlined),
-                  title: Text(tr('bug.title')),
-                  subtitle: Text(tr('bug.subtitle')),
-                  onTap: () => _bugReport(context),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.privacy_tip_outlined),
-                  title: Text(tr('privacy.title')),
-                  subtitle: Text(tr('privacy.subtitle')),
-                  trailing: const Icon(Icons.open_in_new, size: 18),
-                  onTap: () async {
-                    final ok = await SupportService.openPrivacy();
-                    if (!ok && context.mounted) showSnack(context, SupportService.privacyUrl);
-                  },
-                ),
-                if (appState.isCloud)
-                  ListTile(
-                    leading: Icon(Icons.delete_forever_outlined, color: scheme.error),
-                    title: Text(tr('account.delete'), style: TextStyle(color: scheme.error)),
-                    subtitle: Text(tr('account.deleteInfo')),
-                    onTap: () => _deleteAccount(context),
-                  ),
-                const Divider(height: 32),
-                ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: Text(tr('settings.logout')),
-                  subtitle: Text(tr('settings.logoutInfo')),
-                  onTap: () async {
-                    Navigator.of(context).popUntil((r) => r.isFirst);
-                    await appState.logout();
-                  },
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: Text('FamilyRecipes $appVersion', style: TextStyle(fontSize: 12, color: scheme.outline)),
-                ),
-                const SizedBox(height: 14),
-                Center(
-                  child: Image.asset('assets/gian_trip_logo.png',
-                      width: 96, height: 96, filterQuality: FilterQuality.medium),
-                ),
-                const SizedBox(height: 6),
-                Center(
-                  child: Text('© 2026 Gian Trip Apps', style: TextStyle(fontSize: 12, color: scheme.outline)),
-                ),
-                const SizedBox(height: 24),
-              ]),
+                    ListTile(
+                      leading: const Icon(Icons.qr_code_2),
+                      title: Text(tr('link.menu')),
+                      subtitle: Text(tr('link.menuInfo')),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => recipeFromLinkFlow(context),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.ios_share),
+                      title: Text(tr('export.title')),
+                      subtitle: Text(tr('export.info')),
+                      onTap: () => exportRecipesFlow(context),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.settings_backup_restore),
+                      title: Text(tr('backup.title')),
+                      subtitle: Text(tr('backup.subtitle')),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => push(const BackupScreen()),
+                    ),
+                  ]),
+                  page([
+                    _header(context, tr('settings.groups')),
+                    if (!appState.isCloud)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Text(
+                          appState.auth.cloudAvailable ? tr('settings.groupsNeedCloud') : tr('family.cloudOff'),
+                          style: TextStyle(color: scheme.onSurfaceVariant),
+                        ),
+                      )
+                    else
+                      ..._familySection(context, push),
+                  ]),
+                  page([
+                    _header(context, tr('settings.notifications')),
+                    const _NotifyStatus(),
+                    if (appState.isCloud)
+                      SwitchListTile(
+                        secondary: const Icon(Icons.notifications_active_outlined),
+                        title: Text(tr('settings.groupAlerts')),
+                        subtitle: Text(tr('settings.groupAlertsInfo')),
+                        value: appState.groupAlerts,
+                        onChanged: appState.setGroupAlerts,
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        child: Text(tr('settings.alertsNeedCloud'), style: TextStyle(color: scheme.onSurfaceVariant)),
+                      ),
+                    ListTile(
+                      leading: const Icon(Icons.notifications_outlined),
+                      title: Text(tr('settings.testNow')),
+                      subtitle: Text(tr('settings.testNowInfo')),
+                      onTap: () async {
+                        await appState.notifications.requestPermission();
+                        await appState.notifications.showTest();
+                      },
+                    ),
+                    if (appState.isCloud)
+                      ListTile(
+                        leading: Icon(
+                          appState.push.registered ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
+                          color: appState.push.registered ? Colors.green.shade700 : Colors.orange.shade800,
+                        ),
+                        title: Text(appState.push.registered ? tr('settings.pushOk') : tr('settings.pushNo')),
+                        subtitle:
+                            Text(appState.push.registered ? tr('settings.pushOkInfo') : tr('settings.pushNoInfo')),
+                        onTap: () async {
+                          if (appState.push.registered) {
+                            Clipboard.setData(ClipboardData(text: appState.push.token!));
+                            showSnack(context, tr('settings.pushCopied'));
+                            return;
+                          }
+                          await appState.startPush();
+                          if (context.mounted && !appState.push.registered)
+                            showSnack(context, tr('settings.pushFailed'));
+                        },
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                      child: Text(tr('settings.batteryHint'),
+                          style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+                    ),
+                  ]),
+                  page([
+                    _header(context, tr('settings.account')),
+                    ListTile(
+                      leading: Icon(appState.isCloud ? Icons.cloud : Icons.phone_android),
+                      title: Text(s?.displayName ?? ''),
+                      subtitle: Text([
+                        if (appState.isCloud && s?.email != null && s!.email != s.displayName) s.email!,
+                        appState.isCloud ? tr('settings.accountCloud') : tr('settings.accountLocal'),
+                      ].join('\n')),
+                    ),
+                    if (!appState.isCloud && appState.auth.cloudAvailable)
+                      ListTile(
+                        leading: const Icon(Icons.cloud_upload_outlined),
+                        title: Text(tr('upgrade.button')),
+                        subtitle: Text(tr('upgrade.settingsInfo')),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => push(const LoginScreen(upgrade: true)),
+                      ),
+                    _header(context, tr('support.title')),
+                    if (appState.isAdmin)
+                      ListTile(
+                        leading: Icon(Icons.admin_panel_settings_outlined, color: scheme.primary),
+                        title: Text(tr('admin.title')),
+                        subtitle: Text(tr('admin.subtitle')),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => push(const AdminScreen()),
+                      ),
+                    ListTile(
+                      leading: const Icon(Icons.bug_report_outlined),
+                      title: Text(tr('bug.title')),
+                      subtitle: Text(tr('bug.subtitle')),
+                      onTap: () => _bugReport(context),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.privacy_tip_outlined),
+                      title: Text(tr('privacy.title')),
+                      subtitle: Text(tr('privacy.subtitle')),
+                      trailing: const Icon(Icons.open_in_new, size: 18),
+                      onTap: () async {
+                        final ok = await SupportService.openPrivacy();
+                        if (!ok && context.mounted) showSnack(context, SupportService.privacyUrl);
+                      },
+                    ),
+                    if (appState.isCloud)
+                      ListTile(
+                        leading: Icon(Icons.delete_forever_outlined, color: scheme.error),
+                        title: Text(tr('account.delete'), style: TextStyle(color: scheme.error)),
+                        subtitle: Text(tr('account.deleteInfo')),
+                        onTap: () => _deleteAccount(context),
+                      ),
+                    const Divider(height: 32),
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: Text(tr('settings.logout')),
+                      subtitle: Text(tr('settings.logoutInfo')),
+                      onTap: () async {
+                        Navigator.of(context).popUntil((r) => r.isFirst);
+                        await appState.logout();
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Text('FamilyRecipes $appVersion', style: TextStyle(fontSize: 12, color: scheme.outline)),
+                    ),
+                    const SizedBox(height: 14),
+                    Center(
+                      child: Image.asset('assets/gian_trip_logo.png',
+                          width: 96, height: 96, filterQuality: FilterQuality.medium),
+                    ),
+                    const SizedBox(height: 6),
+                    Center(
+                      child: Text('© 2026 Gian Trip Apps', style: TextStyle(fontSize: 12, color: scheme.outline)),
+                    ),
+                    const SizedBox(height: 24),
+                  ]),
+                ]),
+              ),
             ),
           ),
         );
@@ -366,7 +416,8 @@ class SettingsScreen extends StatelessWidget {
       ),
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-        child: Text(tr('start.info'), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        child: Text(tr('start.info'),
+            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
       ),
       _label(tr('tabs.title')),
       Padding(

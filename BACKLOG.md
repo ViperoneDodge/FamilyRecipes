@@ -176,6 +176,14 @@ Pubblicata il 9 ottobre 2026:
   copertina 1024×500) e guida `STORE.md` con testi delle schede, questionari e passi da fare.
 - [x] Informativa privacy aggiornata (Apple, App Store).
 
+## Versione 1.9.0
+- Impostazioni divise in 5 schede: Aspetto, Ricette, Gruppi, Notifiche, Account.
+- Backup e ripristino (come in MyFleetManager): copie complete sul telefono (ultime 3) con tutte le ricette,
+  le foto dei piatti e dei passaggi e i preferiti; backup automatico prima di ogni importazione e prima di
+  un ripristino; salva su file, condividi, carica da file.
+- Regole Firestore: libri personali leggibili solo dal proprietario, email dei membri protette, campo
+  `personal` non modificabile dagli amministratori dei gruppi, ID dei gruppi di 10 caratteri.
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

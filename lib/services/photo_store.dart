@@ -39,6 +39,12 @@ class PhotoStore {
     return id;
   }
 
+  /// Salva una foto con un id già noto (ripristino da backup).
+  Future<void> put(String id, Uint8List bytes) async {
+    await (await file(id)).writeAsBytes(bytes, flush: true);
+    _remember(id, bytes);
+  }
+
   Future<Uint8List?> read(String id) async {
     final m = _mem[id];
     if (m != null) return m;

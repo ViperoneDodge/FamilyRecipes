@@ -128,6 +128,7 @@ class _ImportScreenState extends State<ImportScreen> {
       _busy = true;
       _done = 0;
     });
+    await appState.backupNow('import');
     var ok = 0;
     for (final i in _selected.toList()..sort()) {
       final it = widget.items[i];
