@@ -87,6 +87,24 @@ dopo la pubblicazione).
 
 ---
 
+## 2b. FamilyRecipes Pro (acquisto in-app, dalla 1.10.0)
+
+Acquisto **una tantum, non consumabile**, ID prodotto **`familyrecipes_pro`** (uguale sui due store).
+Versione gratuita: solo Aperitivi, Primi, Secondi e Dolci, al massimo 3 ricette per categoria in ogni
+ricettario (anche nei gruppi); niente Suggerimento dello chef. Le ricette già oltre i limiti restano
+leggibili (le proprie) ma non modificabili.
+
+- **Google Play**: Play Console → app → *Monetizza → Prodotti → Prodotti in-app* → **Crea prodotto**:
+  ID `familyrecipes_pro`, nome "FamilyRecipes Pro", descrizione, prezzo → *Salva* e *Attiva*.
+  (La sezione compare solo dopo aver caricato un AAB con il permesso BILLING, cioè dalla 1.10.0.)
+  Per provarlo senza pagare: *Impostazioni → Test delle licenze* → aggiungi la tua email.
+- **App Store**: App Store Connect → app → *Monetizzazione → Acquisti in-app* → **+** → *Non consumabile*:
+  nome di riferimento "FamilyRecipes Pro", ID prodotto `familyrecipes_pro`, prezzo, localizzazione
+  (nome e descrizione), screenshot della schermata Pro per la revisione. Va inviato insieme a una versione
+  dell'app (nella pagina della versione → *Acquisti in-app e abbonamenti* → aggiungilo).
+  Serve anche l'accordo **App a pagamento** firmato (*Business → Accordi*) con dati bancari e fiscali.
+- Schede: togliere "gratuita, senza acquisti" dove scritto; gli store mostrano da soli "Acquisti in-app".
+
 ## 3. Testi delle schede
 
 **URL informativa privacy**: <https://viperonedodge.github.io/FamilyRecipes/privacy.html>

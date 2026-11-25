@@ -184,6 +184,14 @@ Pubblicata il 9 ottobre 2026:
 - Regole Firestore: libri personali leggibili solo dal proprietario, email dei membri protette, campo
   `personal` non modificabile dagli amministratori dei gruppi, ID dei gruppi di 10 caratteri.
 
+## Versione 1.10.0
+- **FamilyRecipes Pro** (acquisto una tantum `familyrecipes_pro`, come MyFleetManager Pro).
+  Gratis: Aperitivi, Primi, Secondi e Dolci, al massimo 3 ricette per categoria in ogni ricettario
+  (anche nei gruppi). Le altre categorie e il Suggerimento dello chef richiedono Pro. Le ricette già
+  presenti oltre i limiti restano: le proprie in sola lettura (si possono eliminare), quelle dei gruppi
+  scritte da altri con il lucchetto. Importazione: le ricette oltre i limiti vengono saltate.
+- Schermata Pro (Impostazioni → Account), acquisto, ripristino dell'acquisto; l'amministratore ha Pro.
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

@@ -10,6 +10,7 @@ import '../services/dose_scaler.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'family_screen.dart';
+import 'pro_screen.dart';
 import 'recipe_edit_screen.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
@@ -39,8 +40,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
   /// Durante lo sfoglio: la ricetta che arriva e il verso (+1 successiva, -1 precedente).
   String? _other;
   int _dir = 0;
-  late final AnimationController _flip =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
+  late final AnimationController _flip = AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
 
   /// Persone scelte per ricalcolare le dosi (per ricetta, solo su questo schermo).
   final Map<String, int> _people = {};
@@ -61,7 +61,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
     super.dispose();
   }
 
-  List<String> get _seq => [for (final id in widget.sequence) if (appState.recipeById(id) != null) id];
+  List<String> get _seq => [
+        for (final id in widget.sequence)
+          if (appState.recipeById(id) != null) id
+      ];
 
   void _go(int dir) {
     if (_flip.isAnimating) return;
@@ -115,9 +118,11 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
           final o = _other == null ? null : appState.recipeById(_other!);
           if (o == null) return sheet(_body(context, r));
           final t = Curves.easeInOutCubic.transform(_flip.value);
-          return Stack(fit: StackFit.expand, children: _dir > 0
-              ? [sheet(_body(context, o)), _lifted(sheet(_body(context, r)), t)]
-              : [sheet(_body(context, r)), _lifted(sheet(_body(context, o)), 1 - t)]);
+          return Stack(
+              fit: StackFit.expand,
+              children: _dir > 0
+                  ? [sheet(_body(context, o)), _lifted(sheet(_body(context, r)), t)]
+                  : [sheet(_body(context, r)), _lifted(sheet(_body(context, o)), 1 - t)]);
         },
       ),
     );
@@ -149,8 +154,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
     }
   }
 
-  void _edit(Recipe r) => Navigator.of(context)
-      .push(MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: r.copy())));
+  void _edit(Recipe r) =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecipeEditScreen(recipe: r.copy())));
 
   void _openPhoto(Recipe r, List<String> photos, int index) => Navigator.of(context).push(MaterialPageRoute(
         fullscreenDialog: true,
@@ -200,13 +205,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
                   _ => null,
                 },
                 itemBuilder: (ctx) => [
-                  if (appState.isCloud && canEdit)
-                    PopupMenuItem(value: 'move', child: Text(tr('recipe.moveMenu'))),
+                  if (appState.isCloud && canEdit) PopupMenuItem(value: 'move', child: Text(tr('recipe.moveMenu'))),
                   if (!appState.isPersonal(r)) PopupMenuItem(value: 'copy', child: Text(tr('recipe.copyMine'))),
-                  if (canEdit) PopupMenuItem(value: 'delete', child: Text(tr('common.delete'))),
+                  if (appState.canDelete(r)) PopupMenuItem(value: 'delete', child: Text(tr('common.delete'))),
                 ],
               ),
             ],
+            bottom: !canEdit && appState.canDelete(r) ? proReadOnlyBar(context) : null,
           ),
           body: NotebookPage.sheets(builder: (context, sheet) => _pages(context, sheet, r)),
         );
@@ -262,7 +267,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
       key: PageStorageKey('recipe-${r.id}'),
       padding: const EdgeInsets.fromLTRB(6, 6, 12, 40),
       children: [
-        Text([categoryLabel(r.category).toUpperCase(), if (pos >= 0 && seq.length > 1) '${pos + 1} / ${seq.length}'].join('  ·  '),
+        Text(
+            [categoryLabel(r.category).toUpperCase(), if (pos >= 0 && seq.length > 1) '${pos + 1} / ${seq.length}']
+                .join('  ·  '),
             style: TextStyle(fontSize: 12, letterSpacing: 1.3, color: nb.accent, fontWeight: FontWeight.w700)),
         Text(r.displayTitle, style: TextStyle(fontFamily: handFont, fontSize: 38, height: 1.1, color: nb.ink)),
         Padding(
@@ -292,8 +299,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
           for (final c in courses)
             RecipeCard(
               recipe: c,
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: c.id))),
+              onTap: () =>
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: c.id))),
             ),
         ],
         if (r.ingredients.isNotEmpty) ...[

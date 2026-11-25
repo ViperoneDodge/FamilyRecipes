@@ -13,6 +13,7 @@ import '../services/photo_tools.dart';
 import '../services/recipe_import.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import 'pro_screen.dart';
 
 /// Sceglie un file di ricette (`.json`) e apre l'anteprima dell'importazione.
 Future<void> importRecipesFlow(BuildContext context, {String? bookId}) async {
@@ -69,7 +70,8 @@ Future<void> exportRecipesFlow(BuildContext context) async {
     }
     final safe = name.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
     final day = DateTime.now().toIso8601String().substring(0, 10);
-    final file = File('${(await getTemporaryDirectory()).path}/ricettario-${safe.isEmpty ? 'famiglia' : safe}-$day.json');
+    final file =
+        File('${(await getTemporaryDirectory()).path}/ricettario-${safe.isEmpty ? 'famiglia' : safe}-$day.json');
     await file.writeAsString(RecipeImport.encode(list, photos));
     await SharePlus.instance.share(ShareParams(
       files: [XFile(file.path, mimeType: 'application/json')],
@@ -130,11 +132,17 @@ class _ImportScreenState extends State<ImportScreen> {
     });
     await appState.backupNow('import');
     var ok = 0;
+    var skipped = 0;
     for (final i in _selected.toList()..sort()) {
       final it = widget.items[i];
       final r = it.recipe.copy()
         ..id = newId()
         ..bookId = _book;
+      if (!appState.canPlace(r)) {
+        skipped++;
+        if (mounted) setState(() => _done++);
+        continue;
+      }
       if (it.photo case final photo?) {
         try {
           r.coverPhoto = await appState.addPhoto(await compressPhoto(photo));
@@ -150,7 +158,9 @@ class _ImportScreenState extends State<ImportScreen> {
     }
     if (!mounted) return;
     showSnack(context, trn('import.done', ok));
-    Navigator.of(context).pop();
+    final nav = Navigator.of(context);
+    if (skipped > 0) await showProOffer(context, tr('pro.skipped', {'n': skipped}));
+    nav.pop();
   }
 
   @override
@@ -171,8 +181,8 @@ class _ImportScreenState extends State<ImportScreen> {
             if (groups.isNotEmpty)
               DropdownButtonFormField<String?>(
                 initialValue: _book,
-                decoration: InputDecoration(
-                    labelText: tr('edit.whereSave'), prefixIcon: const Icon(Icons.menu_book_outlined)),
+                decoration:
+                    InputDecoration(labelText: tr('edit.whereSave'), prefixIcon: const Icon(Icons.menu_book_outlined)),
                 items: [
                   DropdownMenuItem(value: null, child: Text(tr('book.mine'))),
                   for (final g in groups) DropdownMenuItem(value: g.id, child: Text(g.name)),
@@ -187,9 +197,8 @@ class _ImportScreenState extends State<ImportScreen> {
             const SizedBox(height: 8),
             Row(children: [
               TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => setState(() => _selected.addAll(List.generate(widget.items.length, (i) => i))),
+                onPressed:
+                    _busy ? null : () => setState(() => _selected.addAll(List.generate(widget.items.length, (i) => i))),
                 child: Text(tr('import.all')),
               ),
               TextButton(
@@ -224,17 +233,23 @@ class _ImportScreenState extends State<ImportScreen> {
       secondary: switch (it.photo) {
         final photo? => ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: Image.memory(photo, width: 48, height: 48, fit: BoxFit.cover, cacheWidth: 144,
+            child: Image.memory(photo,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+                cacheWidth: 144,
                 errorBuilder: (_, __, ___) => Icon(categoryIcon(r.category))),
           ),
         null => Icon(categoryIcon(r.category)),
       },
       title: Text(r.displayTitle),
-      subtitle: Text([
-        categoryLabel(r.category),
-        if (r.createdByName.isNotEmpty) tr('recipe.by', {'name': r.createdByName}),
-        if (dup) tr('import.duplicate'),
-      ].join(' · '), style: TextStyle(color: dup ? scheme.error : null)),
+      subtitle: Text(
+          [
+            categoryLabel(r.category),
+            if (r.createdByName.isNotEmpty) tr('recipe.by', {'name': r.createdByName}),
+            if (dup) tr('import.duplicate'),
+          ].join(' · '),
+          style: TextStyle(color: dup ? scheme.error : null)),
     );
   }
 }

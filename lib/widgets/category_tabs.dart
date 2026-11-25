@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n.dart';
+import '../main.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
@@ -38,10 +39,12 @@ Color _tabInk(RecipeCategory? c, NotebookColors nb, bool dark, bool sel, int n) 
 
 String _tabLabel(RecipeCategory? c) => c == null ? tr('filter.allShort') : categoryShortLabel(c);
 
-IconData _tabIcon(RecipeCategory? c) => c == null ? Icons.menu_book_outlined : categoryIcon(c);
+IconData _tabIcon(RecipeCategory? c) =>
+    c == null ? Icons.menu_book_outlined : (appState.categoryOpen(c) ? categoryIcon(c) : Icons.lock_outline);
 
 /// Linguetta toccabile, letta come "Categoria (n)" dall'accessibilità.
-Widget _tabButton(RecipeCategory? c, int n, bool sel, ValueChanged<RecipeCategory?> onSelected, {required Widget child}) =>
+Widget _tabButton(RecipeCategory? c, int n, bool sel, ValueChanged<RecipeCategory?> onSelected,
+        {required Widget child}) =>
     Semantics(
       button: true,
       selected: sel,

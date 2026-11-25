@@ -156,6 +156,9 @@ class RecipeCard extends StatelessWidget {
   final bool showCategory;
   final bool selected;
 
+  /// Oltre i limiti della versione gratuita: lucchetto al posto della freccia.
+  final bool locked;
+
   const RecipeCard({
     super.key,
     required this.recipe,
@@ -164,6 +167,7 @@ class RecipeCard extends StatelessWidget {
     this.badge,
     this.showCategory = true,
     this.selected = false,
+    this.locked = false,
   });
 
   @override
@@ -201,7 +205,7 @@ class RecipeCard extends StatelessWidget {
                 ]),
               ]),
             ),
-            const Icon(Icons.chevron_right),
+            Icon(locked ? Icons.lock_outline : Icons.chevron_right, color: locked ? nb.accent : null),
           ]),
         ),
       ),

@@ -11,6 +11,7 @@ import '../services/photo_tools.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'photo_crop_screen.dart';
+import 'pro_screen.dart';
 
 class _IngRow {
   final TextEditingController name;
@@ -136,6 +137,14 @@ class _RecipeEditScreenState extends State<RecipeEditScreen> {
     _collect();
     if (r.title.isEmpty) {
       showSnack(context, tr('edit.needTitle'));
+      return;
+    }
+    if (!appState.canPlace(r)) {
+      await showProOffer(
+          context,
+          appState.categoryOpen(r.category)
+              ? proLimitReason()
+              : tr('pro.reasonCategory', {'cat': categoryLabel(r.category)}));
       return;
     }
     setState(() => _saving = true);

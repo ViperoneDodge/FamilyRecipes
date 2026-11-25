@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../l10n.dart';
+import '../main.dart';
 import '../models.dart';
 import '../services/online_recipes.dart' show OnlineRecipe;
 import '../services/recipe_reader.dart';
@@ -12,11 +13,17 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/group_qr.dart' show scanQr;
 import 'import_screen.dart';
+import 'pro_screen.dart';
 import 'recipe_edit_screen.dart';
 import 'suggest_screen.dart' show OnlineRecipeScreen;
 
 /// "Nuova ricetta": scritta a mano oppure letta da foto (fotocamera o galleria) o da un PDF.
 Future<void> newRecipeFlow(BuildContext context, {String? bookId, RecipeCategory? category}) async {
+  if (!appState.hasFreeSlot(bookId)) {
+    await showProOffer(context, proLimitReason());
+    return;
+  }
+  if (category != null && !appState.categoryOpen(category)) category = null;
   final choice = await showModalBottomSheet<String>(
     context: context,
     builder: (ctx) {

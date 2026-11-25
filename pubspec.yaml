@@ -1,7 +1,7 @@
 name: familyrecipes
 description: Il ricettario di famiglia, da compilare insieme nei gruppi.
 publish_to: 'none'
-version: 1.9.0+16
+version: 1.10.0+17
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -26,6 +26,7 @@ dependencies:
   url_launcher: ^6.3.1
   device_info_plus: ^11.3.0
   in_app_update: ^4.2.3
+  in_app_purchase: ^3.2.0
   pdf: ^3.11.0
   printing: ^5.13.0
   qr_flutter: ^4.1.0

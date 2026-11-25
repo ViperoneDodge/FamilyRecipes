@@ -14,6 +14,7 @@ import 'family_screen.dart';
 import 'import_screen.dart';
 import 'login_screen.dart';
 import 'new_recipe.dart' show recipeFromLinkFlow;
+import 'pro_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -168,6 +169,14 @@ class SettingsScreen extends StatelessWidget {
                   ]),
                   page([
                     _header(context, tr('settings.account')),
+                    ListTile(
+                      leading: Icon(appState.isPro ? Icons.verified : Icons.workspace_premium_outlined,
+                          color: NotebookColors.of(context).accent),
+                      title: Text(appState.isPro ? tr('pro.active') : tr('pro.section')),
+                      subtitle: appState.isPro ? null : Text(tr('pro.subtitle')),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => push(const ProScreen()),
+                    ),
                     ListTile(
                       leading: Icon(appState.isCloud ? Icons.cloud : Icons.phone_android),
                       title: Text(s?.displayName ?? ''),

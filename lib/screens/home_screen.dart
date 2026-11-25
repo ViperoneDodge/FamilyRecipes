@@ -11,6 +11,7 @@ import '../theme.dart';
 import '../widgets/recipe_browser.dart';
 import 'family_screen.dart';
 import 'new_recipe.dart';
+import 'pro_screen.dart';
 import 'suggest_screen.dart';
 import 'recipe_detail_screen.dart';
 import 'settings_screen.dart';
@@ -148,7 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onAdd: (g) => _openAdd(bookId: g),
               selectedId: _twoPane ? _selectedId : null,
             ),
-          2 => SuggestTab(onOpen: _openDetail),
+          2 => appState.isPro
+              ? SuggestTab(onOpen: _openDetail)
+              : ListView(padding: const EdgeInsets.fromLTRB(8, 24, 12, 24), children: [
+                  ProTeaser(icon: Icons.soup_kitchen_outlined, text: tr('pro.reasonChef')),
+                ]),
           _favTab => _favoritesTab(),
           _ => _myTab(),
         };

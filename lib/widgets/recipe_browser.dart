@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
+import '../screens/pro_screen.dart';
 import '../theme.dart';
 import 'category_tabs.dart';
 import 'common.dart';
@@ -10,6 +11,7 @@ import 'common.dart';
 /// Elenco di ricette con linguette per categoria (stile rubrica) e ricerca.
 class RecipeBrowser extends StatefulWidget {
   final List<Recipe> recipes;
+
   /// Riceve anche l'elenco mostrato (filtri e ordine), per sfogliare le ricette in quell'ordine.
   final void Function(Recipe r, List<Recipe> shown) onOpen;
   final void Function(Recipe r)? onLongPress;
@@ -85,6 +87,8 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         padding: const EdgeInsets.fromLTRB(4, 10, 10, 96),
         children: [
           ...widget.header,
+          if (_cat != null && !appState.categoryOpen(_cat!))
+            ProTeaser(icon: categoryIcon(_cat!), text: tr('pro.reasonCategory', {'cat': categoryLabel(_cat!)})),
           if (all.isNotEmpty) ...[
             TextField(
               controller: _q,
@@ -109,7 +113,7 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
             const Spacer(),
             if (list.length > 1) sortOrderButton(context) else const SizedBox(height: 40),
           ]),
-          if (list.isEmpty)
+          if (list.isEmpty && (_cat == null || appState.categoryOpen(_cat!)))
             all.isEmpty
                 ? EmptyState(
                     icon: _cat == null ? Icons.menu_book_outlined : categoryIcon(_cat!),
@@ -163,7 +167,10 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
         badge: widget.badgeFor?.call(r),
         showCategory: false,
         selected: r.id == widget.selectedId,
-        onTap: () => widget.onOpen(r, list),
+        locked: !appState.withinFree(r),
+        onTap: () => appState.canOpen(r)
+            ? widget.onOpen(r, list.where(appState.canOpen).toList())
+            : showProOffer(context, proLimitReason()),
         onLongPress: widget.onLongPress == null ? null : () => widget.onLongPress!(r),
       );
 

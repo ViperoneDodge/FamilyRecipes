@@ -14,6 +14,7 @@ import '../widgets/recipe_browser.dart';
 import 'login_screen.dart';
 import 'recipe_detail_screen.dart';
 import 'new_recipe.dart';
+import 'pro_screen.dart';
 
 class FamilyTab extends StatelessWidget {
   final void Function(Recipe r) onOpen;
@@ -277,7 +278,7 @@ Future<void> exportPdf(BuildContext context, String title, List<Recipe> recipes)
   try {
     await PdfExport.share(
       title: title,
-      recipes: recipes,
+      recipes: recipes.where(appState.canOpen).toList(),
       photo: (r, p) => appState.photos.load(p, bookId: appState.bookOf(r)),
       lookup: {for (final r in appState.recipes) r.id: r},
     );
@@ -410,12 +411,20 @@ Future<void> moveRecipeSheet(BuildContext context, Recipe r) async {
     return;
   }
   final target = dest == personalKey ? null : dest;
+  if (!appState.canPlace(r.copy()..bookId = target)) {
+    await showProOffer(context, proLimitReason());
+    return;
+  }
   final label = target == null ? tr('book.mine') : (appState.data.groupById(target)?.name ?? tr('family.defaultName'));
   await appState.moveRecipe(r.id, target);
   if (context.mounted) showSnack(context, tr('move.done', {'name': name, 'where': label}));
 }
 
 Future<void> copyToMine(BuildContext context, Recipe r) async {
+  if (!appState.canPlace(Recipe(category: r.category))) {
+    await showProOffer(context, proLimitReason());
+    return;
+  }
   showSnack(context, tr('recipe.copying'));
   final c = await appState.duplicateRecipe(r, null);
   if (context.mounted && c != null) showSnack(context, tr('recipe.copied', {'name': r.displayTitle}));

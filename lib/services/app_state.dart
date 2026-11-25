@@ -13,6 +13,7 @@ import 'group_watch.dart';
 import 'local_store.dart';
 import 'notification_service.dart';
 import 'photo_store.dart';
+import 'pro_service.dart';
 import 'push_service.dart';
 import 'sync_service.dart';
 import 'update_service.dart';
@@ -26,6 +27,7 @@ class AppState extends ChangeNotifier {
   final NotificationService notifications = NotificationService();
   final SyncService sync = SyncService();
   final PushService push = PushService();
+  final ProService pro = ProService();
 
   GroupWatchState watch = GroupWatchState();
 
@@ -73,9 +75,94 @@ class AppState extends ChangeNotifier {
     return g == null ? GroupRole.viewer : g.roleOf(session?.key);
   }
 
-  bool canEdit(Recipe r) => roleIn(isPersonal(r) ? null : r.bookId) != GroupRole.viewer;
+  /// Può modificarla e spostarla: ruolo nel ricettario e, senza Pro, entro i limiti della versione gratuita.
+  bool canEdit(Recipe r) => canDelete(r) && withinFree(r);
+
+  /// Può eliminarla (anche se è oltre i limiti della versione gratuita: così libera posto).
+  bool canDelete(Recipe r) => roleIn(isPersonal(r) ? null : r.bookId) != GroupRole.viewer;
 
   bool canAddTo(String? bookId) => roleIn(bookId) != GroupRole.viewer;
+
+  // ---- Versione Pro ----
+
+  /// Acquistata su questo telefono (o ripristinata dallo store).
+  bool purchasedPro = false;
+
+  bool get isPro => purchasedPro || isAdmin;
+
+  /// Versione gratuita: solo queste categorie, al massimo [freeLimit] ricette ciascuna in ogni ricettario.
+  static const Set<RecipeCategory> freeCategories = {
+    RecipeCategory.aperitivi,
+    RecipeCategory.primi,
+    RecipeCategory.secondi,
+    RecipeCategory.dolci,
+  };
+  static const int freeLimit = 3;
+
+  bool categoryOpen(RecipeCategory c) => isPro || freeCategories.contains(c);
+
+  String _bookKey(Recipe r) => isPersonal(r) ? '' : r.bookId!;
+
+  /// Per ricettario e categoria: gli id delle prime [freeLimit] ricette (le più vecchie), le sole usabili
+  /// senza Pro. Ricalcolato a ogni cambiamento.
+  Map<String, Set<String>>? _freeIds;
+
+  Map<String, Set<String>> get _free {
+    final cached = _freeIds;
+    if (cached != null) return cached;
+    final by = <String, List<Recipe>>{};
+    for (final r in data.recipes) {
+      if (r.deleted || !freeCategories.contains(r.category)) continue;
+      by.putIfAbsent('${_bookKey(r)}|${r.category.name}', () => []).add(r);
+    }
+    final out = <String, Set<String>>{};
+    by.forEach((k, list) {
+      list.sort((a, b) {
+        final c = a.createdAt.compareTo(b.createdAt);
+        return c != 0 ? c : a.id.compareTo(b.id);
+      });
+      out[k] = {for (final r in list.take(freeLimit)) r.id};
+    });
+    return _freeIds = out;
+  }
+
+  @override
+  void notifyListeners() {
+    _freeIds = null;
+    super.notifyListeners();
+  }
+
+  /// Rientra nella versione gratuita (o c'è Pro).
+  bool withinFree(Recipe r) => isPro || (_free['${_bookKey(r)}|${r.category.name}']?.contains(r.id) ?? false);
+
+  /// Si può aprire: nei limiti, oppure è una propria ricetta (oltre i limiti resta in sola lettura).
+  bool canOpen(Recipe r) => withinFree(r) || isMine(r);
+
+  int _countIn(String book, RecipeCategory c) =>
+      data.recipes.where((r) => !r.deleted && r.category == c && _bookKey(r) == book).length;
+
+  /// La ricetta può stare (nuova, o con categoria/ricettario cambiati) nel suo ricettario e categoria.
+  bool canPlace(Recipe r) {
+    if (isPro) return true;
+    if (!freeCategories.contains(r.category)) return false;
+    final old = recipeById(r.id);
+    if (old != null && old.category == r.category && _bookKey(old) == _bookKey(r)) return withinFree(old);
+    return _countIn(_bookKey(r), r.category) < freeLimit;
+  }
+
+  /// C'è ancora posto per almeno una ricetta nel ricettario (null = le mie).
+  bool hasFreeSlot(String? bookId) {
+    if (isPro) return true;
+    final book = bookId == null || bookId == data.personalBookId ? '' : bookId;
+    return freeCategories.any((c) => _countIn(book, c) < freeLimit);
+  }
+
+  Future<void> _setPro() async {
+    if (purchasedPro) return;
+    purchasedPro = true;
+    notifyListeners();
+    await _writeSettings();
+  }
 
   bool canManage(FamilyGroup g) => isAdmin || g.roleOf(session?.key) == GroupRole.admin;
 
@@ -122,6 +209,7 @@ class AppState extends ChangeNotifier {
     favRecipes = ids(settings?['favRecipes']);
     favGroups = ids(settings?['favGroups']);
     startOnFavorites = settings?['start'] == 'favorites';
+    purchasedPro = settings?['pro'] == true;
     photos.downloader = (book, id) => isCloud ? sync.downloadPhoto(book, id) : Future.value(null);
     notifyListeners();
     try {
@@ -132,6 +220,7 @@ class AppState extends ChangeNotifier {
     loading = false;
     notifyListeners();
     UpdateService.instance.start(pushAvailable: auth.cloudAvailable);
+    pro.init(onOwned: _setPro, onChanged: notifyListeners);
   }
 
   Future<void> login(Session s) async {
@@ -426,6 +515,7 @@ class AppState extends ChangeNotifier {
         'favRecipes': favRecipes.toList(),
         'favGroups': favGroups.toList(),
         if (startOnFavorites) 'start': 'favorites',
+        if (purchasedPro) 'pro': true,
       });
 
   // ---- Preferiti ----
