@@ -384,7 +384,7 @@
  "settings.groupAlerts": "새 레시피 알림",
  "settings.groupAlertsInfo": "다른 멤버가 내 그룹에서 레시피를 추가, 수정 또는 삭제하면 알려 드려요. 앱이 닫혀 있으면 알림이 몇 분 늦게 올 수 있어요.",
  "settings.groups": "그룹",
- "settings.groupsNeedCloud": "그룹에서 레시피를 공유하려면 온라인 계정으로 전환하세요(위의 계정 섹션).",
+ "settings.groupsNeedCloud": "그룹에서 레시피를 공유하려면 온라인 계정으로 전환하세요.",
  "settings.joinInvite": "초대 코드로 참여",
  "settings.langAuto": "휴대폰과 동일",
  "settings.language": "언어",

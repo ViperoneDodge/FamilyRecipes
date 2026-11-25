@@ -43,10 +43,26 @@ class RecipeWords {
       return RecipeCategory.conserve;
     }
     if (any(['spritz', 'cocktail', 'aperitivo', 'negroni', 'sangria'])) return RecipeCategory.aperitivi;
-    if (any(['torta', 'dolce', 'biscott', 'crostata', 'tiramis', 'gelato', 'budino', 'panna cotta', 'ciambell', 'frittell',
-      'cake', 'cookie', 'pie', 'dessert', 'muffin', 'crema', 'semifreddo', 'strudel', 'gâteau', 'tarte', 'kuchen', 'torte', 'tarta', 'flan'])) {
+    // Per i dolci si guardano le parole intere o il loro inizio: «pie» non deve trovare «ripieni» o
+    // «piemontese», «torte» non deve trovare «tortellini».
+    final words = t.split(RegExp(r'[^a-zà-öø-ÿß]+')).where((w) => w.isNotEmpty).toList();
+    bool word(List<String> ws) => words.any(ws.contains);
+    bool starts(List<String> ps) => words.any((w) => ps.any(w.startsWith));
+    // «Crema» è un dolce (pasticcera, catalana, al cioccolato…) tranne «crema di» + qualcosa di salato.
+    final crema = RegExp(r'\bcrema\b(?:\s+(?:di|de)\s+(\S+))?').firstMatch(t);
+    final sweetCream = crema != null &&
+        (crema.group(1) == null ||
+            ['mascarpone', 'nocciol', 'cioccolat', 'latte', 'limon', 'caff', 'ricotta', 'vaniglia', 'pistacchi']
+                .any(crema.group(1)!.startsWith));
+    final savoury = any(['pasta ', 'spaghetti', 'risotto', 'tagliatelle', 'penne', 'fusilli', 'linguine', 'gnocchi']);
+    if (word(['torta', 'torte', 'dolce', 'dolci', 'pie', 'cake', 'tarte', 'tarta', 'flan', 'dessert', 'muffin', 'gelato']) ||
+        starts(['biscott', 'crostat', 'tiramis', 'budin', 'ciambell', 'frittell', 'cookie', 'semifredd', 'strudel',
+          'gâteau', 'kuchen', 'cupcake', 'cheesecake', 'pannacotta']) ||
+        t.contains('panna cotta') ||
+        (sweetCream && !savoury)) {
       return RecipeCategory.dolci;
     }
+    if (any(['crema di ', 'vellutat', 'passato di '])) return RecipeCategory.primi;
     if (any(['pasta', 'spaghetti', 'risotto', 'lasagn', 'gnocchi', 'zuppa', 'minestr', 'tagliatelle', 'ravioli', 'tortellini',
       'penne', 'fusilli', 'orecchiette', 'pappardelle', 'cannelloni', 'polenta', 'soup', 'noodle', 'soupe', 'suppe', 'nudeln', 'sopa'])) {
       return RecipeCategory.primi;

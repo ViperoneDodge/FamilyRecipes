@@ -1,4 +1,4 @@
-// BUG trovati dal tester cattivo sulla ricerca (1.9.0). Questi test FALLISCONO finché il problema c'è.
+// Regressioni: bug trovati dal tester cattivo nella 1.9.0/1.10.0 e corretti nella 1.10.1.
 // Lancio:  flutter test tool/tests/bug_ricerca_test.dart
 import 'package:familyrecipes/l10n.dart';
 import 'package:familyrecipes/main.dart';
@@ -9,7 +9,7 @@ import 'package:familyrecipes/widgets/recipe_browser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../test/mfm_aiuti.dart';
+import 'mfm_aiuti.dart';
 
 final _ricette = [
   Recipe(id: '1', title: 'Pasta e fagioli', ingredients: [Ingredient(name: 'Borlotti')]),

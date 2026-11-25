@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Powiadomienia o nowych przepisach",
  "settings.groupAlertsInfo": "Powiadamia cię, gdy inny członek doda, zmieni lub usunie przepis w jednej z twoich grup. Gdy aplikacja jest zamknięta, powiadomienie może przyjść z kilkuminutowym opóźnieniem.",
  "settings.groups": "Grupy",
- "settings.groupsNeedCloud": "Aby udostępniać przepisy w grupie, przejdź na konto online (powyżej, w sekcji Konto).",
+ "settings.groupsNeedCloud": "Aby udostępniać przepisy w grupie, przejdź na konto online.",
  "settings.joinInvite": "Dołącz kodem zaproszenia",
  "settings.langAuto": "Jak w telefonie",
  "settings.language": "Język",

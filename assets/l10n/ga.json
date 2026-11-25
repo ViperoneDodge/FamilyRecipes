@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Foláirimh faoi oidis nua",
  "settings.groupAlertsInfo": "Cuireann sé in iúl duit nuair a chuireann ball eile oideas leis, nuair a athraíonn nó a scriosann sé ceann i gceann de do ghrúpaí. Leis an aip dúnta, d'fhéadfadh an foláireamh teacht cúpla nóiméad déanach.",
  "settings.groups": "Grúpaí",
- "settings.groupsNeedCloud": "Chun oidis a roinnt i ngrúpa, aistrigh chuig cuntas ar líne (thuas, sa chuid Cuntas).",
+ "settings.groupsNeedCloud": "Chun oidis a roinnt i ngrúpa, aistrigh chuig cuntas ar líne.",
  "settings.joinInvite": "Téigh isteach le cód cuiridh",
  "settings.langAuto": "Mar an fón",
  "settings.language": "Teanga",

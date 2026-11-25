@@ -384,7 +384,7 @@
  "settings.groupAlerts": "नई रेसिपी की सूचनाएँ",
  "settings.groupAlertsInfo": "जब कोई दूसरा सदस्य आपके किसी समूह में रेसिपी जोड़े, बदले या हटाए तो आपको बताता है। ऐप बंद होने पर सूचना कुछ मिनट देर से आ सकती है।",
  "settings.groups": "समूह",
- "settings.groupsNeedCloud": "किसी समूह में रेसिपी साझा करने के लिए ऑनलाइन खाते पर जाएँ (ऊपर, खाता अनुभाग में)।",
+ "settings.groupsNeedCloud": "किसी समूह में रेसिपी साझा करने के लिए ऑनलाइन खाते पर जाएँ।",
  "settings.joinInvite": "आमंत्रण कोड से जुड़ें",
  "settings.langAuto": "फ़ोन जैसी",
  "settings.language": "भाषा",

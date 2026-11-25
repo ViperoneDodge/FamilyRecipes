@@ -1,5 +1,5 @@
-// BUG trovati dal tester cattivo su dosi, lettura da foto/PDF, file di importazione e pagine web (1.9.0).
-// Questi test FALLISCONO finché il problema c'è (per questo non stanno in test/).
+// Regressioni: bug trovati dal tester cattivo nella 1.9.0/1.10.0 e corretti nella 1.10.1.
+// Devono restare verdi: se uno fallisce, il bug è tornato.
 // Lancio:  flutter test tool/tests/bug_import_test.dart
 import 'dart:convert';
 

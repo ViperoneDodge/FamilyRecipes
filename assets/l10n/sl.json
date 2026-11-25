@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Obvestila o novih receptih",
  "settings.groupAlertsInfo": "Obvesti te, ko drug član doda, spremeni ali izbriše recept v eni od tvojih skupin. Ko je aplikacija zaprta, lahko obvestilo pride z nekajminutno zamudo.",
  "settings.groups": "Skupine",
- "settings.groupsNeedCloud": "Za deljenje receptov v skupini preklopi na spletni račun (zgoraj, v razdelku Račun).",
+ "settings.groupsNeedCloud": "Za deljenje receptov v skupini preklopi na spletni račun.",
  "settings.joinInvite": "Pridruži se s kodo povabila",
  "settings.langAuto": "Kot telefon",
  "settings.language": "Jezik",

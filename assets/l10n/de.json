@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Hinweise auf neue Rezepte",
  "settings.groupAlertsInfo": "Benachrichtigt dich, wenn ein anderes Mitglied in einer deiner Gruppen ein Rezept hinzufügt, ändert oder löscht. Bei geschlossener App kann der Hinweis einige Minuten später kommen.",
  "settings.groups": "Gruppen",
- "settings.groupsNeedCloud": "Um Rezepte in einer Gruppe zu teilen, wechsle zu einem Online-Konto (oben im Bereich Konto).",
+ "settings.groupsNeedCloud": "Um Rezepte in einer Gruppe zu teilen, wechsle zu einem Online-Konto.",
  "settings.joinInvite": "Mit Einladungscode beitreten",
  "settings.langAuto": "Wie das Telefon",
  "settings.language": "Sprache",

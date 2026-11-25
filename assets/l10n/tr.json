@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Yeni tarif bildirimleri",
  "settings.groupAlertsInfo": "Gruplarından birinde başka bir üye tarif eklediğinde, değiştirdiğinde veya sildiğinde seni haberdar eder. Uygulama kapalıyken bildirim birkaç dakika gecikebilir.",
  "settings.groups": "Gruplar",
- "settings.groupsNeedCloud": "Bir grupta tarif paylaşmak için çevrimiçi hesaba geç (yukarıda, Hesap bölümünde).",
+ "settings.groupsNeedCloud": "Bir grupta tarif paylaşmak için çevrimiçi hesaba geç.",
  "settings.joinInvite": "Davet koduyla katıl",
  "settings.langAuto": "Telefonla aynı",
  "settings.language": "Dil",

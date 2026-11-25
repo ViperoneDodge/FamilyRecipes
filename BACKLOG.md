@@ -192,6 +192,27 @@ Pubblicata il 9 ottobre 2026:
   scritte da altri con il lucchetto. Importazione: le ricette oltre i limiti vengono saltate.
 - Schermata Pro (Impostazioni → Account), acquisto, ripristino dell'acquisto; l'amministratore ha Pro.
 
+## Versione 1.10.1
+Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`, 340 test in tutto):
+- **Regole Firestore**: chi esce da un gruppo non può più aggiungere admin o membri (sé stesso o un complice);
+  chi entra con il codice non può togliere gli altri dalla sola lettura; tipi dei campi dei gruppi controllati.
+- **Account solo sul telefono**: nomi simili («mario.rossi» / «mario_rossi», nomi in altri alfabeti) non
+  condividono più file dati e backup (i file vecchi vengono ripresi); file locali rovinati non bloccano l'avvio.
+- **Gruppi**: un campo del tipo sbagliato non blocca più l'elenco gruppi; ricette senza id non si duplicano;
+  date di modifica nel futuro ignorate.
+- **Backup e ripristino**: ricette di un altro account ripristinate tra le mie; niente doppioni dopo uno
+  spostamento o senza id; una ricetta rovinata non rende illeggibile tutto il file; id delle foto ripuliti.
+- **PDF**: testi lunghi (introduzione, passaggi, consigli) divisi tra le pagine invece dell'errore.
+- **Dosi**: «1.000 g», «1 1/2», «1½», «2–3», dosi piccole; punto decimale per ja, zh, ko, th, hi, ga, mt.
+- **Lettura del testo e importazione**: «Ingredienti per 4 persone», «1 ora e 30 minuti», «1h30», persone
+  oltre 99, categorie (ripieni, tortellini, crema di zucca), tempi scritti a mano nei file, ricette scritte
+  male saltate invece di rifiutare il file, entità HTML non valide.
+- **Preferiti**: la stella resta spostando una ricetta in un gruppo.
+- **Ricerca**: più parole in qualunque ordine, senza accenti, spazi doppi.
+- **Lingue**: i segnaposto non vengono più sostituiti dentro i testi dell'utente.
+- **Schermate**: schede delle Impostazioni con il testo grande, chiusura di una ricetta eliminata;
+  nella scheda Gruppi il pulsante per passare all'account online.
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

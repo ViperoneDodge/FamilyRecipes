@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Notifikasi resep baru",
  "settings.groupAlertsInfo": "Memberi tahu saat anggota lain menambah, mengubah, atau menghapus resep di salah satu grupmu. Saat aplikasi ditutup, notifikasi bisa terlambat beberapa menit.",
  "settings.groups": "Grup",
- "settings.groupsNeedCloud": "Untuk berbagi resep di grup, beralihlah ke akun online (di atas, di bagian Akun).",
+ "settings.groupsNeedCloud": "Untuk berbagi resep di grup, beralihlah ke akun online.",
  "settings.joinInvite": "Gabung dengan kode undangan",
  "settings.langAuto": "Sama seperti ponsel",
  "settings.language": "Bahasa",

@@ -222,10 +222,11 @@ class PdfExport {
         if (r.servings > 0) info(tr('recipe.servings'), tr('recipe.people', {'n': r.servings})),
         info(tr('recipe.cost'), costLabel(r.cost)),
       ]),
-      if (r.intro.trim().isNotEmpty)
+      // Testi lunghi a pezzi: un unico blocco più alto di una pagina non si può stampare.
+      for (final (i, part) in _chunks(r.intro).indexed)
         pw.Padding(
-          padding: const pw.EdgeInsets.only(top: 10),
-          child: pw.Text(r.intro.trim(), style: _paragraph),
+          padding: pw.EdgeInsets.only(top: i == 0 ? 10 : 4),
+          child: pw.Text(part, style: _paragraph),
         ),
     ];
 
@@ -275,6 +276,7 @@ class PdfExport {
       for (var n = 0; n < r.steps.length; n++) {
         final s = r.steps[n];
         final pics = s.photos.map((p) => images[p]).whereType<pw.ImageProvider>().toList();
+        final parts = _chunks(s.text);
         out.add(pw.Padding(
           padding: const pw.EdgeInsets.only(bottom: 8),
           child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
@@ -289,9 +291,8 @@ class PdfExport {
             pw.SizedBox(width: 8),
             pw.Expanded(
               child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                if (s.text.trim().isNotEmpty)
-                  pw.Text(s.text.trim(), style: _paragraph),
-                if (pics.isNotEmpty)
+                if (parts.isNotEmpty) pw.Text(parts.first, style: _paragraph),
+                if (pics.isNotEmpty && parts.length <= 1)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(top: 5),
                     child: pw.Wrap(spacing: 6, runSpacing: 6, children: [
@@ -307,19 +308,60 @@ class PdfExport {
             ),
           ]),
         ));
+        // Il resto di un passaggio lungo, allineato al testo del passaggio.
+        for (final part in parts.skip(1)) {
+          out.add(pw.Padding(
+            padding: const pw.EdgeInsets.only(left: 28, bottom: 6),
+            child: pw.Text(part, style: _paragraph),
+          ));
+        }
+        if (pics.isNotEmpty && parts.length > 1) {
+          out.add(pw.Padding(
+            padding: const pw.EdgeInsets.only(left: 28, bottom: 8),
+            child: pw.Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final p in pics)
+                pw.ClipRRect(
+                  horizontalRadius: 4,
+                  verticalRadius: 4,
+                  child: pw.Image(p, width: 120, height: 90, fit: pw.BoxFit.cover),
+                ),
+            ]),
+          ));
+        }
       }
     }
 
     if (r.tips.trim().isNotEmpty) {
       out.add(section(tr('recipe.tips')));
-      out.add(pw.Container(
-        padding: const pw.EdgeInsets.all(10),
-        decoration: pw.BoxDecoration(
-          color: const PdfColor.fromInt(0xFFFBEBC8),
-          borderRadius: pw.BorderRadius.circular(4),
-        ),
-        child: pw.Text(r.tips.trim(), style: _paragraph),
-      ));
+      for (final part in _chunks(r.tips)) {
+        out.add(pw.Container(
+          padding: const pw.EdgeInsets.all(10),
+          decoration: pw.BoxDecoration(
+            color: const PdfColor.fromInt(0xFFFBEBC8),
+            borderRadius: pw.BorderRadius.circular(4),
+          ),
+          child: pw.Text(part, style: _paragraph),
+        ));
+      }
+    }
+    return out;
+  }
+
+  /// Divide un testo in pezzi da stampare uno dopo l'altro: per paragrafi e, se un paragrafo è
+  /// lunghissimo, ogni [maxWords] parole (così nessun pezzo supera l'altezza di una pagina).
+  static List<String> _chunks(String text, {int maxWords = 120}) {
+    final out = <String>[];
+    for (final para in text.trim().split(RegExp(r'\n\s*\n|\n'))) {
+      final words = para.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+      for (var i = 0; i < words.length; i += maxWords) {
+        var piece = words.sublist(i, (i + maxWords).clamp(0, words.length)).join(' ');
+        // Una "parola" enorme (testo senza spazi) va spezzata anche lei.
+        while (piece.length > 1500) {
+          out.add(piece.substring(0, 1500));
+          piece = piece.substring(1500);
+        }
+        if (piece.isNotEmpty) out.add(piece);
+      }
     }
     return out;
   }

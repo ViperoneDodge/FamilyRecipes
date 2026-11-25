@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Alerte despre rețete noi",
  "settings.groupAlertsInfo": "Te anunță când un alt membru adaugă, modifică sau șterge o rețetă într-unul din grupurile tale. Cu aplicația închisă, alerta poate ajunge cu câteva minute întârziere.",
  "settings.groups": "Grupuri",
- "settings.groupsNeedCloud": "Pentru a partaja rețete într-un grup, trece la un cont online (mai sus, în secțiunea Cont).",
+ "settings.groupsNeedCloud": "Pentru a partaja rețete într-un grup, trece la un cont online.",
  "settings.joinInvite": "Intră cu un cod de invitație",
  "settings.langAuto": "Ca telefonul",
  "settings.language": "Limbă",

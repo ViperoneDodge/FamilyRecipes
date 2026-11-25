@@ -434,7 +434,7 @@ class WebRecipes {
       final e = m[1]!;
       if (e.startsWith('#')) {
         final code = e[1] == 'x' || e[1] == 'X' ? int.tryParse(e.substring(2), radix: 16) : int.tryParse(e.substring(1));
-        return code == null ? m[0]! : String.fromCharCode(code);
+        return code == null || code > 0x10FFFF || (code >= 0xD800 && code <= 0xDFFF) ? m[0]! : String.fromCharCode(code);
       }
       return _entities[e] ?? m[0]!;
     });

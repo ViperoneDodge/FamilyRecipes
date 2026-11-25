@@ -40,7 +40,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
   /// Durante lo sfoglio: la ricetta che arriva e il verso (+1 successiva, -1 precedente).
   String? _other;
   int _dir = 0;
-  late final AnimationController _flip = AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
+  late final AnimationController _flip;
 
   /// Persone scelte per ricalcolare le dosi (per ricetta, solo su questo schermo).
   final Map<String, int> _people = {};
@@ -51,6 +51,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
   @override
   void initState() {
     super.initState();
+    _flip = AnimationController(vsync: this, duration: const Duration(milliseconds: 480));
     if (_awake++ == 0) WakelockPlus.enable().catchError((_) {});
   }
 
@@ -313,7 +314,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTick
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(child: Text(ing.name, style: ink)),
                 const SizedBox(width: 8),
-                Text(DoseScaler.scale(ing.amount, _factor(r), comma: L10n.code != 'en'),
+                Text(DoseScaler.scale(ing.amount, _factor(r), comma: !decimalPointLanguages.contains(L10n.code)),
                     style: ink.copyWith(fontWeight: FontWeight.w700)),
               ]),
             ),

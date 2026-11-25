@@ -384,7 +384,7 @@
  "settings.groupAlerts": "新食谱提醒",
  "settings.groupAlertsInfo": "当其他成员在你的群组中添加、修改或删除食谱时提醒你。应用关闭时，提醒可能会延迟几分钟。",
  "settings.groups": "群组",
- "settings.groupsNeedCloud": "要在群组中分享食谱，请切换到在线账号（见上方「账号」部分）。",
+ "settings.groupsNeedCloud": "要在群组中分享食谱，请切换到在线账号。",
  "settings.joinInvite": "用邀请码加入",
  "settings.langAuto": "跟随手机",
  "settings.language": "语言",

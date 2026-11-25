@@ -123,7 +123,7 @@ class SyncService {
           final book = d.reference.parent.parent?.id;
           if (book == null) continue;
           try {
-            final r = Recipe.fromJson(d.data())..bookId = book;
+            final r = Recipe.fromJson({...d.data(), 'id': d.id})..bookId = book;
             if (!r.deleted) out.add(r);
           } catch (_) {}
         }
@@ -273,7 +273,8 @@ class SyncService {
       final remote = <Recipe>[];
       for (final d in snap.docs) {
         try {
-          remote.add(Recipe.fromJson(d.data())..bookId = bookId);
+          // L'id è quello del documento: una ricetta scritta senza «id» non si duplica a ogni aggiornamento.
+          remote.add(Recipe.fromJson({...d.data(), 'id': d.id})..bookId = bookId);
         } catch (_) {}
       }
       final fromServer = !snap.metadata.isFromCache;

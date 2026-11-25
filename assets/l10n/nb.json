@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Varsler om nye oppskrifter",
  "settings.groupAlertsInfo": "Varsler deg når et annet medlem legger til, endrer eller sletter en oppskrift i en av gruppene dine. Når appen er lukket, kan varselet komme noen minutter forsinket.",
  "settings.groups": "Grupper",
- "settings.groupsNeedCloud": "For å dele oppskrifter i en gruppe må du bytte til en nettkonto (over, i delen Konto).",
+ "settings.groupsNeedCloud": "For å dele oppskrifter i en gruppe må du bytte til en nettkonto.",
  "settings.joinInvite": "Bli med med en invitasjonskode",
  "settings.langAuto": "Som telefonen",
  "settings.language": "Språk",

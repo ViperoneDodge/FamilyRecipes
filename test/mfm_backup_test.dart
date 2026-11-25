@@ -107,7 +107,9 @@ void main() {
         {'id': 'x', 'title': 'Lapide', 'deleted': true},
         {'id': '', 'title': 'Id vuoto'},
       ]))!;
-      expect(aMano.recipes, isEmpty);
+      // La lapide resta fuori; la ricetta senza id entra con un id stabile (uguale a ogni lettura).
+      expect(aMano.recipes.map((r) => r.title), ['Id vuoto']);
+      expect(aMano.recipes.single.id, startsWith('r'));
     });
   });
 

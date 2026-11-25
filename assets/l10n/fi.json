@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Ilmoitukset uusista resepteistä",
  "settings.groupAlertsInfo": "Ilmoittaa, kun toinen jäsen lisää, muokkaa tai poistaa reseptin jossakin ryhmässäsi. Kun sovellus on suljettu, ilmoitus voi tulla muutaman minuutin viiveellä.",
  "settings.groups": "Ryhmät",
- "settings.groupsNeedCloud": "Jaa reseptejä ryhmässä siirtymällä verkkotiliin (yllä, Tili-osiossa).",
+ "settings.groupsNeedCloud": "Jaa reseptejä ryhmässä siirtymällä verkkotiliin.",
  "settings.joinInvite": "Liity kutsukoodilla",
  "settings.langAuto": "Kuten puhelimessa",
  "settings.language": "Kieli",

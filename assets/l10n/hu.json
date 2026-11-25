@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Értesítések új receptekről",
  "settings.groupAlertsInfo": "Szól, ha egy másik tag receptet ad hozzá, módosít vagy töröl valamelyik csoportodban. Bezárt appnál az értesítés néhány perc késéssel érkezhet.",
  "settings.groups": "Csoportok",
- "settings.groupsNeedCloud": "Receptek csoportban való megosztásához válts online fiókra (fent, a Fiók részben).",
+ "settings.groupsNeedCloud": "Receptek csoportban való megosztásához válts online fiókra.",
  "settings.joinInvite": "Csatlakozás meghívókóddal",
  "settings.langAuto": "Mint a telefonon",
  "settings.language": "Nyelv",

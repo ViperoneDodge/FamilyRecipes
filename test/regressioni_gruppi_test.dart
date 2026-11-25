@@ -1,4 +1,4 @@
-// BUG trovato dal tester cattivo sui documenti dei gruppi (1.9.0). Il test FALLISCE finché il problema c'è.
+// Regressioni: bug trovati dal tester cattivo nella 1.9.0/1.10.0 e corretti nella 1.10.1.
 // Lancio:  flutter test tool/tests/bug_gruppi_test.dart
 import 'package:familyrecipes/l10n.dart';
 import 'package:familyrecipes/models.dart';

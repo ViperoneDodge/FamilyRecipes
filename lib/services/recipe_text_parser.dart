@@ -194,15 +194,22 @@ class RecipeTextParser {
     final low = l.toLowerCase();
     var used = false;
     final serv = RegExp(
-            r'(?:dosi\s+per|per|porzioni|serves|servings|for)\s*:?\s*(\d{1,2})\s*(?:persone|porzioni|people|servings|pers\.?)?',
+            r'(?:dosi\s+per|per|porzioni|serves|servings|for)\s*:?\s*(\d{1,3})(?!\d)\s*(?:persone|porzioni|people|servings|pers\.?)?',
             caseSensitive: false)
         .firstMatch(low);
     if (serv != null &&
         (low.contains('person') || low.contains('porzion') || low.contains('dosi') || low.contains('serv'))) {
-      r.servings = int.parse(serv.group(1)!);
+      final n = int.parse(serv.group(1)!);
+      if (n >= 1 && n <= 99) r.servings = n; // oltre 99 (il massimo dell'editor) meglio non indovinare
       used = true;
     }
     int? minutes(String key) {
+      // "1 ora e 30 minuti", "1h30", "1 h 30 min", "2 hours 15 minutes"
+      final hm = RegExp(
+              '(?:$key)[^\\d]{0,20}(\\d+)\\s*(?:h|ore|ora|hours?|hrs?)\\.?\\s*(?:e|and|,)?\\s*(\\d{1,2})\\s*(?:min|minuti|m\\b|\\b|\$)',
+              caseSensitive: false)
+          .firstMatch(low);
+      if (hm != null) return int.parse(hm.group(1)!) * 60 + int.parse(hm.group(2)!);
       final m = RegExp('(?:$key)[^\\d]{0,20}(\\d+(?:[\\.,]\\d)?)\\s*(min|minuti|m\\b|h|ore|ora|hours?|hrs?)',
               caseSensitive: false)
           .firstMatch(low);
@@ -229,6 +236,8 @@ class RecipeTextParser {
       r.difficulty = RecipeWords.difficulty(diff.group(1)) ?? r.difficulty;
       used = true;
     }
+    // "Ingredienti per 4 persone" resta: è anche l'intestazione della lista.
+    if (_ingHeader.hasMatch(low)) return false;
     // La riga è "solo meta" se è corta e non sembra un ingrediente né una frase.
     return used && l.length < 80 && !l.endsWith('.');
   }

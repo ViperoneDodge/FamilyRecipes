@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Beskeder om nye opskrifter",
  "settings.groupAlertsInfo": "Giver dig besked, når et andet medlem tilføjer, ændrer eller sletter en opskrift i en af dine grupper. Når appen er lukket, kan beskeden komme et par minutter forsinket.",
  "settings.groups": "Grupper",
- "settings.groupsNeedCloud": "For at dele opskrifter i en gruppe skal du skifte til en onlinekonto (ovenfor, i afsnittet Konto).",
+ "settings.groupsNeedCloud": "For at dele opskrifter i en gruppe skal du skifte til en onlinekonto.",
  "settings.joinInvite": "Bliv medlem med en invitationskode",
  "settings.langAuto": "Som telefonen",
  "settings.language": "Sprog",

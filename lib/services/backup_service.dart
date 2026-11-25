@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models.dart';
@@ -81,6 +82,9 @@ class BackupService {
     }
   }
 
+  /// Id di foto usabile come nome di file (niente «../», barre o caratteri strani).
+  static bool safePhotoId(String id) => RegExp(r'^[A-Za-z0-9_-]{1,64}$').hasMatch(id);
+
   static DateTime _at(Object? v) =>
       (DateTime.tryParse(v is String ? v : '') ?? DateTime.fromMillisecondsSinceEpoch(0)).toLocal();
 
@@ -88,22 +92,33 @@ class BackupService {
     final m = _root(bytes);
     if (m == null) return null;
     try {
-      final recipes = <Recipe>[
-        for (final e in m['recipes'] as List)
-          if (e is Map) Recipe.fromJson(Map<String, dynamic>.from(e)),
-      ].where((r) => r.id.isNotEmpty && !r.deleted).toList();
+      final recipes = <Recipe>[];
+      for (final e in m['recipes'] as List) {
+        if (e is! Map) continue;
+        try {
+          final j = Map<String, dynamic>.from(e);
+          // Senza id: uno stabile ricavato dal contenuto, così ripristinare due volte non crea doppioni.
+          if (j['id'] is! String || (j['id'] as String).isEmpty) {
+            j['id'] = 'r${sha1.convert(utf8.encode(jsonEncode(j))).toString().substring(0, 24)}';
+          }
+          final r = Recipe.fromJson(j);
+          if (!r.deleted) recipes.add(r);
+        } catch (_) {
+          // Una ricetta rovinata non deve impedire di ripristinare le altre.
+        }
+      }
       final photos = <String, Uint8List>{};
       final p = m['photos'];
       if (p is Map) {
         p.forEach((k, v) {
-          if (k is! String || v is! String) return;
+          if (k is! String || v is! String || !safePhotoId(k)) return;
           try {
             photos[k] = base64Decode(v);
           } catch (_) {}
         });
       }
       final fav = m['favorites'];
-      return BackupData(_at(m['at']), (m['reason'] as String?) ?? '', recipes, photos, {
+      return BackupData(_at(m['at']), m['reason'] is String ? m['reason'] as String : '', recipes, photos, {
         if (fav is List)
           for (final f in fav)
             if (f is String) f
@@ -176,7 +191,7 @@ class BackupService {
       // Legge solo l'intestazione (data, motivo, numero di ricette), senza decodificare le foto.
       final r = await Isolate.run(() {
         final m = _root(File(path).readAsBytesSync());
-        return m == null ? null : (at: _at(m['at']), n: (m['recipes'] as List).length, reason: '${m['reason'] ?? ''}');
+        return m == null ? null : (at: _at(m['at']), n: (m['recipes'] as List).length, reason: m['reason'] is String ? m['reason'] as String : '');
       });
       out.add(BackupInfo(e, r?.at ?? DateTime.fromMillisecondsSinceEpoch(0), r?.n ?? -1, r?.reason ?? ''));
     }

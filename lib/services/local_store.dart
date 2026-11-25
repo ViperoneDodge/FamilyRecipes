@@ -62,8 +62,24 @@ class LocalStore {
   String _dataFile(Session s) => 'data_${s.storageKey}.json';
 
   Future<UserData> readUserData(Session s) async {
-    final j = await _readJson(_dataFile(s));
-    return j == null ? UserData() : UserData.fromJson(j);
+    var name = _dataFile(s);
+    if (s.legacyStorageKey != s.storageKey && !await (await _file(name)).exists()) {
+      // File salvato con il nome di prima della 1.10.1: lo si copia nel nome nuovo.
+      final old = await _file('data_${s.legacyStorageKey}.json');
+      if (await old.exists()) await old.copy((await _file(name)).path);
+    }
+    final j = await _readJson(name);
+    if (j == null) return UserData();
+    try {
+      return UserData.fromJson(j);
+    } catch (_) {
+      // Contenuto inatteso: si mette da parte il file (non lo si sovrascrive) e si riparte vuoti.
+      try {
+        final f = await _file(name);
+        await f.copy('${f.path}.illeggibile-${DateTime.now().millisecondsSinceEpoch}');
+      } catch (_) {}
+      return UserData();
+    }
   }
 
   Future<void> deleteUserData(Session s) async {

@@ -384,7 +384,7 @@
  "settings.groupAlerts": "新着レシピのお知らせ",
  "settings.groupAlertsInfo": "ほかのメンバーがグループでレシピを追加・編集・削除したときにお知らせします。アプリを閉じているときは、数分遅れて届くことがあります。",
  "settings.groups": "グループ",
- "settings.groupsNeedCloud": "グループでレシピを共有するには、オンラインアカウントに切り替えてください（上の「アカウント」セクション）。",
+ "settings.groupsNeedCloud": "グループでレシピを共有するには、オンラインアカウントに切り替えてください。",
  "settings.joinInvite": "招待コードで参加",
  "settings.langAuto": "端末と同じ",
  "settings.language": "言語",

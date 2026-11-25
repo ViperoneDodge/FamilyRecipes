@@ -31,7 +31,11 @@ class SettingsScreen extends StatelessWidget {
         Widget tab(IconData icon, String label) => Tab(
               height: 58,
               icon: Icon(icon, size: 22),
-              child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1)),
+              // Con il testo del telefono molto grande l'etichetta non deve uscire dalla linguetta.
+              child: MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.3,
+                child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1)),
+              ),
             );
         Widget page(List<Widget> children) =>
             ListView(padding: const EdgeInsets.only(top: 6, right: 4), children: children);
@@ -105,15 +109,22 @@ class SettingsScreen extends StatelessWidget {
                   ]),
                   page([
                     _header(context, tr('settings.groups')),
-                    if (!appState.isCloud)
+                    if (!appState.isCloud) ...[
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
                           appState.auth.cloudAvailable ? tr('settings.groupsNeedCloud') : tr('family.cloudOff'),
                           style: TextStyle(color: scheme.onSurfaceVariant),
                         ),
-                      )
-                    else
+                      ),
+                      if (appState.auth.cloudAvailable)
+                        ListTile(
+                          leading: const Icon(Icons.cloud_upload_outlined),
+                          title: Text(tr('upgrade.button')),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => push(const LoginScreen(upgrade: true)),
+                        ),
+                    ] else
                       ..._familySection(context, push),
                   ]),
                   page([

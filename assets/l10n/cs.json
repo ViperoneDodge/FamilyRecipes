@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Upozornění na nové recepty",
  "settings.groupAlertsInfo": "Upozorní tě, když jiný člen přidá, upraví nebo smaže recept v některé z tvých skupin. Když je aplikace zavřená, může upozornění přijít s několikaminutovým zpožděním.",
  "settings.groups": "Skupiny",
- "settings.groupsNeedCloud": "Ke sdílení receptů ve skupině přejdi na online účet (výše, v části Účet).",
+ "settings.groupsNeedCloud": "Ke sdílení receptů ve skupině přejdi na online účet.",
  "settings.joinInvite": "Připojit se kódem pozvánky",
  "settings.langAuto": "Podle telefonu",
  "settings.language": "Jazyk",

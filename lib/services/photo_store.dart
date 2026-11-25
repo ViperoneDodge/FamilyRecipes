@@ -18,7 +18,11 @@ class PhotoStore {
   final Map<String, Future<Uint8List?>> _loading = {};
   static const int _memMax = 40;
 
-  Future<File> file(String id) async => File('${(await store.photosDir()).path}/$id.jpg');
+  Future<File> file(String id) async {
+    // Gli id arrivano anche da file e da altri telefoni: mai un percorso fuori dalla cartella delle foto.
+    final safe = id.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+    return File('${(await store.photosDir()).path}/$safe.jpg');
+  }
 
   Future<bool> exists(String id) async => (await file(id)).exists();
 

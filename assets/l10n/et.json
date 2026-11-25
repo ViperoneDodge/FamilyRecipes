@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Uute retseptide teavitused",
  "settings.groupAlertsInfo": "Teavitab sind, kui mõni teine liige lisab, muudab või kustutab retsepti mõnes sinu grupis. Kui rakendus on suletud, võib teavitus jõuda kohale mõneminutilise viivitusega.",
  "settings.groups": "Grupid",
- "settings.groupsNeedCloud": "Gruppides retseptide jagamiseks mine üle veebikontole (ülal, jaotises Konto).",
+ "settings.groupsNeedCloud": "Gruppides retseptide jagamiseks mine üle veebikontole.",
  "settings.joinInvite": "Liitu kutsekoodiga",
  "settings.langAuto": "Nagu telefonis",
  "settings.language": "Keel",

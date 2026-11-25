@@ -67,9 +67,9 @@ class ThemeSettings {
     return ThemeSettings(
       tabs: TabsStyle.values.asNameMap()[j['tabs']] ?? TabsStyle.top,
       mode: ThemeMode.values.asNameMap()[j['mode']] ?? ThemeMode.system,
-      palette: (j['palette'] as num?)?.toInt() ?? 0,
+      palette: j['palette'] is num ? (j['palette'] as num).toInt() : 0,
       paper: PaperStyle.values.asNameMap()[j['paper']] ?? PaperStyle.righe,
-      tablecloth: j['tablecloth'] as bool? ?? true,
+      tablecloth: j['tablecloth'] is bool ? j['tablecloth'] as bool : true,
     );
   }
 }

@@ -1,4 +1,4 @@
-// BUG trovati dal tester cattivo sulle schermate (1.9.0). Questi test FALLISCONO finché il problema c'è.
+// Regressioni: bug trovati dal tester cattivo nella 1.9.0/1.10.0 e corretti nella 1.10.1.
 // Lancio:  flutter test tool/tests/bug_schermate_test.dart
 import 'package:familyrecipes/l10n.dart';
 import 'package:familyrecipes/main.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../test/mfm_aiuti.dart';
+import 'mfm_aiuti.dart';
 
 Widget _app(Widget home) => MaterialApp(
       // come main.dart: le lingue che Flutter non ha (mt, ga) usano l'inglese per i testi di sistema

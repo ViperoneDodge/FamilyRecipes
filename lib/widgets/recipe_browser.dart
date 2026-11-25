@@ -68,7 +68,7 @@ class _RecipeBrowserState extends State<RecipeBrowser> {
     final q = _q.text.trim().toLowerCase();
     final list = all
         .where((r) => _cat == null || r.category == _cat)
-        .where((r) => q.isEmpty || r.searchText.contains(q))
+        .where((r) => q.isEmpty || r.matchesSearch(q))
         .toList();
     // Con "Tutte" le ricette sono raggruppate per categoria, nell'ordine delle linguette; dentro ogni
     // gruppo resta l'ordinamento scelto (alfabetico o più recenti).

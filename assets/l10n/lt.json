@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Pranešimai apie naujus receptus",
  "settings.groupAlertsInfo": "Praneša, kai kitas narys tavo grupėje prideda, pakeičia ar ištrina receptą. Kai programėlė uždaryta, pranešimas gali vėluoti kelias minutes.",
  "settings.groups": "Grupės",
- "settings.groupsNeedCloud": "Norėdamas dalytis receptais grupėje, pereik prie internetinės paskyros (aukščiau, skiltyje Paskyra).",
+ "settings.groupsNeedCloud": "Norėdamas dalytis receptais grupėje, pereik prie internetinės paskyros.",
  "settings.joinInvite": "Prisijungti pakvietimo kodu",
  "settings.langAuto": "Kaip telefone",
  "settings.language": "Kalba",

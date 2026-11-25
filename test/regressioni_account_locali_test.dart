@@ -1,5 +1,5 @@
-// BUG trovati dal tester cattivo sugli account senza registrazione e sui file locali (1.9.0).
-// Questi test FALLISCONO finché il problema c'è (per questo non stanno in test/).
+// Regressioni: bug trovati dal tester cattivo nella 1.9.0/1.10.0 e corretti nella 1.10.1.
+// Devono restare verdi: se uno fallisce, il bug è tornato.
 // Lancio:  flutter test tool/tests/bug_account_locali_test.dart
 import 'dart:io';
 
@@ -10,7 +10,7 @@ import 'package:familyrecipes/services/backup_service.dart';
 import 'package:familyrecipes/services/local_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../test/mfm_aiuti.dart';
+import 'mfm_aiuti.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

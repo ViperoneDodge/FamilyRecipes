@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Paziņojumi par jaunām receptēm",
  "settings.groupAlertsInfo": "Paziņo tev, kad cits dalībnieks pievieno, maina vai dzēš recepti kādā no tavām grupām. Kad lietotne ir aizvērta, paziņojums var pienākt ar dažu minūšu kavēšanos.",
  "settings.groups": "Grupas",
- "settings.groupsNeedCloud": "Lai dalītos ar receptēm grupā, pārej uz tiešsaistes kontu (augstāk, sadaļā Konts).",
+ "settings.groupsNeedCloud": "Lai dalītos ar receptēm grupā, pārej uz tiešsaistes kontu.",
  "settings.joinInvite": "Pievienoties ar ielūguma kodu",
  "settings.langAuto": "Kā tālrunī",
  "settings.language": "Valoda",

@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Tilkynningar um nýjar uppskriftir",
  "settings.groupAlertsInfo": "Lætur þig vita þegar annar meðlimur bætir við, breytir eða eyðir uppskrift í einum af hópunum þínum. Þegar appið er lokað getur tilkynningin borist nokkrum mínútum seinna.",
  "settings.groups": "Hópar",
- "settings.groupsNeedCloud": "Til að deila uppskriftum í hópi skaltu skipta yfir í netaðgang (hér fyrir ofan, í hlutanum Aðgangur).",
+ "settings.groupsNeedCloud": "Til að deila uppskriftum í hópi skaltu skipta yfir í netaðgang.",
  "settings.joinInvite": "Ganga í hóp með boðskóða",
  "settings.langAuto": "Eins og síminn",
  "settings.language": "Tungumál",

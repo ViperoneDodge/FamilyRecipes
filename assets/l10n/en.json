@@ -384,7 +384,7 @@
  "settings.groupAlerts": "New recipe alerts",
  "settings.groupAlertsInfo": "Notifies you when another member adds, edits or deletes a recipe in one of your groups. When the app is closed the alert may arrive a few minutes late.",
  "settings.groups": "Groups",
- "settings.groupsNeedCloud": "To share recipes in a group, switch to an online account (above, in the Account section).",
+ "settings.groupsNeedCloud": "To share recipes in a group, switch to an online account.",
  "settings.joinInvite": "Join with an invite code",
  "settings.langAuto": "Same as phone",
  "settings.language": "Language",

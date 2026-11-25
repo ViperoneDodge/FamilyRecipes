@@ -52,8 +52,12 @@ class RecipeImport {
     final out = <ImportedRecipe>[];
     for (final e in list) {
       if (e is! Map) continue;
-      final r = _recipe(Map<String, dynamic>.from(e));
-      if (r != null) out.add(r);
+      try {
+        final r = _recipe(Map<String, dynamic>.from(e));
+        if (r != null) out.add(r);
+      } catch (_) {
+        // Una ricetta scritta male non deve far rifiutare tutto il file.
+      }
     }
     return out;
   }
@@ -61,7 +65,7 @@ class RecipeImport {
   static ImportedRecipe? _recipe(Map<String, dynamic> j) {
     final title = _str(j['title']);
     final ingredients = <Ingredient>[];
-    for (final i in (j['ingredients'] as List?) ?? const []) {
+    for (final i in _list(j['ingredients'])) {
       if (i is Map) {
         final name = _str(i['name']);
         if (name.isNotEmpty) ingredients.add(Ingredient(name: name, amount: _str(i['amount'])));
@@ -70,7 +74,7 @@ class RecipeImport {
       }
     }
     final steps = <RecipeStep>[];
-    for (final s in (j['steps'] as List?) ?? const []) {
+    for (final s in _list(j['steps'])) {
       final t = s is Map ? _str(s['text']) : _str(s);
       if (t.isNotEmpty) steps.add(RecipeStep(text: t));
     }
@@ -81,8 +85,8 @@ class RecipeImport {
       intro: _str(j['intro']),
       difficulty: RecipeWords.difficulty(_str(j['difficulty'])) ?? Difficulty.easy,
       cost: RecipeWords.cost(_str(j['cost'])) ?? Cost.low,
-      prepMinutes: _int(j['prepMinutes'] ?? j['prep']),
-      cookMinutes: _int(j['cookMinutes'] ?? j['cook']),
+      prepMinutes: _minutes(j['prepMinutes'] ?? j['prep']),
+      cookMinutes: _minutes(j['cookMinutes'] ?? j['cook']),
       servings: _int(j['servings'], 4).clamp(1, 99),
       ingredients: ingredients,
       steps: steps,
@@ -95,9 +99,29 @@ class RecipeImport {
   static String _str(Object? v) => v == null ? '' : v.toString().trim();
 
   static int _int(Object? v, [int fallback = 0]) {
-    if (v is num) return v.round().clamp(0, 100000);
+    if (v is num) return v.isFinite ? v.round().clamp(0, 100000) : fallback;
     final m = RegExp(r'\d+').firstMatch(_str(v));
-    return m == null ? fallback : int.parse(m[0]!);
+    return m == null ? fallback : (int.tryParse(m[0]!) ?? 100000).clamp(0, 100000);
+  }
+
+  /// Minuti da un numero o da un testo: "45", "1 h", "1,5 ore", "1 ora e 30 minuti", "1h30".
+  static int _minutes(Object? v) {
+    if (v is num) return _int(v);
+    final t = _str(v).toLowerCase();
+    final hm = RegExp(r'(\d+(?:[.,]\d+)?)\s*(?:h|ore|ora|hours?|hrs?)\b\.?\s*(?:e|and|,)?\s*(\d{1,2})?').firstMatch(t);
+    if (hm != null) {
+      final h = double.tryParse(hm[1]!.replaceAll(',', '.')) ?? 0;
+      return (h * 60).round().clamp(0, 100000) + (hm[2] == null ? 0 : int.parse(hm[2]!));
+    }
+    return _int(v);
+  }
+
+  /// Elenco da un campo che può essere un elenco, un oggetto ({"1": "…"}) o un testo ("farina, uova").
+  static List<Object?> _list(Object? v) {
+    if (v is List) return v;
+    if (v is Map) return v.values.toList();
+    if (v is String) return v.split(RegExp(r'[\n,;]')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    return const [];
   }
 
   static Uint8List? _photo(Object? v) {

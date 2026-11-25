@@ -384,7 +384,7 @@
  "settings.groupAlerts": "Aviseringar om nya recept",
  "settings.groupAlertsInfo": "Meddelar dig när en annan medlem lägger till, ändrar eller raderar ett recept i någon av dina grupper. När appen är stängd kan aviseringen komma några minuter sent.",
  "settings.groups": "Grupper",
- "settings.groupsNeedCloud": "För att dela recept i en grupp, byt till ett onlinekonto (ovan, under Konto).",
+ "settings.groupsNeedCloud": "För att dela recept i en grupp, byt till ett onlinekonto.",
  "settings.joinInvite": "Gå med med en inbjudningskod",
  "settings.langAuto": "Som telefonen",
  "settings.language": "Språk",

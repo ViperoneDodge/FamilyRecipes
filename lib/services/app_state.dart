@@ -202,10 +202,15 @@ class AppState extends ChangeNotifier {
 
   Future<void> init() async {
     final settings = await store.readSettings();
-    theme = ThemeSettings.fromJson(settings);
-    langPref = settings?['lang'] as String?;
+    try {
+      theme = ThemeSettings.fromJson(settings);
+    } catch (_) {
+      theme = ThemeSettings();
+    }
+    final lang = settings?['lang'];
+    langPref = lang is String ? lang : null;
     sortNewestFirst = settings?['sortNewest'] == true;
-    Set<String> ids(Object? v) => {for (final e in (v as List?) ?? const []) '$e'};
+    Set<String> ids(Object? v) => {if (v is List) for (final e in v) '$e'};
     favRecipes = ids(settings?['favRecipes']);
     favGroups = ids(settings?['favGroups']);
     startOnFavorites = settings?['start'] == 'favorites';
@@ -215,8 +220,14 @@ class AppState extends ChangeNotifier {
     try {
       await notifications.init();
     } catch (_) {}
-    final s = await store.readSession();
-    if (s != null && (s.mode != AccountMode.cloud || auth.cloudSessionValid(s))) await _open(s);
+    try {
+      final s = await store.readSession();
+      if (s != null && (s.mode != AccountMode.cloud || auth.cloudSessionValid(s))) await _open(s);
+    } catch (_) {
+      // Un file rovinato non deve bloccare l'app sulla schermata iniziale: si riparte dall'accesso.
+      session = null;
+      data = UserData();
+    }
     loading = false;
     notifyListeners();
     UpdateService.instance.start(pushAvailable: auth.cloudAvailable);
@@ -395,6 +406,10 @@ class AppState extends ChangeNotifier {
       }
       final moved = r.copy()..id = newId();
       data.recipes.add(moved);
+      if (favRecipes.remove(old.id)) {
+        favRecipes.add(moved.id);
+        _writeSettings();
+      }
       r = moved;
     } else if (i >= 0) {
       data.recipes[i] = r;
@@ -658,7 +673,11 @@ class AppState extends ChangeNotifier {
       final copy = List.of(remote);
       _watchChain = _watchChain.then((_) => _checkGroupActivity(bookId, copy, existed)).catchError((_) {});
     }
+    // Una data di modifica nel futuro (orologio sbagliato o scritta apposta) bloccherebbe le modifiche degli
+    // altri: oltre un giorno avanti si considera "adesso".
+    final limit = DateTime.now().add(const Duration(days: 1)).millisecondsSinceEpoch;
     for (final r in remote) {
+      if (r.updatedAt > limit) r.updatedAt = DateTime.now().millisecondsSinceEpoch;
       r.bookId = personal ? null : bookId;
       final i = data.recipes.indexWhere((x) => x.id == r.id);
       if (i < 0) {
@@ -760,6 +779,16 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  /// La stessa ricetta con un altro id (dopo uno spostamento): stesso autore, data di creazione e titolo.
+  Recipe? _twinOf(Recipe b) {
+    if (b.createdAt == 0) return null;
+    for (final r in data.recipes) {
+      if (r.deleted || r.id == b.id) continue;
+      if (r.createdAt == b.createdAt && r.createdBy == b.createdBy && r.title.trim() == b.title.trim()) return r;
+    }
+    return null;
+  }
+
   /// Riporta le ricette del backup com'erano allora; quelle aggiunte dopo restano. Le ricette di gruppi
   /// che non ci sono più tornano tra le mie; quelle dei gruppi in cui si è in sola lettura si saltano.
   Future<int> restoreBackup(BackupData b, {File? from}) async {
@@ -768,7 +797,9 @@ class AppState extends ChangeNotifier {
     final seen = <String>{};
     for (final src in b.recipes) {
       if (!seen.add(src.id)) continue;
-      final old = data.recipes.where((x) => x.id == src.id).firstOrNull;
+      var old = data.recipes.where((x) => x.id == src.id).firstOrNull;
+      // Spostata in un altro ricettario dopo il backup: qui c'è solo la lapide, la ricetta vive con un id nuovo.
+      if (old == null || old.deleted) old = _twinOf(src) ?? old;
       String? book = src.bookId;
       if (book == data.personalBookId || (book != null && data.groupById(book) == null)) book = null;
       if (old != null && !old.deleted) book = isPersonal(old) ? null : old.bookId;
@@ -778,8 +809,14 @@ class AppState extends ChangeNotifier {
         if (bytes != null && !await photos.exists(p)) await photos.put(p, bytes);
       }
       final r = src.copy()
+        ..id = old != null && !old.deleted ? old.id : src.id
         ..bookId = book
         ..deleted = false;
+      // Tra le mie (anche da un backup di un altro account o di quello senza registrazione): diventa mia.
+      if (book == null && session != null) {
+        r.createdBy = session!.key;
+        if (r.createdByName.isEmpty) r.createdByName = session!.displayName;
+      }
       try {
         await saveRecipe(r);
         if (b.favorites.contains(src.id)) favRecipes.add(r.id);

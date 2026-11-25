@@ -77,8 +77,10 @@ class L10n {
 
 String tr(String key, [Map<String, Object?>? args]) {
   var s = L10n._cur[key] ?? L10n._en[key] ?? L10n._it[key] ?? key;
-  args?.forEach((k, v) => s = s.replaceAll('{$k}', '$v'));
-  return s;
+  if (args == null || args.isEmpty) return s;
+  // Un solo passaggio sul testo tradotto: i valori inseriti (testi dell'utente) non vengono riletti,
+  // così una ricetta chiamata «Torta {category}» resta tale.
+  return s.replaceAllMapped(RegExp(r'\{(\w+)\}'), (m) => args.containsKey(m[1]) ? '${args[m[1]]}' : m[0]!);
 }
 
 String trn(String key, int n, [Map<String, Object?>? args]) =>
