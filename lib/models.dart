@@ -337,6 +337,110 @@ class FamilyGroup {
   }
 }
 
+/// Pasti della giornata, in ordine. Pranzo e cena ci sono sempre; gli altri quattro si aggiungono a scelta
+/// (così la settimana ha al massimo 6 pasti al giorno, anche nel PDF e nel file Excel).
+enum Meal { colazione, spuntino, pranzo, merenda, cena, dopocena }
+
+const Set<Meal> baseMeals = {Meal.pranzo, Meal.cena};
+
+Meal? mealFrom(String? s) => Meal.values.asNameMap()[s];
+
+String mealLabel(Meal m) => tr('meal.${m.name}');
+
+/// Una ricetta in un pasto, con le porzioni da preparare.
+class PlanEntry {
+  String recipeId;
+  int servings;
+
+  PlanEntry({required this.recipeId, this.servings = 2});
+
+  Map<String, dynamic> toJson() => {'recipe': recipeId, 'servings': servings};
+
+  static PlanEntry? fromJson(Map<String, dynamic> j) {
+    final id = _optStr(j['recipe']);
+    if (id == null || id.isEmpty) return null;
+    final n = _int(j['servings']);
+    return PlanEntry(recipeId: id, servings: n < 1 ? 1 : (n > 99 ? 99 : n));
+  }
+}
+
+/// Giorno nel formato del piano: "2026-11-30".
+String planDay(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+/// Lunedì della settimana di [d] (a mezzanotte).
+DateTime weekStart(DateTime d) {
+  final day = DateTime(d.year, d.month, d.day);
+  return day.subtract(Duration(days: day.weekday - DateTime.monday));
+}
+
+/// Pianificazione dei pasti: per giorno e pasto, le ricette con le porzioni.
+class MealPlan {
+  /// Pasti in più rispetto a pranzo e cena (colazione e spuntini) mostrati nel piano.
+  Set<Meal> extraMeals;
+
+  /// giorno ("2026-11-30") → pasto → ricette.
+  Map<String, Map<Meal, List<PlanEntry>>> days;
+
+  MealPlan({Set<Meal>? extraMeals, Map<String, Map<Meal, List<PlanEntry>>>? days})
+      : extraMeals = extraMeals ?? {},
+        days = days ?? {};
+
+  /// Pasti mostrati, in ordine.
+  List<Meal> get meals => [for (final m in Meal.values) if (baseMeals.contains(m) || extraMeals.contains(m)) m];
+
+  List<PlanEntry> entries(String day, Meal meal) => days[day]?[meal] ?? const [];
+
+  void add(String day, Meal meal, PlanEntry e) => ((days[day] ??= {})[meal] ??= []).add(e);
+
+  void remove(String day, Meal meal, int index) {
+    final l = days[day]?[meal];
+    if (l == null || index < 0 || index >= l.length) return;
+    l.removeAt(index);
+    if (l.isEmpty) days[day]!.remove(meal);
+    if (days[day]!.isEmpty) days.remove(day);
+  }
+
+  /// Tutte le voci dei giorni da [from] (compreso) per [count] giorni, con giorno e pasto.
+  List<({String day, Meal meal, PlanEntry entry})> range(DateTime from, int count) => [
+        for (var i = 0; i < count; i++)
+          for (final m in Meal.values)
+            for (final e in entries(planDay(from.add(Duration(days: i))), m)) (day: planDay(from.add(Duration(days: i))), meal: m, entry: e),
+      ];
+
+  Map<String, dynamic> toJson() => {
+        'extra': [for (final m in extraMeals) m.name],
+        'days': {
+          for (final d in days.entries)
+            d.key: {for (final m in d.value.entries) m.key.name: [for (final e in m.value) e.toJson()]},
+        },
+      };
+
+  factory MealPlan.fromJson(Object? v) {
+    final p = MealPlan();
+    if (v is! Map) return p;
+    for (final m in _strings(v['extra'])) {
+      final meal = mealFrom(m);
+      if (meal != null && !baseMeals.contains(meal)) p.extraMeals.add(meal);
+    }
+    final days = v['days'];
+    if (days is Map) {
+      for (final d in days.entries) {
+        if (d.key is! String || d.value is! Map) continue;
+        for (final m in (d.value as Map).entries) {
+          final meal = mealFrom('${m.key}');
+          if (meal == null) continue;
+          for (final e in _maps(m.value)) {
+            final entry = PlanEntry.fromJson(e);
+            if (entry != null) p.add(d.key as String, meal, entry);
+          }
+        }
+      }
+    }
+    return p;
+  }
+}
+
 class UserData {
   List<Recipe> recipes;
 
@@ -346,14 +450,19 @@ class UserData {
   /// Foto già caricate online, come "bookId/photoId".
   Set<String> uploaded;
 
+  /// Pianificazione dei pasti (solo su questo telefono).
+  MealPlan plan;
+
   UserData({
     List<Recipe>? recipes,
     this.personalBookId,
     List<FamilyGroup>? groups,
     Set<String>? uploaded,
+    MealPlan? plan,
   })  : recipes = recipes ?? [],
         groups = groups ?? [],
-        uploaded = uploaded ?? {};
+        uploaded = uploaded ?? {},
+        plan = plan ?? MealPlan();
 
   FamilyGroup? groupById(String? id) => groups.where((g) => g.id == id).firstOrNull;
 
@@ -362,6 +471,7 @@ class UserData {
         'personalBookId': personalBookId,
         'groups': groups.map((g) => g.toJson()).toList(),
         'uploaded': uploaded.toList(),
+        'plan': plan.toJson(),
       };
 
   factory UserData.fromJson(Map<String, dynamic> j) => UserData(
@@ -372,6 +482,7 @@ class UserData {
             if (g['id'] is String) FamilyGroup.fromJson(g),
         ],
         uploaded: _strings(j['uploaded']).toSet(),
+        plan: MealPlan.fromJson(j['plan']),
       );
 }
 

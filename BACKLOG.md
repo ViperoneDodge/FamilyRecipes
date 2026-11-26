@@ -221,6 +221,18 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
 - **Pro dopo un rimborso**: su Android, all'avvio, se Google Play non elenca più `familyrecipes_pro` tra gli
   acquisti (risposta valida, non offline) Pro si spegne. Su iPhone resta com'è (nessuna verifica server).
 
+## Versione 1.11.0
+- **Pianificazione** (scheda al posto di Preferiti, versione Pro): settimana da lunedì a domenica, pranzo e cena
+  sempre, fino a 4 pasti in più (colazione, spuntino, merenda, dopocena). Per ogni pasto una o più ricette con
+  le porzioni. Il piano resta sul telefono ed entra nei backup.
+- **Lista della spesa**: ingredienti di tutte le ricette della settimana scalati sulle porzioni e sommati
+  (stesso ingrediente in ricette e giorni diversi; g/kg e ml/l convertiti; «q.b.» a parte), da spuntare;
+  PDF (settimana in tabella + lista) ed Excel.
+- **Modulo Excel** (.xlsx scritto e letto dall'app, senza librerie esterne): fogli Ricette, Ingredienti,
+  Passaggi, Settimana e Valori. Esporta ricette, modulo vuoto con esempio, importa ricette (Impostazioni →
+  Ricette) e la settimana (Pianificazione → altre azioni).
+- **Preferiti**: dalla stella in alto in «Le mie» e «Gruppi»; la pagina iniziale può essere la Pianificazione.
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

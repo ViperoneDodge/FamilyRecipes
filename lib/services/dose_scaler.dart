@@ -51,6 +51,16 @@ class DoseScaler {
     return comma ? s.replaceAll('.', ',') : s;
   }
 
+  /// Quantità iniziale e resto ("200 g" → 200, "g"); per un intervallo ("2-3") il valore più alto.
+  static ({double value, String rest})? parse(String amount) {
+    final m = _lead.firstMatch(amount);
+    if (m == null) return null;
+    var v = _num(m[1]!);
+    if (m[3] != null) v = _num(m[3]!) ?? v;
+    if (v == null) return null;
+    return (value: v, rest: amount.substring(m.end).trim());
+  }
+
   static String scale(String amount, double factor, {bool comma = true}) {
     if (factor == 1) return amount;
     final m = _lead.firstMatch(amount);

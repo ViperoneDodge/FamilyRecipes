@@ -63,7 +63,7 @@ void main() {
     final j = jsonDecode(File('${docs.path}/settings.json').readAsStringSync()) as Map;
     expect(j['favRecipes'], ['a']);
     expect(j['favGroups'], ['G1G1G1G1G1']);
-    expect(j['start'], 'favorites');
+    expect(j['start'], 'plan');
     final t = statoFinto()..session = null;
     await t.init();
     expect(t.favRecipes, {'a'});

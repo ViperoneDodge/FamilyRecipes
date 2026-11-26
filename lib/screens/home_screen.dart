@@ -11,6 +11,7 @@ import '../theme.dart';
 import '../widgets/recipe_browser.dart';
 import 'family_screen.dart';
 import 'new_recipe.dart';
+import 'planner_screen.dart';
 import 'pro_screen.dart';
 import 'suggest_screen.dart';
 import 'recipe_detail_screen.dart';
@@ -28,8 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   RecipeCategory? _myCategory;
   RecipeCategory? _favCategory;
 
-  // Schede: 0 Le mie, 1 Gruppi, 2 Suggerimento, 3 Preferiti (prima nella barra).
-  static const int _favTab = 3;
+  // Schede: 0 Le mie, 1 Gruppi, 2 Suggerimento, 3 Pianificazione.
+  static const int _planTab = 3;
 
   String? _selectedId;
   List<String> _selectedSeq = const [];
@@ -38,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    if (appState.startOnFavorites) _tab = _favTab;
+    if (appState.startOnFavorites) _tab = _planTab;
     // Link di una ricetta condiviso dal browser ("Condividi → FamilyRecipes").
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ShareReceiver.listen((text) {
@@ -142,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListenableBuilder(
       listenable: appState,
       builder: (context, _) {
-        final titles = [tr('book.mine'), tr('tab.family'), tr('tab.suggest'), tr('fav.title')];
+        final titles = [tr('book.mine'), tr('tab.family'), tr('tab.suggest'), tr('plan.title')];
         final body = switch (_tab) {
           1 => FamilyTab(
               onOpen: _openDetail,
@@ -154,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : ListView(padding: const EdgeInsets.fromLTRB(8, 24, 12, 24), children: [
                   ProTeaser(icon: Icons.soup_kitchen_outlined, text: tr('pro.reasonChef')),
                 ]),
-          _favTab => _favoritesTab(),
+          _planTab => const PlannerTab(),
           _ => _myTab(),
         };
         final mine = appState.myRecipes;
@@ -176,6 +177,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       cat == null ? mine : mine.where((r) => r.category == cat).toList(),
                     );
                   },
+                ),
+              if (_tab == 0 || _tab == 1)
+                IconButton(
+                  tooltip: tr('fav.title'),
+                  icon: const Icon(Icons.star_outline),
+                  onPressed: _openFavorites,
                 ),
               _syncIcon(),
               IconButton(
@@ -253,10 +260,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: SafeArea(
         top: false,
         child: Row(children: [
-          item(_favTab, Icons.star_outline, Icons.star, tr('tab.fav')),
           item(0, Icons.edit_note_outlined, Icons.edit_note, tr('tab.mine')),
           item(1, Icons.groups_outlined, Icons.groups, tr('tab.family')),
           item(2, Icons.soup_kitchen_outlined, Icons.soup_kitchen, tr('tab.tonight')),
+          item(_planTab, Icons.calendar_month_outlined, Icons.calendar_month, tr('tab.plan')),
         ]),
       ),
     );
@@ -272,16 +279,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return best < 0 ? s : '${s.substring(0, best)}\n${s.substring(best + 1)}';
   }
 
+  /// Preferiti (dalla stella in alto): una pagina a sé con le ricette preferite.
+  void _openFavorites() => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => ListenableBuilder(
+          listenable: appState,
+          builder: (context, _) => TableclothBackground(
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(title: Text(tr('fav.title'))),
+              body: NotebookPage(child: _favoritesTab(page: true)),
+            ),
+          ),
+        ),
+      ));
+
   /// Preferiti: le ricette scelte e quelle dei gruppi preferiti, con le linguette delle categorie.
-  Widget _favoritesTab() {
+  Widget _favoritesTab({bool page = false}) {
     final groups = appState.data.groups.where((g) => appState.favGroups.contains(g.id)).toList();
     return RecipeBrowser(
       key: const ValueKey('fav'),
       recipes: appState.favoriteRecipes,
       initialCategory: _favCategory,
       onCategoryChanged: (c) => _favCategory = c,
-      selectedId: _twoPane ? _selectedId : null,
-      onOpen: _openDetail,
+      selectedId: !page && _twoPane ? _selectedId : null,
+      onOpen: page
+          ? (r, shown) => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => RecipeDetailScreen(recipeId: r.id, sequence: [for (final x in shown) x.id])))
+          : _openDetail,
       onLongPress: (r) => recipeActionsSheet(context, r),
       badgeFor: (r) => appState.isPersonal(r) ? null : appState.bookLabel(r),
       emptyTitle: tr('fav.empty'),

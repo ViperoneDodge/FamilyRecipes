@@ -21,10 +21,13 @@ class BackupData {
   final Map<String, Uint8List> photos;
   final Set<String> favorites;
 
+  /// Pianificazione dei pasti (null nei backup senza).
+  final MealPlan? plan;
+
   /// File `.zip` da cui leggere le foto (null per i backup `.json` di prima, con le foto dentro).
   final String? zipPath;
 
-  const BackupData(this.at, this.reason, this.recipes, this.photos, this.favorites, {this.zipPath});
+  const BackupData(this.at, this.reason, this.recipes, this.photos, this.favorites, {this.zipPath, this.plan});
 
   Future<Uint8List?> photo(String id) async {
     final m = photos[id];
@@ -72,6 +75,7 @@ class BackupService {
     required Set<String> favorites,
     required String reason,
     DateTime? at,
+    MealPlan? plan,
   }) =>
       Uint8List.fromList(utf8.encode(jsonEncode({
         'app': _app,
@@ -86,6 +90,7 @@ class BackupService {
         ],
         'photos': {for (final e in photos.entries) e.key: base64Encode(e.value)},
         'favorites': favorites.toList(),
+        if (plan != null) 'plan': plan.toJson(),
       })));
 
   static Map<String, dynamic>? _root(Uint8List bytes) {
@@ -137,7 +142,8 @@ class BackupService {
         });
       }
       final fav = m['favorites'];
-      return BackupData(_at(m['at']), m['reason'] is String ? m['reason'] as String : '', recipes, photos, zipPath: zipPath, {
+      return BackupData(_at(m['at']), m['reason'] is String ? m['reason'] as String : '', recipes, photos,
+          zipPath: zipPath, plan: m['plan'] is Map ? MealPlan.fromJson(m['plan']) : null, {
         if (fav is List)
           for (final f in fav)
             if (f is String) f
@@ -259,6 +265,7 @@ class BackupService {
     required DateTime at,
     required Future<Uint8List?> Function(Recipe r, String photoId) photo,
     File? protect,
+    MealPlan? plan,
   }) async {
     final d = await _dir(user);
     var f = File('${d.path}/${zipName(at)}');
@@ -272,7 +279,7 @@ class BackupService {
     try {
       final live = [for (final r in recipes) if (!r.deleted) r];
       enc.addArchiveFile(
-          ArchiveFile.bytes('backup.json', encode(recipes: live, photos: const {}, favorites: favorites, reason: reason, at: at)));
+          ArchiveFile.bytes('backup.json', encode(recipes: live, photos: const {}, favorites: favorites, reason: reason, at: at, plan: plan)));
       final done = <String>{};
       for (final r in live) {
         for (final p in r.photoIds) {

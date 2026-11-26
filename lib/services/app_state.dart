@@ -220,7 +220,7 @@ class AppState extends ChangeNotifier {
     Set<String> ids(Object? v) => {if (v is List) for (final e in v) '$e'};
     favRecipes = ids(settings?['favRecipes']);
     favGroups = ids(settings?['favGroups']);
-    startOnFavorites = settings?['start'] == 'favorites';
+    startOnFavorites = settings?['start'] == 'plan'; // pagina iniziale: la pianificazione
     purchasedPro = settings?['pro'] == true;
     photos.downloader = (book, id) => isCloud ? sync.downloadPhoto(book, id) : Future.value(null);
     notifyListeners();
@@ -536,7 +536,7 @@ class AppState extends ChangeNotifier {
         'sortNewest': sortNewestFirst,
         'favRecipes': favRecipes.toList(),
         'favGroups': favGroups.toList(),
-        if (startOnFavorites) 'start': 'favorites',
+        if (startOnFavorites) 'start': 'plan',
         if (purchasedPro) 'pro': true,
       });
 
@@ -767,6 +767,7 @@ class AppState extends ChangeNotifier {
         s.storageKey,
         recipes: data.recipes.where((r) => !r.deleted).toList(),
         favorites: Set<String>.of(favRecipes),
+        plan: data.plan,
         reason: reason,
         at: DateTime.now(),
         photo: (r, p) => photos.load(p, bookId: bookOf(r)).timeout(const Duration(seconds: 30)),
@@ -822,10 +823,69 @@ class AppState extends ChangeNotifier {
         n++;
       } catch (_) {}
     }
-    if (n > 0) {
+    // Pianificazione: si riprendono i giorni che oggi sono vuoti (quelli già pianificati restano come sono).
+    final plan = b.plan;
+    if (plan != null) {
+      for (final d in plan.days.entries) {
+        if (data.plan.days.containsKey(d.key)) continue;
+        data.plan.days[d.key] = {for (final m in d.value.entries) m.key: List.of(m.value)};
+      }
+      data.plan.extraMeals.addAll(plan.extraMeals);
+      await _persist();
+    }
+    if (n > 0 || plan != null) {
       await _writeSettings();
       notifyListeners();
     }
     return n;
+  }
+
+  // ---- Pianificazione dei pasti ----
+
+  MealPlan get plan => data.plan;
+
+  Future<void> _savePlan() async {
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> planAdd(String day, Meal meal, PlanEntry e) {
+    data.plan.add(day, meal, e);
+    return _savePlan();
+  }
+
+  Future<void> planRemove(String day, Meal meal, int index) {
+    data.plan.remove(day, meal, index);
+    return _savePlan();
+  }
+
+  Future<void> planSetServings(String day, Meal meal, int index, int servings) {
+    final l = data.plan.days[day]?[meal];
+    if (l != null && index >= 0 && index < l.length) l[index].servings = servings.clamp(1, 99);
+    return _savePlan();
+  }
+
+  /// Colazione e spuntini in più (pranzo e cena ci sono sempre).
+  Future<void> setExtraMeal(Meal meal, bool on) {
+    if (baseMeals.contains(meal)) return Future.value();
+    on ? data.plan.extraMeals.add(meal) : data.plan.extraMeals.remove(meal);
+    return _savePlan();
+  }
+
+  /// Svuota i 7 giorni dal lunedì [start].
+  Future<void> planClearWeek(DateTime start) {
+    for (var i = 0; i < 7; i++) {
+      data.plan.days.remove(planDay(start.add(Duration(days: i))));
+    }
+    return _savePlan();
+  }
+
+  /// Aggiunge le voci (per esempio da un file Excel); i pasti in più usati si attivano.
+  Future<void> planImport(List<({String day, Meal meal, PlanEntry entry})> entries) {
+    for (final e in entries) {
+      data.plan.add(e.day, e.meal, e.entry);
+      if (!baseMeals.contains(e.meal)) data.plan.extraMeals.add(e.meal);
+    }
+    return _savePlan();
   }
 }

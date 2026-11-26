@@ -10,19 +10,22 @@ import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
 import '../services/photo_tools.dart';
+import '../services/excel_form.dart';
 import '../services/recipe_import.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'pro_screen.dart';
 
-/// Sceglie un file di ricette (`.json`) e apre l'anteprima dell'importazione.
+/// Sceglie un file di ricette (`.json` o il modulo Excel `.xlsx`) e apre l'anteprima dell'importazione.
 Future<void> importRecipesFlow(BuildContext context, {String? bookId}) async {
   List<ImportedRecipe> items;
   try {
-    final res = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: const ['json', 'txt']);
+    final res = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: const ['json', 'txt', 'xlsx']);
     final path = res?.files.single.path;
     if (path == null) return;
-    items = RecipeImport.parse(await File(path).readAsString());
+    items = path.toLowerCase().endsWith('.xlsx')
+        ? ExcelForm.importRecipes(await File(path).readAsBytes())
+        : RecipeImport.parse(await File(path).readAsString());
   } catch (_) {
     if (context.mounted) showSnack(context, tr('import.badFile'));
     return;
@@ -37,7 +40,7 @@ Future<void> importRecipesFlow(BuildContext context, {String? bookId}) async {
 
 /// Esporta un ricettario (Le mie o un gruppo) in un file `.json` con le foto, da condividere o
 /// conservare come copia; si reimporta con [importRecipesFlow].
-Future<void> exportRecipesFlow(BuildContext context) async {
+Future<void> exportRecipesFlow(BuildContext context, {bool excel = false}) async {
   final List<FamilyGroup> groups = appState.isCloud ? appState.data.groups : const [];
   String? book = '';
   if (groups.isNotEmpty) {
@@ -60,6 +63,11 @@ Future<void> exportRecipesFlow(BuildContext context) async {
     return;
   }
   final name = book.isEmpty ? tr('book.mine') : groups.firstWhere((g) => g.id == book).name;
+  if (excel) {
+    await _shareXlsx(context, ExcelForm.export(list), 'ricettario-$name',
+        trn('export.shareText', list.length, {'name': name}));
+    return;
+  }
   try {
     final photos = <String, Uint8List>{};
     for (final r in list) {
@@ -76,6 +84,25 @@ Future<void> exportRecipesFlow(BuildContext context) async {
     await SharePlus.instance.share(ShareParams(
       files: [XFile(file.path, mimeType: 'application/json')],
       text: trn('export.shareText', list.length, {'name': name}),
+    ));
+  } catch (_) {
+    if (context.mounted) showSnack(context, tr('export.failed'));
+  }
+}
+
+/// Modulo Excel vuoto (con una ricetta d'esempio) da compilare al computer e importare.
+Future<void> excelTemplateFlow(BuildContext context) =>
+    _shareXlsx(context, ExcelForm.template(), 'FamilyRecipes-modulo', tr('xls.templateShare'));
+
+Future<void> _shareXlsx(BuildContext context, Uint8List bytes, String name, String text) async {
+  try {
+    final safe = name.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
+    final day = DateTime.now().toIso8601String().substring(0, 10);
+    final file = File('${(await getTemporaryDirectory()).path}/${safe.isEmpty ? 'FamilyRecipes' : safe}-$day.xlsx');
+    await file.writeAsBytes(bytes, flush: true);
+    await SharePlus.instance.share(ShareParams(
+      files: [XFile(file.path, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')],
+      text: text,
     ));
   } catch (_) {
     if (context.mounted) showSnack(context, tr('export.failed'));

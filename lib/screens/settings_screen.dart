@@ -100,6 +100,18 @@ class SettingsScreen extends StatelessWidget {
                       onTap: () => exportRecipesFlow(context),
                     ),
                     ListTile(
+                      leading: const Icon(Icons.table_chart_outlined),
+                      title: Text(tr('xls.export')),
+                      subtitle: Text(tr('xls.exportInfo')),
+                      onTap: () => exportRecipesFlow(context, excel: true),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.grid_on_outlined),
+                      title: Text(tr('xls.template')),
+                      subtitle: Text(tr('xls.templateInfo')),
+                      onTap: () => excelTemplateFlow(context),
+                    ),
+                    ListTile(
                       leading: const Icon(Icons.settings_backup_restore),
                       title: Text(tr('backup.title')),
                       subtitle: Text(tr('backup.subtitle')),
@@ -428,7 +440,7 @@ class SettingsScreen extends StatelessWidget {
           showSelectedIcon: false,
           segments: [
             ButtonSegment(value: false, icon: const Icon(Icons.edit_note), label: Text(tr('tab.mine'))),
-            ButtonSegment(value: true, icon: const Icon(Icons.star_outline), label: Text(tr('tab.fav'))),
+            ButtonSegment(value: true, icon: const Icon(Icons.calendar_month_outlined), label: Text(tr('tab.plan'))),
           ],
           selected: {appState.startOnFavorites},
           onSelectionChanged: (sel) => appState.setStartOnFavorites(sel.first),

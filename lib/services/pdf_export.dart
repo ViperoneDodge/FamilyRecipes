@@ -8,6 +8,7 @@ import 'package:printing/printing.dart';
 
 import '../l10n.dart';
 import '../models.dart';
+import 'shopping_list.dart';
 import '../widgets/common.dart' show fmtDate;
 
 /// Carica i byte di una foto della ricetta (telefono o cloud).
@@ -138,6 +139,122 @@ class PdfExport {
         build: (ctx) => _recipe(r, images, hand, lookup),
       ));
     }
+    return doc.save();
+  }
+
+  /// PDF della settimana: tabella giorni × pasti e lista della spesa (con le caselle da spuntare).
+  static Future<Uint8List> buildWeek({
+    required String title,
+    required DateTime start,
+    required List<Meal> meals,
+    required MealPlan plan,
+    required Recipe? Function(String id) byId,
+    required List<ShoppingItem> shopping,
+    bool includePlan = true,
+  }) async {
+    final base = await _asset('NotoSans-Regular.ttf');
+    final bold = await _asset('NotoSans-Bold.ttf');
+    final hand = _latin.contains(L10n.code) ? await _asset('PatrickHand-Regular.ttf') : bold;
+    final theme = pw.ThemeData.withFont(base: base, bold: bold, fontFallback: await _fallback());
+    final doc = pw.Document(title: title, creator: 'FamilyRecipes', theme: theme);
+    pw.PageTheme pageTheme(PdfPageFormat f) => pw.PageTheme(
+          pageFormat: f,
+          margin: const pw.EdgeInsets.fromLTRB(30, 28, 30, 28),
+          buildBackground: (ctx) => pw.FullPage(ignoreMargins: true, child: pw.Container(color: _paper)),
+        );
+    pw.Widget footer(pw.Context ctx) => pw.Container(
+          alignment: pw.Alignment.centerRight,
+          margin: const pw.EdgeInsets.only(top: 6),
+          child: pw.Text('$title · ${ctx.pageNumber} / ${ctx.pagesCount}',
+              style: const pw.TextStyle(fontSize: 8, color: _muted)),
+        );
+    final days = [for (var i = 0; i < 7; i++) start.add(Duration(days: i))];
+    final dayFmt = DateFormat('EEE d', L10n.code);
+    String dayLabel(DateTime d) {
+      try {
+        return dayFmt.format(d);
+      } catch (_) {
+        return fmtDate(d);
+      }
+    }
+
+    if (includePlan) {
+      doc.addPage(pw.MultiPage(
+        pageTheme: pageTheme(PdfPageFormat.a4.landscape),
+        footer: footer,
+        build: (ctx) => [
+          pw.Text(title, style: pw.TextStyle(font: hand, fontSize: 28, color: _accent)),
+          pw.SizedBox(height: 8),
+          pw.Table(
+            border: pw.TableBorder.all(color: _line, width: 0.8),
+            columnWidths: {0: const pw.FixedColumnWidth(70)},
+            defaultVerticalAlignment: pw.TableCellVerticalAlignment.top,
+            children: [
+              pw.TableRow(decoration: const pw.BoxDecoration(color: _line), children: [
+                pw.SizedBox(),
+                for (final d in days)
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(dayLabel(d), style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _ink)),
+                  ),
+              ]),
+              for (final m in meals)
+                pw.TableRow(children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(4),
+                    child: pw.Text(mealLabel(m), style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: _accent)),
+                  ),
+                  for (final d in days)
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(4),
+                      child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                        for (final e in plan.entries(planDay(d), m))
+                          if (byId(e.recipeId) case final r?)
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.only(bottom: 3),
+                              child: pw.Text('${r.displayTitle} (${e.servings})', style: const pw.TextStyle(fontSize: 8.5, color: _ink)),
+                            ),
+                      ]),
+                    ),
+                ]),
+            ],
+          ),
+          pw.SizedBox(height: 6),
+          pw.Text(tr('plan.pdfNote'), style: const pw.TextStyle(fontSize: 8, color: _muted)),
+        ],
+      ));
+    }
+    doc.addPage(pw.MultiPage(
+      pageTheme: pageTheme(PdfPageFormat.a4),
+      footer: footer,
+      build: (ctx) => [
+        pw.Text(tr('shop.title'), style: pw.TextStyle(font: hand, fontSize: 28, color: _accent)),
+        pw.Text(title, style: const pw.TextStyle(fontSize: 10, color: _muted)),
+        pw.SizedBox(height: 10),
+        if (shopping.isEmpty) pw.Text(tr('shop.empty'), style: _body),
+        for (final i in shopping)
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(vertical: 5),
+            decoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: _line, width: 0.6))),
+            child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+              pw.Container(
+                width: 10,
+                height: 10,
+                margin: const pw.EdgeInsets.only(top: 2, right: 8),
+                decoration: pw.BoxDecoration(border: pw.Border.all(color: _muted, width: 0.8)),
+              ),
+              pw.Expanded(
+                child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                  pw.Text(i.name, style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold, color: _ink)),
+                  pw.Text(i.recipes.join(', '), style: const pw.TextStyle(fontSize: 8, color: _muted)),
+                ]),
+              ),
+              pw.SizedBox(width: 8),
+              pw.Text(i.amountText, style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold, color: _ink)),
+            ]),
+          ),
+      ],
+    ));
     return doc.save();
   }
 
