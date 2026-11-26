@@ -88,10 +88,17 @@ void main() {
       expect(eggs([Ingredient(name: 'Egg yolks', amount: '2'), Ingredient(name: 'eggs', amount: '2')]), 4);
       expect(eggs([Ingredient(name: 'Eigelb', amount: '3'), Ingredient(name: 'Eiweiß', amount: '1')]), 3);
     });
-    test('albumi a peso restano una voce a sé', () {
-      final r = Recipe(id: 'x', title: 'Meringhe', servings: 4, ingredients: [Ingredient(name: 'Albumi', amount: '120 g')]);
-      final l = ShoppingList.build([PlanEntry(recipeId: 'x', servings: 4)], (_) => r);
-      expect(l.single.amounts, ['120 g']);
+    test('a peso: uovo medio 50 g, tuorlo 18 g, albume 32 g, arrotondando per eccesso', () {
+      // 120 g di albumi = 3,75 → 4 uova
+      expect(eggs([Ingredient(name: 'Albumi', amount: '120 g')]), 4);
+      // 100 g di uova intere = 2 uova; più 3 tuorli = 5
+      expect(eggs([Ingredient(name: 'Uova', amount: '100 g'), Ingredient(name: 'Tuorli', amount: '3')]), 5);
+      // 40 g di tuorli = 2,2 tuorli; 3 albumi → 3 uova
+      expect(eggs([Ingredient(name: 'Tuorli', amount: '40 g'), Ingredient(name: 'Albumi', amount: '3')]), 3);
+      // 0,25 kg di albumi = 7,8 → 8
+      expect(eggs([Ingredient(name: 'Albumi', amount: '0,25 kg')]), 8);
+      // 100 ml di albume = 3,1 → 4
+      expect(eggs([Ingredient(name: 'Albume', amount: '100 ml')]), 4);
     });
   });
 

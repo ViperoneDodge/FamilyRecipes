@@ -74,6 +74,10 @@ class ShoppingList {
   static const List<String> _white = ['albume', 'albumi', 'bianco d uovo', 'bianchi d uovo', 'egg white', 'blanc', 'eiweiss', 'clara'];
   static const List<String> _whole = ['uovo', 'uova', 'egg', 'eggs', 'oeuf', 'oeufs', 'ei', 'eier', 'huevo', 'huevos', 'ovo', 'ovos'];
 
+  /// Peso medio (g, senza guscio) di un uovo medio: intero, tuorlo, albume. Servono per le dosi a peso
+  /// ("120 g di albumi" = 4 albumi, arrotondando per eccesso).
+  static const Map<String, double> eggGrams = {'e': 50, 'y': 18, 'w': 32};
+
   /// "y" tuorli, "w" albumi, "e" uova intere; null se non sono uova.
   static String? _eggKind(String folded) {
     final t = folded.replaceAll(RegExp(r"[^a-z0-9 ]+"), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
@@ -134,9 +138,12 @@ class ShoppingList {
         if (egg != null) {
           final p = DoseScaler.parse(amount.isEmpty ? '1' : amount);
           final unit = p == null ? null : _units[p.rest.split(RegExp(r'\s+')).first.toLowerCase()];
-          // Uova contate (non a peso: "100 g di albumi" resta una voce a sé).
-          if (p != null && (unit == null || unit.$1 == '')) {
-            final n = p.value * factor;
+          // Uova contate, oppure a peso/volume ("120 g di albumi", "100 ml di albumi") convertite con il
+          // peso medio di un uovo medio.
+          final byWeight = unit != null && (unit.$1 == 'g' || unit.$1 == 'ml');
+          if (p != null && (unit == null || unit.$1 == '' || byWeight)) {
+            var n = p.value * factor;
+            if (byWeight) n = n * unit.$2 / eggGrams[egg]!;
             if (egg == 'y') {
               yolks += n;
             } else if (egg == 'w') {
