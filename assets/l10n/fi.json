@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Kuullota sipuli, lisää perunakuutiot ja peitä kuumalla vedellä.",
  "xls.exampleStep2": "Kun perunat ovat pehmeitä, lisää pasta ja keitä sekoittaen.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Tarkista ruokakomerosta",
+ "shop.eggs": "Kananmunat",
+ "shop.exportPdf": "Vie PDF",
+ "shop.exportExcel": "Vie Excel"
 }

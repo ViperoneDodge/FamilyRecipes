@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Zeszklij cebulę, dodaj ziemniaki w kostkę i zalej gorącą wodą.",
  "xls.exampleStep2": "Gdy ziemniaki zmiękną, dodaj makaron i gotuj, mieszając.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Sprawdź w spiżarni",
+ "shop.eggs": "Jajka",
+ "shop.exportPdf": "Eksportuj PDF",
+ "shop.exportExcel": "Eksportuj Excel"
 }

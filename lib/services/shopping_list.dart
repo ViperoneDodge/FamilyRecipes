@@ -18,7 +18,11 @@ class ShoppingItem {
   /// Volte in cui compare nel piano (stesso piatto in giorni diversi conta più volte).
   final int uses;
 
-  const ShoppingItem(this.name, this.amounts, this.notes, this.recipes, this.uses);
+  /// Voce unica della dispensa (sale, spezie, olio, aceto, acqua…): [recipes] contiene gli ingredienti
+  /// da controllare, senza quantità.
+  final bool pantry;
+
+  const ShoppingItem(this.name, this.amounts, this.notes, this.recipes, this.uses, {this.pantry = false});
 
   String get amountText => [...amounts, ...notes].join(' + ');
 }
@@ -41,12 +45,61 @@ class ShoppingList {
     'cup': ('cup', 1), 'cups': ('cup', 1), 'pz': ('', 1), 'pz.': ('', 1), 'pezzi': ('', 1), 'pezzo': ('', 1),
   };
 
+  // Dispensa: si controllano, non si sommano (parole intere, anche nelle lingue più comuni).
+  static const Set<String> _pantryWords = {
+    'sale', 'pepe', 'acqua', 'olio', 'aceto', 'spezie', 'origano', 'cannella', 'noce moscata', 'paprika', 'curry',
+    'cumino', 'curcuma', 'peperoncino', 'chiodi di garofano', 'chiodo di garofano', 'alloro', 'timo', 'zafferano',
+    'zenzero in polvere', 'coriandolo', 'finocchietto', 'semi di finocchio',
+    'salt', 'pepper', 'water', 'oil', 'vinegar', 'spices', 'oregano', 'cinnamon', 'nutmeg', 'cumin', 'turmeric',
+    'chili flakes', 'cloves', 'bay leaf', 'bay leaves', 'thyme', 'saffron', 'sel', 'poivre', 'eau', 'huile',
+    'vinaigre', 'salz', 'pfeffer', 'wasser', 'ol', 'essig', 'sal', 'pimienta', 'agua', 'aceite', 'vinagre',
+    'pimenta', 'azeite', 'oleo',
+  };
+
+  static bool _isPantry(String folded) {
+    final words = folded.split(RegExp(r"[^a-z0-9à-ÿ]+")).where((w) => w.isNotEmpty).toList();
+    final joined = ' ${words.join(' ')} ';
+    // "pepe nero", "olio extravergine", "sale grosso" sì; "peperoni", "insalata" no.
+    for (final w in _pantryWords) {
+      if (joined.startsWith(' $w ')) return true;
+    }
+    // "un pizzico di sale", "olio e aceto": anche se la parola non è la prima ma il nome è corto.
+    return words.length <= 4 && words.every((w) => _pantryWords.contains(w) || _glue.contains(w));
+  }
+
+  static const Set<String> _glue = {'e', 'di', 'q', 'b', 'qb', 'and', 'of', 'et', 'de', 'und', 'y', 'un', 'pizzico'};
+
+  // Uova: intere, tuorli e albumi (parole iniziali, in più lingue).
+  static const List<String> _yolk = ['tuorl', 'rosso d uovo', 'rossi d uovo', 'yolk', 'egg yolk', 'jaune', 'eigelb', 'yema', 'gema'];
+  static const List<String> _white = ['albume', 'albumi', 'bianco d uovo', 'bianchi d uovo', 'egg white', 'blanc', 'eiweiss', 'clara'];
+  static const List<String> _whole = ['uovo', 'uova', 'egg', 'eggs', 'oeuf', 'oeufs', 'ei', 'eier', 'huevo', 'huevos', 'ovo', 'ovos'];
+
+  /// "y" tuorli, "w" albumi, "e" uova intere; null se non sono uova.
+  static String? _eggKind(String folded) {
+    final t = folded.replaceAll(RegExp(r"[^a-z0-9 ]+"), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    bool starts(List<String> ws) => ws.any((w) => t == w || t.startsWith('$w ') || t.startsWith(w) && w.length > 4);
+    if (starts(_yolk)) return 'y';
+    if (starts(_white)) return 'w';
+    final first = t.split(' ').first;
+    if (_whole.contains(first)) return 'e';
+    return null;
+  }
+
   /// [plan]: le voci della settimana; [recipeById]: le ricette (quelle che non ci sono più si saltano).
+  /// Le uova si contano insieme a tuorli e albumi (4 tuorli e 3 albumi = 4 uova; 4 uova e 3 tuorli = 7);
+  /// sale, spezie, olio, aceto e acqua vanno in una sola voce [pantryLabel] da controllare.
   static List<ShoppingItem> build(
     List<PlanEntry> plan,
     Recipe? Function(String id) recipeById, {
     bool comma = true,
+    String pantryLabel = 'Dispensa',
+    String eggsLabel = 'Uova',
   }) {
+    final pantry = <String, String>{}; // chiave → nome come scritto
+    final pantryRecipes = <String>{};
+    var whole = 0.0, yolks = 0.0, whites = 0.0;
+    final eggRecipes = <String>{};
+    var eggUses = 0;
     final totals = <String, Map<String, double>>{}; // nome → unità → quantità
     final unitLabel = <String, String>{}; // "nome|unità" → come scriverla (la prima incontrata)
     final notes = <String, Set<String>>{};
@@ -72,6 +125,30 @@ class ShoppingList {
         }
         final key = _key(name);
         if (key.isEmpty) continue;
+        if (_isPantry(key)) {
+          pantry.putIfAbsent(key, () => name[0].toUpperCase() + name.substring(1));
+          pantryRecipes.add(r.displayTitle);
+          continue;
+        }
+        final egg = _eggKind(key);
+        if (egg != null) {
+          final p = DoseScaler.parse(amount.isEmpty ? '1' : amount);
+          final unit = p == null ? null : _units[p.rest.split(RegExp(r'\s+')).first.toLowerCase()];
+          // Uova contate (non a peso: "100 g di albumi" resta una voce a sé).
+          if (p != null && (unit == null || unit.$1 == '')) {
+            final n = p.value * factor;
+            if (egg == 'y') {
+              yolks += n;
+            } else if (egg == 'w') {
+              whites += n;
+            } else {
+              whole += n;
+            }
+            eggRecipes.add(r.displayTitle);
+            eggUses++;
+            continue;
+          }
+        }
         if (!names.containsKey(key)) {
           names[key] = name[0].toUpperCase() + name.substring(1);
           order.add(key);
@@ -100,7 +177,9 @@ class ShoppingList {
       }
     }
 
+    final eggs = (whole + (yolks > whites ? yolks : whites) - 1e-9).ceil();
     return [
+      if (eggUses > 0) ShoppingItem(eggsLabel, ['$eggs'], const [], eggRecipes.toList(), eggUses),
       for (final k in order)
         ShoppingItem(
           names[k]!,
@@ -112,7 +191,13 @@ class ShoppingList {
           (recipes[k] ?? const <String>{}).toList(),
           uses[k] ?? 0,
         ),
-    ]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    ]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()))
+      // La dispensa per ultima: è un promemoria, non qualcosa da comprare per forza.
+      ..addAll([
+        if (pantry.isNotEmpty)
+          ShoppingItem(pantryLabel, const [], const [], (pantry.values.toList()..sort()), pantryRecipes.length, pantry: true),
+      ]);
   }
 
   static String _key(String name) => foldForSearch(name).trim();

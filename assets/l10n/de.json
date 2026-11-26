@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Zwiebel anbraten, Kartoffelwürfel dazugeben und mit heißem Wasser bedecken.",
  "xls.exampleStep2": "Wenn die Kartoffeln weich sind, Nudeln dazugeben und unter Rühren garen.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Im Vorrat prüfen",
+ "shop.eggs": "Eier",
+ "shop.exportPdf": "PDF exportieren",
+ "shop.exportExcel": "Excel exportieren"
 }

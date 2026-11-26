@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Apcep sīpolu, pievieno kartupeļu kubiņus un pārlej ar karstu ūdeni.",
  "xls.exampleStep2": "Kad kartupeļi ir mīksti, pievieno makaronus un vāri, maisot.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Pārbaudi pieliekamajā",
+ "shop.eggs": "Olas",
+ "shop.exportPdf": "Eksportēt PDF",
+ "shop.exportExcel": "Eksportēt Excel"
 }

@@ -76,25 +76,31 @@ class _PlannerTabState extends State<PlannerTab> {
             IconButton(tooltip: tr('plan.nextWeek'), icon: const Icon(Icons.chevron_right), onPressed: () => _move(1)),
           ]),
           Wrap(alignment: WrapAlignment.center, spacing: 6, runSpacing: 6, children: [
-            FilledButton.tonalIcon(
+            FilledButton.icon(
               onPressed: () => Navigator.of(context)
                   .push(MaterialPageRoute(builder: (_) => ShoppingScreen(start: _start))),
               icon: const Icon(Icons.shopping_cart_outlined),
               label: Text(tr('shop.title')),
             ),
+            OutlinedButton.icon(
+              onPressed: () => _sharePdf(context, _start),
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              label: const Text('PDF'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _shareExcel(context, _start),
+              icon: const Icon(Icons.table_chart_outlined),
+              label: const Text('Excel'),
+            ),
             PopupMenuButton<String>(
               tooltip: tr('plan.more'),
               onSelected: (v) => switch (v) {
-                'pdf' => _sharePdf(context, _start),
-                'xlsx' => _shareExcel(context, _start),
                 'import' => _importExcel(context),
                 'meals' => _chooseMeals(context),
                 'clear' => _clear(context),
                 _ => null,
               },
               itemBuilder: (_) => [
-                PopupMenuItem(value: 'pdf', child: _menuRow(Icons.picture_as_pdf_outlined, tr('plan.pdf'))),
-                PopupMenuItem(value: 'xlsx', child: _menuRow(Icons.table_chart_outlined, tr('plan.excel'))),
                 PopupMenuItem(value: 'import', child: _menuRow(Icons.file_open_outlined, tr('plan.importExcel'))),
                 PopupMenuItem(value: 'meals', child: _menuRow(Icons.tune, tr('plan.meals'))),
                 PopupMenuItem(value: 'clear', child: _menuRow(Icons.delete_sweep_outlined, tr('plan.clear'))),
@@ -335,8 +341,13 @@ Future<int?> askServings(BuildContext context, int initial) {
   );
 }
 
-List<ShoppingItem> _shopping(DateTime start) =>
-    ShoppingList.build([for (final e in _weekEntries(start)) e.entry], appState.recipeById, comma: _comma);
+List<ShoppingItem> _shopping(DateTime start) => ShoppingList.build(
+      [for (final e in _weekEntries(start)) e.entry],
+      appState.recipeById,
+      comma: _comma,
+      pantryLabel: tr('shop.pantry'),
+      eggsLabel: tr('shop.eggs'),
+    );
 
 Future<void> _sharePdf(BuildContext context, DateTime start, {bool includePlan = true}) async {
   showSnack(context, tr('pdf.creating'));
@@ -389,18 +400,32 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
     return TableclothBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(title: Text(tr('shop.title')), actions: [
-          IconButton(
-            tooltip: tr('pdf.export'),
-            icon: const Icon(Icons.picture_as_pdf_outlined),
-            onPressed: () => _sharePdf(context, widget.start, includePlan: false),
-          ),
-          IconButton(
-            tooltip: tr('plan.excel'),
-            icon: const Icon(Icons.table_chart_outlined),
-            onPressed: () => _shareExcel(context, widget.start),
-          ),
-        ]),
+        appBar: AppBar(title: Text(tr('shop.title'))),
+        // Esportazione sempre in vista, in basso.
+        bottomNavigationBar: items.isEmpty
+            ? null
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+                  child: Row(children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => _sharePdf(context, widget.start, includePlan: false),
+                        icon: const Icon(Icons.picture_as_pdf_outlined),
+                        label: FittedBox(child: Text(tr('shop.exportPdf'))),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton.tonalIcon(
+                        onPressed: () => _shareExcel(context, widget.start),
+                        icon: const Icon(Icons.table_chart_outlined),
+                        label: FittedBox(child: Text(tr('shop.exportExcel'))),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
         body: NotebookPage(
           child: ListView(padding: const EdgeInsets.fromLTRB(4, 8, 10, 24), children: [
             Text(weekTitle(widget.start),
@@ -416,8 +441,10 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                     style: TextStyle(
                         decoration: _done.contains(i.name) ? TextDecoration.lineThrough : null,
                         fontWeight: FontWeight.w600)),
-                subtitle: Text(i.recipes.join(', '), maxLines: 2, overflow: TextOverflow.ellipsis),
-                secondary: Text(i.amountText, style: const TextStyle(fontWeight: FontWeight.w700)),
+                subtitle: Text(i.recipes.join(', '), maxLines: i.pantry ? 6 : 2, overflow: TextOverflow.ellipsis),
+                secondary: i.pantry
+                    ? Icon(Icons.kitchen_outlined, color: scheme.onSurfaceVariant)
+                    : Text(i.amountText, style: const TextStyle(fontWeight: FontWeight.w700)),
               ),
           ]),
         ),

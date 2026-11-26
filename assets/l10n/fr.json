@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Fais revenir l'oignon, ajoute les pommes de terre en dés et couvre d'eau chaude.",
  "xls.exampleStep2": "Quand les pommes de terre sont tendres, ajoute les pâtes et fais cuire en remuant.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "À vérifier dans le placard",
+ "shop.eggs": "Œufs",
+ "shop.exportPdf": "Exporter en PDF",
+ "shop.exportExcel": "Exporter en Excel"
 }

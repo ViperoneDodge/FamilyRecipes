@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Aloura a cebola, junta as batatas em cubos e cobre com água quente.",
  "xls.exampleStep2": "Quando as batatas estiverem macias junta a massa e coze mexendo.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Verificar na despensa",
+ "shop.eggs": "Ovos",
+ "shop.exportPdf": "Exportar PDF",
+ "shop.exportExcel": "Exportar Excel"
 }

@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Обжарь лук, добавь картофель кубиками и залей горячей водой.",
  "xls.exampleStep2": "Когда картофель станет мягким, добавь пасту и вари, помешивая.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Проверить в кладовой",
+ "shop.eggs": "Яйца",
+ "shop.exportPdf": "Экспорт в PDF",
+ "shop.exportExcel": "Экспорт в Excel"
 }

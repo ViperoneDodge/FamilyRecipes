@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Călește ceapa, adaugă cartofii tăiați cubulețe și acoperă cu apă fierbinte.",
  "xls.exampleStep2": "Când cartofii sunt moi adaugă pastele și fierbe amestecând.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "De verificat în cămară",
+ "shop.eggs": "Ouă",
+ "shop.exportPdf": "Exportă PDF",
+ "shop.exportExcel": "Exportă Excel"
 }

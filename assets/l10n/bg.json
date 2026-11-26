@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Запържи лука, добави картофите на кубчета и залей с гореща вода.",
  "xls.exampleStep2": "Когато картофите омекнат, добави пастата и вари при разбъркване.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Провери в килера",
+ "shop.eggs": "Яйца",
+ "shop.exportPdf": "Експорт в PDF",
+ "shop.exportExcel": "Експорт в Excel"
 }

@@ -233,6 +233,12 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
   Ricette) e la settimana (Pianificazione → altre azioni).
 - **Preferiti**: dalla stella in alto in «Le mie» e «Gruppi»; la pagina iniziale può essere la Pianificazione.
 
+## Versione 1.11.1
+- **Lista della spesa**: sale, pepe, spezie, acqua, olio e aceto in una sola voce «Da controllare in dispensa»
+  (senza quantità, in fondo). Uova contate insieme a tuorli e albumi: uova intere + il maggiore tra tuorli e
+  albumi, arrotondato all'uovo intero (4 tuorli e 3 albumi = 4; 4 tuorli e 6 albumi = 6; 4 uova e 3 tuorli = 7).
+- **Esportazione in vista**: pulsanti PDF ed Excel nella Pianificazione e in basso nella lista della spesa.
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

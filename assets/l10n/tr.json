@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Soğanı kavur, küp doğranmış patatesleri ekle ve sıcak suyla kapat.",
  "xls.exampleStep2": "Patatesler yumuşayınca makarnayı ekle ve karıştırarak pişir.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Kilerde kontrol et",
+ "shop.eggs": "Yumurta",
+ "shop.exportPdf": "PDF olarak aktar",
+ "shop.exportExcel": "Excel olarak aktar"
 }

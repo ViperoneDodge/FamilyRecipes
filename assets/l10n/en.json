@@ -584,5 +584,9 @@
  "xls.exampleIng1": "Mixed pasta",
  "xls.exampleIng2": "Potatoes",
  "xls.exampleStep1": "Brown the onion, add the diced potatoes and cover with hot water.",
- "xls.exampleStep2": "When the potatoes are soft add the pasta and cook, stirring."
+ "xls.exampleStep2": "When the potatoes are soft add the pasta and cook, stirring.",
+ "shop.pantry": "Check in the pantry",
+ "shop.eggs": "Eggs",
+ "shop.exportPdf": "Export PDF",
+ "shop.exportExcel": "Export Excel"
 }

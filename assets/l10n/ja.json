@@ -584,5 +584,9 @@
  "xls.exampleStep1": "玉ねぎを炒め、角切りのじゃがいもを加えて熱湯をかぶるまで注ぎます。",
  "xls.exampleStep2": "じゃがいもが柔らかくなったらパスタを加え、混ぜながら煮ます。",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "食品庫で確認",
+ "shop.eggs": "卵",
+ "shop.exportPdf": "PDF を書き出す",
+ "shop.exportExcel": "Excel を書き出す"
 }

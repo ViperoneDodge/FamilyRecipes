@@ -584,5 +584,9 @@
  "xls.exampleStep1": "ผัดหอมใหญ่ ใส่มันฝรั่งหั่นเต๋า แล้วเติมน้ำร้อนให้ท่วม",
  "xls.exampleStep2": "เมื่อมันฝรั่งนุ่มใส่พาสต้าแล้วต้มพร้อมคน",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "ตรวจในตู้กับข้าว",
+ "shop.eggs": "ไข่",
+ "shop.exportPdf": "ส่งออก PDF",
+ "shop.exportExcel": "ส่งออก Excel"
 }

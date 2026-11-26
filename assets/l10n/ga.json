@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Donnaigh an t-oinniún, cuir na prátaí diúsáilte leis agus clúdaigh le huisce te.",
  "xls.exampleStep2": "Nuair a bhíonn na prátaí bog cuir an pasta leis agus cócaráil, ag corraí.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Seiceáil sa chófra",
+ "shop.eggs": "Uibheacha",
+ "shop.exportPdf": "Easpórtáil PDF",
+ "shop.exportExcel": "Easpórtáil Excel"
 }

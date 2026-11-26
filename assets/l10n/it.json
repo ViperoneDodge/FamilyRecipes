@@ -584,5 +584,9 @@
  "xls.exampleIng1": "Pasta mista",
  "xls.exampleIng2": "Patate",
  "xls.exampleStep1": "Rosola la cipolla, aggiungi le patate a cubetti e copri con acqua calda.",
- "xls.exampleStep2": "Quando le patate sono morbide aggiungi la pasta e cuoci mescolando."
+ "xls.exampleStep2": "Quando le patate sono morbide aggiungi la pasta e cuoci mescolando.",
+ "shop.pantry": "Da controllare in dispensa",
+ "shop.eggs": "Uova",
+ "shop.exportPdf": "Esporta PDF",
+ "shop.exportExcel": "Esporta Excel"
 }

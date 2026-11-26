@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Popirjaj luk, dodaj krumpir na kockice i prelij vrućom vodom.",
  "xls.exampleStep2": "Kad krumpir omekša, dodaj tjesteninu i kuhaj uz miješanje.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Provjeri u smočnici",
+ "shop.eggs": "Jaja",
+ "shop.exportPdf": "Izvezi PDF",
+ "shop.exportExcel": "Izvezi Excel"
 }

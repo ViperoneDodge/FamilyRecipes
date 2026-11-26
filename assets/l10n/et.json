@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Prae sibul, lisa kuubikuteks lõigatud kartulid ja kata kuuma veega.",
  "xls.exampleStep2": "Kui kartulid on pehmed, lisa pasta ja keeda segades.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Kontrolli sahvrist",
+ "shop.eggs": "Munad",
+ "shop.exportPdf": "Ekspordi PDF",
+ "shop.exportExcel": "Ekspordi Excel"
 }

@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Opraž cibuľu, pridaj zemiaky na kocky a zalej horúcou vodou.",
  "xls.exampleStep2": "Keď sú zemiaky mäkké, pridaj cestoviny a var za stáleho miešania.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Skontrolovať v špajzi",
+ "shop.eggs": "Vajcia",
+ "shop.exportPdf": "Exportovať PDF",
+ "shop.exportExcel": "Exportovať Excel"
 }

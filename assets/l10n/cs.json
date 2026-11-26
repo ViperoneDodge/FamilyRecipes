@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Osmahni cibuli, přidej brambory na kostičky a zalij horkou vodou.",
  "xls.exampleStep2": "Když brambory změknou, přidej těstoviny a vař za stálého míchání.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Zkontrolovat ve spíži",
+ "shop.eggs": "Vejce",
+ "shop.exportPdf": "Exportovat PDF",
+ "shop.exportExcel": "Exportovat Excel"
 }

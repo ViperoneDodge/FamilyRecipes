@@ -584,5 +584,9 @@
  "xls.exampleStep1": "炒香洋葱，加入切丁的土豆，倒入热水没过。",
  "xls.exampleStep2": "土豆变软后加入意面，边搅拌边煮。",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "检查储藏柜",
+ "shop.eggs": "鸡蛋",
+ "shop.exportPdf": "导出 PDF",
+ "shop.exportExcel": "导出 Excel"
 }

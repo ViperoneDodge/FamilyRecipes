@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Dora la cebolla, añade las patatas en dados y cubre con agua caliente.",
  "xls.exampleStep2": "Cuando las patatas estén tiernas añade la pasta y cuece removiendo.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Revisar en la despensa",
+ "shop.eggs": "Huevos",
+ "shop.exportPdf": "Exportar PDF",
+ "shop.exportExcel": "Exportar Excel"
 }

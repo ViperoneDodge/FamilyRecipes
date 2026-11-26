@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Prepraži čebulo, dodaj na kocke narezan krompir in zalij z vročo vodo.",
  "xls.exampleStep2": "Ko je krompir mehak, dodaj testenine in kuhaj ob mešanju.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Preveri v shrambi",
+ "shop.eggs": "Jajca",
+ "shop.exportPdf": "Izvozi PDF",
+ "shop.exportExcel": "Izvozi Excel"
 }

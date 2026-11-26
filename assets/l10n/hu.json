@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Párold meg a hagymát, add hozzá a kockára vágott burgonyát, és öntsd fel forró vízzel.",
  "xls.exampleStep2": "Ha a burgonya megpuhult, add hozzá a tésztát, és kevergetve főzd.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Ellenőrizd a kamrában",
+ "shop.eggs": "Tojás",
+ "shop.exportPdf": "PDF exportálása",
+ "shop.exportExcel": "Excel exportálása"
 }

@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Fräs löken, tillsätt tärnad potatis och täck med hett vatten.",
  "xls.exampleStep2": "När potatisen är mjuk, tillsätt pastan och koka under omrörning.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Kolla i skafferiet",
+ "shop.eggs": "Ägg",
+ "shop.exportPdf": "Exportera PDF",
+ "shop.exportExcel": "Exportera Excel"
 }

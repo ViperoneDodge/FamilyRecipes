@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Fruit de ui, voeg de aardappelblokjes toe en bedek met heet water.",
  "xls.exampleStep2": "Als de aardappelen zacht zijn de pasta toevoegen en al roerend gaar koken.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Controleren in de voorraadkast",
+ "shop.eggs": "Eieren",
+ "shop.exportPdf": "PDF exporteren",
+ "shop.exportExcel": "Excel exporteren"
 }

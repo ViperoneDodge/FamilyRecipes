@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Обсмаж цибулю, додай картоплю кубиками й залий гарячою водою.",
  "xls.exampleStep2": "Коли картопля стане м'якою, додай пасту й вари, помішуючи.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Перевірити в коморі",
+ "shop.eggs": "Яйця",
+ "shop.exportPdf": "Експорт у PDF",
+ "shop.exportExcel": "Експорт в Excel"
 }

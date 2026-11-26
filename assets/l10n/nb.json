@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Fres løken, tilsett potetterninger og dekk med varmt vann.",
  "xls.exampleStep2": "Når potetene er myke, tilsett pastaen og kok under omrøring.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Sjekk i spiskammerset",
+ "shop.eggs": "Egg",
+ "shop.exportPdf": "Eksporter PDF",
+ "shop.exportExcel": "Eksporter Excel"
 }

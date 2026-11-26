@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Brun løget, tilsæt kartoffeltern og dæk med varmt vand.",
  "xls.exampleStep2": "Når kartoflerne er møre, tilsættes pastaen, og det koges under omrøring.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Tjek i spisekammeret",
+ "shop.eggs": "Æg",
+ "shop.exportPdf": "Eksportér PDF",
+ "shop.exportExcel": "Eksportér Excel"
 }

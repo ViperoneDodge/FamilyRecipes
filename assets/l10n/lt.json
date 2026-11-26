@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Pakepink svogūną, sudėk kubeliais supjaustytas bulves ir užpilk karštu vandeniu.",
  "xls.exampleStep2": "Kai bulvės suminkštės, sudėk makaronus ir virk maišydamas.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Patikrink sandėliuke",
+ "shop.eggs": "Kiaušiniai",
+ "shop.exportPdf": "Eksportuoti PDF",
+ "shop.exportExcel": "Eksportuoti Excel"
 }

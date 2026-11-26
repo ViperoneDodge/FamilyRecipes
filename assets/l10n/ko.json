@@ -584,5 +584,9 @@
  "xls.exampleStep1": "양파를 볶고 깍둑썬 감자를 넣은 뒤 뜨거운 물을 붓습니다.",
  "xls.exampleStep2": "감자가 부드러워지면 파스타를 넣고 저어 가며 익힙니다.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "팬트리에서 확인",
+ "shop.eggs": "달걀",
+ "shop.exportPdf": "PDF 내보내기",
+ "shop.exportExcel": "Excel 내보내기"
 }

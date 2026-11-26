@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Aqli l-basla, żid il-patata f'kubi u għattiha b'ilma sħun.",
  "xls.exampleStep2": "Meta l-patata tirtab żid l-għaġin u sajjar waqt li tħawwad.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Iċċekkja fil-kantina",
+ "shop.eggs": "Bajd",
+ "shop.exportPdf": "Esporta PDF",
+ "shop.exportExcel": "Esporta Excel"
 }

@@ -122,7 +122,8 @@ class ExcelForm {
     Recipe? Function(String id) byId, {
     bool comma = true,
   }) {
-    final shopping = ShoppingList.build([for (final p in plan) p.entry], byId, comma: comma);
+    final shopping = ShoppingList.build([for (final p in plan) p.entry], byId,
+        comma: comma, pantryLabel: tr('shop.pantry'), eggsLabel: tr('shop.eggs'));
     return Xlsx.write([
       _planSheet(plan, byId),
       XlsxSheet(tr('shop.title'), [

@@ -28,10 +28,12 @@ void main() {
     expect(patate.uses, 3);
     expect(patate.recipes, containsAll(['Pasta e patate', 'Patate al forno']));
     expect(list.firstWhere((i) => i.name == 'Pasta mista').amounts, ['480 g']);
-    expect(list.firstWhere((i) => i.name == 'Sale').amountText, 'q.b.');
-    expect(list.firstWhere((i) => i.name == 'Olio').amounts, ['4 cucchiai']);
+    // Sale e olio vanno nella voce della dispensa, da controllare.
+    expect(list.last.pantry, isTrue);
+    expect(list.last.recipes, ['Olio', 'Sale']);
     expect(list.firstWhere((i) => i.name == 'Rosmarino').amounts, ['2 rametto']);
-    expect(list.map((i) => i.name), orderedEquals([...list.map((i) => i.name)]..sort()));
+    final buy = list.where((i) => !i.pantry).map((i) => i.name).toList();
+    expect(buy, orderedEquals([...buy]..sort()));
   });
 
   test('lista della spesa: unità diverse dello stesso ingrediente restano separate, numeri senza unità', () {
@@ -60,5 +62,55 @@ void main() {
     expect(b.days, isEmpty);
     expect(planDay(weekStart(DateTime(2026, 12, 3))), '2026-11-30');
     expect(MealPlan.fromJson('rotto').days, isEmpty);
+  });
+
+  group('uova: intere, tuorli e albumi', () {
+    int eggs(List<Ingredient> ings, {int servings = 4, int planned = 4}) {
+      final r = Recipe(id: 'x', title: 'Dolce', servings: servings, ingredients: ings);
+      final l = ShoppingList.build([PlanEntry(recipeId: 'x', servings: planned)], (_) => r, eggsLabel: 'Uova');
+      return int.parse(l.firstWhere((i) => i.name == 'Uova').amounts.single);
+    }
+
+    test('4 tuorli e 3 albumi = 4 uova', () {
+      expect(eggs([Ingredient(name: 'Tuorli', amount: '4'), Ingredient(name: 'Albumi', amount: '3')]), 4);
+    });
+    test('4 tuorli e 6 albumi = 6 uova', () {
+      expect(eggs([Ingredient(name: 'tuorli d\'uovo', amount: '4'), Ingredient(name: '', amount: '6 albumi')]), 6);
+    });
+    test('4 uova e 3 tuorli = 7 uova', () {
+      expect(eggs([Ingredient(name: 'Uova', amount: '4'), Ingredient(name: 'Tuorlo', amount: '3')]), 7);
+    });
+    test('mezze dosi: si arrotonda all\'uovo intero', () {
+      // 3 uova per 4 → per 2 = 1,5 → 2
+      expect(eggs([Ingredient(name: 'Uova', amount: '3 medie')], planned: 2), 2);
+    });
+    test('in inglese e in tedesco', () {
+      expect(eggs([Ingredient(name: 'Egg yolks', amount: '2'), Ingredient(name: 'eggs', amount: '2')]), 4);
+      expect(eggs([Ingredient(name: 'Eigelb', amount: '3'), Ingredient(name: 'Eiweiß', amount: '1')]), 3);
+    });
+    test('albumi a peso restano una voce a sé', () {
+      final r = Recipe(id: 'x', title: 'Meringhe', servings: 4, ingredients: [Ingredient(name: 'Albumi', amount: '120 g')]);
+      final l = ShoppingList.build([PlanEntry(recipeId: 'x', servings: 4)], (_) => r);
+      expect(l.single.amounts, ['120 g']);
+    });
+  });
+
+  test('dispensa: sale, pepe, spezie, acqua, olio e aceto in una sola voce, per ultima', () {
+    final r = Recipe(id: 'x', title: 'Insalata', servings: 2, ingredients: [
+      Ingredient(name: 'Sale', amount: 'q.b.'),
+      Ingredient(name: 'Pepe nero', amount: 'un pizzico'),
+      Ingredient(name: 'Olio extravergine d\'oliva', amount: '3 cucchiai'),
+      Ingredient(name: 'Aceto balsamico', amount: '1 cucchiaio'),
+      Ingredient(name: 'Acqua', amount: '200 ml'),
+      Ingredient(name: 'Origano', amount: ''),
+      Ingredient(name: 'Peperoni', amount: '2'),
+      Ingredient(name: 'Insalata', amount: '1 cespo'),
+      Ingredient(name: 'Salsiccia', amount: '300 g'),
+    ]);
+    final l = ShoppingList.build([PlanEntry(recipeId: 'x', servings: 2)], (_) => r, pantryLabel: 'Dispensa');
+    expect(l.map((i) => i.name), ['Insalata', 'Peperoni', 'Salsiccia', 'Dispensa']);
+    expect(l.last.pantry, isTrue);
+    expect(l.last.recipes, ['Aceto balsamico', 'Acqua', 'Olio extravergine d\'oliva', 'Origano', 'Pepe nero', 'Sale']);
+    expect(l.last.amounts, isEmpty);
   });
 }

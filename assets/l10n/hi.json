@@ -584,5 +584,9 @@
  "xls.exampleStep1": "प्याज़ भूनें, कटे आलू डालें और गर्म पानी से ढक दें।",
  "xls.exampleStep2": "आलू नरम होने पर पास्ता डालें और चलाते हुए पकाएँ।",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "भंडार में जाँचें",
+ "shop.eggs": "अंडे",
+ "shop.exportPdf": "PDF निर्यात करें",
+ "shop.exportExcel": "Excel निर्यात करें"
 }

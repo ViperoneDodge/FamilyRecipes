@@ -584,5 +584,9 @@
  "xls.exampleStep1": "Steiktu laukinn, bættu kartöfluteningum við og helltu heitu vatni yfir.",
  "xls.exampleStep2": "Þegar kartöflurnar eru mjúkar, bættu pastanu við og sjóddu á meðan hrært er.",
  "common.ok": "OK",
- "plan.weekOf": "{from} – {to}"
+ "plan.weekOf": "{from} – {to}",
+ "shop.pantry": "Athuga í búrinu",
+ "shop.eggs": "Egg",
+ "shop.exportPdf": "Flytja út PDF",
+ "shop.exportExcel": "Flytja út Excel"
 }
