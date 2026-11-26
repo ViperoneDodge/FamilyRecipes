@@ -48,7 +48,8 @@ void main() {
     final l = await BackupService.list(s.session!.storageKey);
     expect(l.length, 1);
     expect(l.single.reason, 'restore');
-    final d = BackupService.decode(await l.single.file.readAsBytes())!;
+    expect(l.single.name, endsWith('.zip'));
+    final d = (await BackupService.readFile(l.single.file.path)).data!;
     expect(d.recipes.single.title, 'Attuale');
   });
 

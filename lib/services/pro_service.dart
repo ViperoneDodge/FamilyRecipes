@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 import 'dart:io' show Platform;
 
@@ -17,7 +18,11 @@ class ProService {
   bool busy = false;
   String? lastError;
 
-  Future<void> init({required void Function() onOwned, required void Function() onChanged}) async {
+  Future<void> init({
+    required void Function() onOwned,
+    required void Function() onChanged,
+    void Function()? onRevoked,
+  }) async {
     if (kIsWeb) return;
     try {
       _sub ??= _iap.purchaseStream.listen((list) async {
@@ -55,11 +60,27 @@ class ProService {
         final r = await _iap.queryProductDetails({productId});
         if (r.productDetails.isNotEmpty) product = r.productDetails.first;
         if (!Platform.isIOS) await _iap.restorePurchases();
+        // Rimborso o acquisto annullato: Google Play non elenca più il prodotto tra quelli posseduti.
+        if (onRevoked != null && await ownedOnPlay() == false) onRevoked();
       }
     } catch (_) {
       storeAvailable = false;
     }
     onChanged();
+  }
+
+  /// Solo Android: true/false se Google Play risponde con l'elenco degli acquisti, null se non si sa
+  /// (offline, errore, altra piattaforma): in quel caso non si toglie niente.
+  Future<bool?> ownedOnPlay() async {
+    if (kIsWeb || !Platform.isAndroid || !storeAvailable) return null;
+    try {
+      final addition = _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+      final r = await addition.queryPastPurchases().timeout(const Duration(seconds: 20));
+      if (r.error != null) return null;
+      return r.pastPurchases.any((p) => p.productID == productId);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<bool> buy() async {

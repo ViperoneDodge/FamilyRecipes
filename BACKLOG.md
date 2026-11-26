@@ -213,6 +213,14 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
 - **Schermate**: schede delle Impostazioni con il testo grande, chiusura di una ricetta eliminata;
   nella scheda Gruppi il pulsante per passare all'account online.
 
+## Versione 1.10.2
+- **Backup in formato `.zip`**: `backup.json` (ricette e preferiti) più `photos/<id>.jpg`. Le foto si scrivono e
+  si ripristinano una alla volta, quindi anche un ricettario con centinaia di foto non esaurisce la memoria
+  (prima il file .json con le foto in base64 veniva decodificato tutto insieme). I backup `.json` della
+  1.9–1.10.1 si leggono ancora, fino a 60 MB.
+- **Pro dopo un rimborso**: su Android, all'avvio, se Google Play non elenca più `familyrecipes_pro` tra gli
+  acquisti (risposta valida, non offline) Pro si spegne. Su iPhone resta com'è (nessuna verifica server).
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

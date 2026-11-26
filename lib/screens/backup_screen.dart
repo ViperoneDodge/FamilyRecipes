@@ -96,7 +96,9 @@ class _BackupScreenState extends State<BackupScreen> {
   }
 
   Future<void> _share(BackupInfo b) => _run(() async {
-        await SharePlus.instance.share(ShareParams(files: [XFile(b.file.path, mimeType: 'application/json')]));
+        await SharePlus.instance.share(ShareParams(files: [
+          XFile(b.file.path, mimeType: b.name.endsWith('.zip') ? 'application/zip' : 'application/json')
+        ]));
       });
 
   Future<void> _saveAs(BackupInfo b) => _run(() async {

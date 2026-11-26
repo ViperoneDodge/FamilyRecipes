@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 
@@ -157,6 +156,14 @@ class AppState extends ChangeNotifier {
     return freeCategories.any((c) => _countIn(book, c) < freeLimit);
   }
 
+  /// Acquisto rimborsato o annullato (lo dice Google Play): Pro si spegne su questo telefono.
+  Future<void> _revokePro() async {
+    if (!purchasedPro) return;
+    purchasedPro = false;
+    notifyListeners();
+    await _writeSettings();
+  }
+
   Future<void> _setPro() async {
     if (purchasedPro) return;
     purchasedPro = true;
@@ -231,7 +238,7 @@ class AppState extends ChangeNotifier {
     loading = false;
     notifyListeners();
     UpdateService.instance.start(pushAvailable: auth.cloudAvailable);
-    pro.init(onOwned: _setPro, onChanged: notifyListeners);
+    pro.init(onOwned: _setPro, onChanged: notifyListeners, onRevoked: _revokePro);
   }
 
   Future<void> login(Session s) async {
@@ -750,30 +757,21 @@ class AppState extends ChangeNotifier {
 
   // ---- Backup ----
 
-  /// Tutte le ricette visibili (mie e dei gruppi), con le foto e i preferiti, in un file di backup.
-  Future<Uint8List> backupBytes(String reason, DateTime at) async {
-    final list = data.recipes.where((r) => !r.deleted).toList();
-    final ph = <String, Uint8List>{};
-    for (final r in list) {
-      for (final p in r.photoIds) {
-        if (ph.containsKey(p)) continue;
-        try {
-          final b = await photos.load(p, bookId: bookOf(r)).timeout(const Duration(seconds: 30));
-          if (b != null) ph[p] = b;
-        } catch (_) {}
-      }
-    }
-    final fav = Set<String>.of(favRecipes);
-    return Isolate.run(() => BackupService.encode(recipes: list, photos: ph, favorites: fav, reason: reason, at: at));
-  }
-
-  /// Copia sul telefono (si tengono le ultime [BackupService.keep]); null se non riesce.
+  /// Copia sul telefono di tutte le ricette visibili (mie e dei gruppi), con le foto e i preferiti, in un
+  /// `.zip` scritto una foto alla volta (si tengono le ultime [BackupService.keep]); null se non riesce.
   Future<File?> backupNow([String reason = 'manual', File? protect]) async {
     final s = session;
     if (s == null) return null;
     try {
-      final at = DateTime.now();
-      return await BackupService.save(s.storageKey, await backupBytes(reason, at), at, protect: protect);
+      return await BackupService.saveZip(
+        s.storageKey,
+        recipes: data.recipes.where((r) => !r.deleted).toList(),
+        favorites: Set<String>.of(favRecipes),
+        reason: reason,
+        at: DateTime.now(),
+        photo: (r, p) => photos.load(p, bookId: bookOf(r)).timeout(const Duration(seconds: 30)),
+        protect: protect,
+      );
     } catch (_) {
       return null;
     }
@@ -805,8 +803,9 @@ class AppState extends ChangeNotifier {
       if (old != null && !old.deleted) book = isPersonal(old) ? null : old.bookId;
       if (!canAddTo(book)) continue;
       for (final p in src.photoIds) {
-        final bytes = b.photos[p];
-        if (bytes != null && !await photos.exists(p)) await photos.put(p, bytes);
+        if (await photos.exists(p)) continue;
+        final bytes = await b.photo(p);
+        if (bytes != null) await photos.put(p, bytes);
       }
       final r = src.copy()
         ..id = old != null && !old.deleted ? old.id : src.id

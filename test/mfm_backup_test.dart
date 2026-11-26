@@ -186,7 +186,7 @@ void main() {
       await expectLater(BackupService.save('u', troppo, DateTime(2026)), throwsA(isA<FileSystemException>()));
       expect(await BackupService.list('u'), isEmpty);
       expect(BackupService.decode(troppo), isNull);
-      expect(BackupService.diagnose(troppo), contains('> 200 MB'));
+      expect(BackupService.diagnose(troppo), contains('> ${BackupService.maxBytes ~/ 1048576} MB'));
     });
   });
 
