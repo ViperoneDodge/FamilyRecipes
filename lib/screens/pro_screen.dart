@@ -105,6 +105,7 @@ class ProScreen extends StatelessWidget {
           (Icons.category_outlined, tr('pro.benefitCategories')),
           (Icons.all_inclusive, tr('pro.benefitUnlimited')),
           (Icons.soup_kitchen_outlined, tr('pro.benefitChef')),
+          (Icons.calendar_month_outlined, tr('pro.benefitPlan')),
           (Icons.favorite_outline, tr('pro.benefitSupport')),
         ];
         return TableclothBackground(

@@ -591,5 +591,8 @@
  "shop.exportWhich": "Millises vormingus?",
  "shop.excelInfo": "Nädal ja ostunimekiri arvutis muutmiseks",
  "shop.saved": "Salvestatud telefoni: {name}",
- "shop.notSaved": "Faili ei salvestatud. Saad seda siiski jagada."
+ "shop.notSaved": "Faili ei salvestatud. Saad seda siiski jagada.",
+ "plan.trial": "Tasuta proov: kasutatud {n} nädalat {max}-st",
+ "plan.trialOver": "Kasutasid ära planeerimise {n} prooviagu. Pro-ga planeerid nii mitu nädalat, kui soovid; juba planeeritud jäävad alles.",
+ "pro.benefitPlan": "Toidukordade planeerimine ja ostunimekiri igal nädalal"
 }

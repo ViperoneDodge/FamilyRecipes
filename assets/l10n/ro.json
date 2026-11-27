@@ -591,5 +591,8 @@
  "shop.exportWhich": "În ce format?",
  "shop.excelInfo": "Săptămâna și lista de cumpărături, de editat pe calculator",
  "shop.saved": "Salvat pe telefon: {name}",
- "shop.notSaved": "Fișierul nu a fost salvat. Îl poți totuși partaja."
+ "shop.notSaved": "Fișierul nu a fost salvat. Îl poți totuși partaja.",
+ "plan.trial": "Încercare gratuită: {n} din {max} săptămâni folosite",
+ "plan.trialOver": "Ai folosit cele {n} săptămâni de încercare ale planificării. Cu Pro planifici câte săptămâni vrei; cele deja planificate rămân.",
+ "pro.benefitPlan": "Planificarea meselor și lista de cumpărături, în fiecare săptămână"
 }

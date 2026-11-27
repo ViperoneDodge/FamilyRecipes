@@ -591,5 +591,8 @@
  "shop.exportWhich": "选择格式",
  "shop.excelInfo": "本周计划和购物清单，可在电脑上编辑",
  "shop.saved": "已保存到手机：{name}",
- "shop.notSaved": "文件未保存。你仍然可以分享。"
+ "shop.notSaved": "文件未保存。你仍然可以分享。",
+ "plan.trial": "免费试用：已用 {n}/{max} 周",
+ "plan.trialOver": "你已用完 {n} 周的膳食计划试用。升级 Pro 可规划任意多周；已规划的周会保留。",
+ "pro.benefitPlan": "每周膳食计划和购物清单"
 }

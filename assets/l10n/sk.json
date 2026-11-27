@@ -591,5 +591,8 @@
  "shop.exportWhich": "V akom formáte?",
  "shop.excelInfo": "Týždeň a nákupný zoznam na úpravu v počítači",
  "shop.saved": "Uložené v telefóne: {name}",
- "shop.notSaved": "Súbor sa neuložil. Napriek tomu ho môžeš zdieľať."
+ "shop.notSaved": "Súbor sa neuložil. Napriek tomu ho môžeš zdieľať.",
+ "plan.trial": "Skúšobná verzia: využité {n} z {max} týždňov",
+ "plan.trialOver": "Využil si {n} skúšobné týždne plánovania. S Pro naplánuješ ľubovoľne veľa týždňov; už naplánované zostanú.",
+ "pro.benefitPlan": "Plánovanie jedál a nákupný zoznam, každý týždeň"
 }

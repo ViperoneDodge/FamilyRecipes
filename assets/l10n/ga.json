@@ -591,5 +591,8 @@
  "shop.exportWhich": "Cén fhormáid?",
  "shop.excelInfo": "An tseachtain agus an liosta siopadóireachta, le cur in eagar ar ríomhaire",
  "shop.saved": "Sábháilte ar an bhfón: {name}",
- "shop.notSaved": "Níor sábháladh an comhad. Is féidir leat é a roinnt mar sin féin."
+ "shop.notSaved": "Níor sábháladh an comhad. Is féidir leat é a roinnt mar sin féin.",
+ "plan.trial": "Triail saor in aisce: {n} as {max} seachtain úsáidte",
+ "plan.trialOver": "D'úsáid tú {n} seachtain trialach na pleanála. Le Pro pleanálann tú an oiread seachtainí agus is mian leat; fanann na cinn atá pleanáilte cheana.",
+ "pro.benefitPlan": "Pleanáil béilí agus liosta siopadóireachta, gach seachtain"
 }

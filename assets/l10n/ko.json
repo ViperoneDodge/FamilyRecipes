@@ -591,5 +591,8 @@
  "shop.exportWhich": "어떤 형식으로?",
  "shop.excelInfo": "컴퓨터에서 편집할 주간 식단과 장보기 목록",
  "shop.saved": "휴대폰에 저장됨: {name}",
- "shop.notSaved": "파일이 저장되지 않았습니다. 그래도 공유할 수 있습니다."
+ "shop.notSaved": "파일이 저장되지 않았습니다. 그래도 공유할 수 있습니다.",
+ "plan.trial": "무료 체험: {max}주 중 {n}주 사용",
+ "plan.trialOver": "식단 계획 체험 {n}주를 모두 사용했습니다. Pro로 원하는 만큼 계획하세요. 이미 계획한 주는 그대로 남습니다.",
+ "pro.benefitPlan": "매주 식단 계획과 장보기 목록"
 }

@@ -591,5 +591,8 @@
  "shop.exportWhich": "Kādā formātā?",
  "shop.excelInfo": "Nedēļa un iepirkumu saraksts rediģēšanai datorā",
  "shop.saved": "Saglabāts tālrunī: {name}",
- "shop.notSaved": "Fails nav saglabāts. Tomēr vari to kopīgot."
+ "shop.notSaved": "Fails nav saglabāts. Tomēr vari to kopīgot.",
+ "plan.trial": "Bezmaksas izmēģinājums: izmantotas {n} no {max} nedēļām",
+ "plan.trialOver": "Tu izmantoji {n} plānošanas izmēģinājuma nedēļas. Ar Pro plāno tik nedēļu, cik vēlies; jau ieplānotās paliek.",
+ "pro.benefitPlan": "Ēdienreižu plānošana un iepirkumu saraksts katru nedēļu"
 }

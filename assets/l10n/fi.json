@@ -591,5 +591,8 @@
  "shop.exportWhich": "Missä muodossa?",
  "shop.excelInfo": "Viikko ja ostoslista muokattavaksi tietokoneella",
  "shop.saved": "Tallennettu puhelimeen: {name}",
- "shop.notSaved": "Tiedostoa ei tallennettu. Voit silti jakaa sen."
+ "shop.notSaved": "Tiedostoa ei tallennettu. Voit silti jakaa sen.",
+ "plan.trial": "Ilmainen kokeilu: {n}/{max} viikkoa käytetty",
+ "plan.trialOver": "Olet käyttänyt ateriasuunnittelun {n} kokeiluviikkoa. Pro-versiolla suunnittelet niin monta viikkoa kuin haluat; jo suunnitellut säilyvät.",
+ "pro.benefitPlan": "Ateriasuunnittelu ja ostoslista joka viikko"
 }

@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'mfm_aiuti.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  cartellaDocumentiFinta('pro_test_docs');
   Recipe r(String id, RecipeCategory c, int created, {String? book, String by = 'mario'}) =>
       Recipe(id: id, title: id, category: c, createdAt: created, bookId: book, createdBy: by);
 
@@ -80,5 +82,27 @@ void main() {
     expect(s.hasFreeSlot(null), isFalse);
     s.purchasedPro = true;
     expect(s.hasFreeSlot(null), isTrue);
+  });
+
+  test('Pianificazione senza Pro: prova di 2 settimane qualsiasi, poi solo con Pro', () async {
+    final s = statoFinto();
+    final w1 = DateTime(2026, 11, 23), w2 = DateTime(2026, 12, 7), w3 = DateTime(2026, 12, 14);
+    expect(s.canPlanWeek(w1), isTrue);
+    await s.planAdd(planDay(w1), Meal.pranzo, PlanEntry(recipeId: 'a'));
+    await s.planAdd(planDay(w1.add(const Duration(days: 3))), Meal.cena, PlanEntry(recipeId: 'a'));
+    expect(s.trialWeeksUsed, 1);
+    await s.planAdd(planDay(w2.add(const Duration(days: 6))), Meal.cena, PlanEntry(recipeId: 'b'));
+    expect(s.trialWeeksUsed, 2);
+    expect(s.canPlanWeek(w3), isFalse);
+    await s.planAdd(planDay(w3), Meal.pranzo, PlanEntry(recipeId: 'c'));
+    expect(s.plan.entries(planDay(w3), Meal.pranzo), isEmpty, reason: 'terza settimana: bloccata');
+    // Svuotare una settimana non restituisce la prova.
+    await s.planClearWeek(w1);
+    expect(s.canPlanWeek(w3), isFalse);
+    expect(s.canPlanWeek(w1), isTrue, reason: 'le settimane della prova restano usabili');
+    final skipped = await s.planImport([(day: planDay(w3), meal: Meal.cena, entry: PlanEntry(recipeId: 'c'))]);
+    expect(skipped, 1);
+    s.purchasedPro = true;
+    expect(s.canPlanWeek(w3), isTrue);
   });
 }

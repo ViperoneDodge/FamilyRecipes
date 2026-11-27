@@ -591,5 +591,8 @@
  "shop.exportWhich": "Vilket format?",
  "shop.excelInfo": "Vecka och inköpslista, att redigera på datorn",
  "shop.saved": "Sparad på telefonen: {name}",
- "shop.notSaved": "Filen sparades inte. Du kan ändå dela den."
+ "shop.notSaved": "Filen sparades inte. Du kan ändå dela den.",
+ "plan.trial": "Gratis provperiod: {n} av {max} veckor använda",
+ "plan.trialOver": "Du har använt de {n} provveckorna av matplaneringen. Med Pro planerar du hur många veckor du vill; redan planerade veckor finns kvar.",
+ "pro.benefitPlan": "Matplanering och inköpslista, varje vecka"
 }

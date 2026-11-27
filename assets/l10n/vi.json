@@ -591,5 +591,8 @@
  "shop.exportWhich": "Định dạng nào?",
  "shop.excelInfo": "Tuần và danh sách mua sắm, để sửa trên máy tính",
  "shop.saved": "Đã lưu vào điện thoại: {name}",
- "shop.notSaved": "Tệp chưa được lưu. Bạn vẫn có thể chia sẻ."
+ "shop.notSaved": "Tệp chưa được lưu. Bạn vẫn có thể chia sẻ.",
+ "plan.trial": "Dùng thử miễn phí: đã dùng {n}/{max} tuần",
+ "plan.trialOver": "Bạn đã dùng hết {n} tuần dùng thử lên kế hoạch. Với Pro bạn lên kế hoạch bao nhiêu tuần cũng được; các tuần đã lập vẫn giữ nguyên.",
+ "pro.benefitPlan": "Kế hoạch bữa ăn và danh sách mua sắm, mỗi tuần"
 }

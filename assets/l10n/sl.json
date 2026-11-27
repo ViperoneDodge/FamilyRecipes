@@ -591,5 +591,8 @@
  "shop.exportWhich": "V kateri obliki?",
  "shop.excelInfo": "Teden in nakupovalni seznam za urejanje na računalniku",
  "shop.saved": "Shranjeno v telefon: {name}",
- "shop.notSaved": "Datoteka ni shranjena. Lahko jo vseeno deliš."
+ "shop.notSaved": "Datoteka ni shranjena. Lahko jo vseeno deliš.",
+ "plan.trial": "Brezplačni preizkus: porabljenih {n} od {max} tednov",
+ "plan.trialOver": "Porabil si {n} preizkusna tedna načrtovanja. S Pro načrtuješ poljubno tednov; že načrtovani ostanejo.",
+ "pro.benefitPlan": "Načrtovanje obrokov in nakupovalni seznam, vsak teden"
 }

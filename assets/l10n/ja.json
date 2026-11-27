@@ -591,5 +591,8 @@
  "shop.exportWhich": "形式は？",
  "shop.excelInfo": "週の献立と買い物リスト（パソコンで編集用）",
  "shop.saved": "端末に保存しました：{name}",
- "shop.notSaved": "保存されませんでした。共有はできます。"
+ "shop.notSaved": "保存されませんでした。共有はできます。",
+ "plan.trial": "無料お試し：{max} 週中 {n} 週使用",
+ "plan.trialOver": "献立のお試し {n} 週間を使い切りました。Pro なら何週でも計画できます。作成済みの週は残ります。",
+ "pro.benefitPlan": "毎週の献立プランと買い物リスト"
 }

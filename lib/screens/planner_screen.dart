@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../l10n.dart';
 import '../main.dart';
 import '../models.dart';
+import '../services/app_state.dart';
 import '../services/dose_scaler.dart';
 import '../services/excel_form.dart';
 import '../services/pdf_export.dart';
@@ -49,17 +50,16 @@ class _PlannerTabState extends State<PlannerTab> {
 
   void _move(int weeks) => setState(() => _week = _start.add(Duration(days: 7 * weeks)));
 
+  /// Settimana non pianificabile (senza Pro, oltre le settimane di prova): solo lettura.
+  bool _locked = false;
+
   @override
   Widget build(BuildContext context) {
-    if (!appState.isPro) {
-      return ListView(padding: const EdgeInsets.fromLTRB(8, 24, 12, 24), children: [
-        ProTeaser(icon: Icons.calendar_month_outlined, text: tr('pro.reasonPlan')),
-      ]);
-    }
     return ListenableBuilder(
       listenable: appState,
       builder: (context, _) {
         final nb = NotebookColors.of(context);
+        _locked = !appState.canPlanWeek(_start);
         final today = planDay(DateTime.now());
         final meals = appState.plan.meals;
         return ListView(padding: const EdgeInsets.fromLTRB(4, 6, 10, 96), children: [
@@ -103,6 +103,21 @@ class _PlannerTabState extends State<PlannerTab> {
               child: const Padding(padding: EdgeInsets.all(8), child: Icon(Icons.more_horiz)),
             ),
           ]),
+          if (!appState.isPro) ...[
+            const SizedBox(height: 6),
+            if (_locked)
+              ProTeaser(icon: Icons.calendar_month_outlined, text: tr('plan.trialOver', {'n': AppState.trialWeeks}))
+            else
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: ListTile(
+                  dense: true,
+                  leading: Icon(Icons.hourglass_bottom, color: nb.accent),
+                  title: Text(tr('plan.trial', {'n': appState.trialWeeksUsed, 'max': AppState.trialWeeks})),
+                  trailing: TextButton(onPressed: () => openPro(context), child: const Text('Pro')),
+                ),
+              ),
+          ],
           const SizedBox(height: 6),
           for (var i = 0; i < 7; i++) _day(context, _start.add(Duration(days: i)), meals, today),
         ]);
@@ -150,12 +165,13 @@ class _PlannerTabState extends State<PlannerTab> {
         Expanded(
           child: Wrap(spacing: 6, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
             for (var i = 0; i < entries.length; i++) _entryChip(context, day, meal, i, entries[i]),
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              tooltip: tr('plan.add'),
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: () => _add(context, day, meal),
-            ),
+            if (!_locked)
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                tooltip: tr('plan.add'),
+                icon: const Icon(Icons.add_circle_outline),
+                onPressed: () => _add(context, day, meal),
+              ),
           ]),
         ),
       ]),
@@ -231,9 +247,10 @@ class _PlannerTabState extends State<PlannerTab> {
       final bytes = f?.bytes ?? (f?.path == null ? null : await File(f!.path!).readAsBytes());
       if (bytes == null) return;
       final r = ExcelForm.importWeek(bytes, appState.recipes.where(appState.canOpen).toList());
-      await appState.planImport(r.entries);
+      final skipped = await appState.planImport(r.entries);
       if (context.mounted) {
-        showSnack(context, tr('plan.imported', {'n': r.entries.length, 'missing': r.missing}));
+        showSnack(context, tr('plan.imported', {'n': r.entries.length - skipped, 'missing': r.missing}));
+        if (skipped > 0) await showProOffer(context, tr('plan.trialOver', {'n': AppState.trialWeeks}));
       }
     } catch (_) {
       if (context.mounted) showSnack(context, tr('import.badFile'));

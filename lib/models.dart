@@ -382,9 +382,13 @@ class MealPlan {
   /// giorno ("2026-11-30") → pasto → ricette.
   Map<String, Map<Meal, List<PlanEntry>>> days;
 
-  MealPlan({Set<Meal>? extraMeals, Map<String, Map<Meal, List<PlanEntry>>>? days})
+  /// Settimane (il loro lunedì, "2026-11-30") usate per la prova gratuita, senza Pro.
+  Set<String> trialWeeks;
+
+  MealPlan({Set<Meal>? extraMeals, Map<String, Map<Meal, List<PlanEntry>>>? days, Set<String>? trialWeeks})
       : extraMeals = extraMeals ?? {},
-        days = days ?? {};
+        days = days ?? {},
+        trialWeeks = trialWeeks ?? {};
 
   /// Pasti mostrati, in ordine.
   List<Meal> get meals => [for (final m in Meal.values) if (baseMeals.contains(m) || extraMeals.contains(m)) m];
@@ -410,6 +414,7 @@ class MealPlan {
 
   Map<String, dynamic> toJson() => {
         'extra': [for (final m in extraMeals) m.name],
+        'trial': trialWeeks.toList(),
         'days': {
           for (final d in days.entries)
             d.key: {for (final m in d.value.entries) m.key.name: [for (final e in m.value) e.toJson()]},
@@ -423,6 +428,7 @@ class MealPlan {
       final meal = mealFrom(m);
       if (meal != null && !baseMeals.contains(meal)) p.extraMeals.add(meal);
     }
+    p.trialWeeks.addAll(_strings(v['trial']).take(10));
     final days = v['days'];
     if (days is Map) {
       for (final d in days.entries) {

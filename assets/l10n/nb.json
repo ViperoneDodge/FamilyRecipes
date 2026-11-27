@@ -591,5 +591,8 @@
  "shop.exportWhich": "Hvilket format?",
  "shop.excelInfo": "Uke og handleliste, til redigering på datamaskinen",
  "shop.saved": "Lagret på telefonen: {name}",
- "shop.notSaved": "Filen ble ikke lagret. Du kan likevel dele den."
+ "shop.notSaved": "Filen ble ikke lagret. Du kan likevel dele den.",
+ "plan.trial": "Gratis prøve: {n} av {max} uker brukt",
+ "plan.trialOver": "Du har brukt de {n} prøveukene av måltidsplanen. Med Pro planlegger du så mange uker du vil; de som allerede er planlagt blir værende.",
+ "pro.benefitPlan": "Måltidsplan og handleliste, hver uke"
 }

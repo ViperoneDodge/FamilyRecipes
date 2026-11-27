@@ -591,5 +591,8 @@
  "shop.exportWhich": "V jakém formátu?",
  "shop.excelInfo": "Týden a nákupní seznam k úpravě na počítači",
  "shop.saved": "Uloženo v telefonu: {name}",
- "shop.notSaved": "Soubor nebyl uložen. Přesto ho můžeš sdílet."
+ "shop.notSaved": "Soubor nebyl uložen. Přesto ho můžeš sdílet.",
+ "plan.trial": "Zkušební verze: využito {n} z {max} týdnů",
+ "plan.trialOver": "Využil jsi {n} zkušební týdny plánování. S Pro naplánuješ libovolně týdnů; už naplánované zůstanou.",
+ "pro.benefitPlan": "Plánování jídel a nákupní seznam, každý týden"
 }

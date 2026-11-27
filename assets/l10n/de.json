@@ -591,5 +591,8 @@
  "shop.exportWhich": "In welchem Format?",
  "shop.excelInfo": "Woche und Einkaufsliste, am Computer bearbeitbar",
  "shop.saved": "Auf dem Handy gespeichert: {name}",
- "shop.notSaved": "Datei nicht gespeichert. Du kannst sie trotzdem teilen."
+ "shop.notSaved": "Datei nicht gespeichert. Du kannst sie trotzdem teilen.",
+ "plan.trial": "Gratis-Test: {n} von {max} Wochen genutzt",
+ "plan.trialOver": "Du hast die {n} Testwochen der Essensplanung genutzt. Mit Pro planst du beliebig viele Wochen; bereits geplante bleiben.",
+ "pro.benefitPlan": "Essensplanung und Einkaufsliste, jede Woche"
 }

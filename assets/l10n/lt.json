@@ -591,5 +591,8 @@
  "shop.exportWhich": "Kokiu formatu?",
  "shop.excelInfo": "Savaitė ir pirkinių sąrašas redaguoti kompiuteryje",
  "shop.saved": "Išsaugota telefone: {name}",
- "shop.notSaved": "Failas neišsaugotas. Vis tiek gali juo pasidalyti."
+ "shop.notSaved": "Failas neišsaugotas. Vis tiek gali juo pasidalyti.",
+ "plan.trial": "Nemokamas bandymas: išnaudota {n} iš {max} savaičių",
+ "plan.trialOver": "Išnaudojai {n} bandomąsias planavimo savaites. Su Pro suplanuosi kiek nori savaičių; jau suplanuotos liks.",
+ "pro.benefitPlan": "Valgių planavimas ir pirkinių sąrašas kas savaitę"
 }

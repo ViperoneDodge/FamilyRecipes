@@ -849,7 +849,28 @@ class AppState extends ChangeNotifier {
     await _persist();
   }
 
+  /// Settimane della prova gratuita della pianificazione (senza Pro).
+  static const int trialWeeks = 2;
+
+  static String _weekKey(String day) {
+    final d = DateTime.tryParse(day);
+    return d == null ? day : planDay(weekStart(d));
+  }
+
+  /// Si può pianificare la settimana che inizia il lunedì [start]: con Pro sempre; senza, nelle settimane
+  /// della prova (al massimo [trialWeeks], scelte da chi la usa).
+  bool canPlanWeek(DateTime start) {
+    if (isPro) return true;
+    final key = planDay(weekStart(start));
+    return data.plan.trialWeeks.contains(key) || data.plan.trialWeeks.length < trialWeeks;
+  }
+
+  int get trialWeeksUsed => data.plan.trialWeeks.length;
+
   Future<void> planAdd(String day, Meal meal, PlanEntry e) {
+    final d = DateTime.tryParse(day);
+    if (d != null && !canPlanWeek(d)) return Future.value();
+    if (!isPro) data.plan.trialWeeks.add(_weekKey(day));
     data.plan.add(day, meal, e);
     return _savePlan();
   }
@@ -881,11 +902,20 @@ class AppState extends ChangeNotifier {
   }
 
   /// Aggiunge le voci (per esempio da un file Excel); i pasti in più usati si attivano.
-  Future<void> planImport(List<({String day, Meal meal, PlanEntry entry})> entries) {
+  /// Senza Pro si importano solo le settimane della prova; restituisce le voci saltate.
+  Future<int> planImport(List<({String day, Meal meal, PlanEntry entry})> entries) async {
+    var skipped = 0;
     for (final e in entries) {
+      final d = DateTime.tryParse(e.day);
+      if (d == null || !canPlanWeek(d)) {
+        skipped++;
+        continue;
+      }
+      if (!isPro) data.plan.trialWeeks.add(_weekKey(e.day));
       data.plan.add(e.day, e.meal, e.entry);
       if (!baseMeals.contains(e.meal)) data.plan.extraMeals.add(e.meal);
     }
-    return _savePlan();
+    await _savePlan();
+    return skipped;
   }
 }

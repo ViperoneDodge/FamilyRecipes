@@ -591,5 +591,8 @@
  "shop.exportWhich": "Milyen formátumban?",
  "shop.excelInfo": "Hét és bevásárlólista, számítógépen szerkeszthető",
  "shop.saved": "Mentve a telefonra: {name}",
- "shop.notSaved": "A fájl nincs mentve. Azért megoszthatod."
+ "shop.notSaved": "A fájl nincs mentve. Azért megoszthatod.",
+ "plan.trial": "Ingyenes próba: {max} hétből {n} felhasználva",
+ "plan.trialOver": "Felhasználtad a tervezés {n} próbahetét. Pro-val annyi hetet tervezel, amennyit szeretnél; a már megtervezettek megmaradnak.",
+ "pro.benefitPlan": "Étkezéstervezés és bevásárlólista minden héten"
 }

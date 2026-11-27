@@ -591,5 +591,8 @@
  "shop.exportWhich": "Hvilket format?",
  "shop.excelInfo": "Uge og indkøbsliste, til redigering på computeren",
  "shop.saved": "Gemt på telefonen: {name}",
- "shop.notSaved": "Filen blev ikke gemt. Du kan stadig dele den."
+ "shop.notSaved": "Filen blev ikke gemt. Du kan stadig dele den.",
+ "plan.trial": "Gratis prøve: {n} af {max} uger brugt",
+ "plan.trialOver": "Du har brugt de {n} prøveuger af madplanen. Med Pro planlægger du så mange uger, du vil; de allerede planlagte bliver.",
+ "pro.benefitPlan": "Madplan og indkøbsliste, hver uge"
 }

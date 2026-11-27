@@ -591,5 +591,8 @@
  "shop.exportWhich": "In welk formaat?",
  "shop.excelInfo": "Week en boodschappenlijst, te bewerken op de computer",
  "shop.saved": "Opgeslagen op de telefoon: {name}",
- "shop.notSaved": "Bestand niet opgeslagen. Je kunt het wel delen."
+ "shop.notSaved": "Bestand niet opgeslagen. Je kunt het wel delen.",
+ "plan.trial": "Gratis proef: {n} van {max} weken gebruikt",
+ "plan.trialOver": "Je hebt de {n} proefweken van de planning gebruikt. Met Pro plan je zoveel weken als je wilt; al geplande weken blijven.",
+ "pro.benefitPlan": "Maaltijdplanning en boodschappenlijst, elke week"
 }

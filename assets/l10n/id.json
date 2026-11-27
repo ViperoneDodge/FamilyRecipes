@@ -591,5 +591,8 @@
  "shop.exportWhich": "Format apa?",
  "shop.excelInfo": "Minggu dan daftar belanja, untuk diedit di komputer",
  "shop.saved": "Disimpan di ponsel: {name}",
- "shop.notSaved": "File tidak disimpan. Kamu tetap bisa membagikannya."
+ "shop.notSaved": "File tidak disimpan. Kamu tetap bisa membagikannya.",
+ "plan.trial": "Uji coba gratis: {n} dari {max} minggu terpakai",
+ "plan.trialOver": "Kamu sudah memakai {n} minggu uji coba perencanaan. Dengan Pro kamu bisa merencanakan minggu sebanyak yang kamu mau; minggu yang sudah direncanakan tetap ada.",
+ "pro.benefitPlan": "Perencanaan makan dan daftar belanja, setiap minggu"
 }

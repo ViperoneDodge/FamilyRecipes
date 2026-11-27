@@ -591,5 +591,8 @@
  "shop.exportWhich": "Dans quel format ?",
  "shop.excelInfo": "Semaine et liste de courses, à modifier sur l'ordinateur",
  "shop.saved": "Enregistré sur le téléphone : {name}",
- "shop.notSaved": "Fichier non enregistré. Tu peux quand même le partager."
+ "shop.notSaved": "Fichier non enregistré. Tu peux quand même le partager.",
+ "plan.trial": "Essai gratuit : {n} semaines utilisées sur {max}",
+ "plan.trialOver": "Tu as utilisé les {n} semaines d'essai du planning. Avec Pro tu planifies autant de semaines que tu veux ; celles déjà planifiées restent.",
+ "pro.benefitPlan": "Planning des repas et liste de courses, chaque semaine"
 }

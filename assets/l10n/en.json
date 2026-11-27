@@ -591,5 +591,8 @@
  "shop.exportWhich": "Which format?",
  "shop.excelInfo": "Week and shopping list, to edit on your computer",
  "shop.saved": "Saved on the phone: {name}",
- "shop.notSaved": "File not saved. You can still share it."
+ "shop.notSaved": "File not saved. You can still share it.",
+ "plan.trial": "Free trial: {n} of {max} weeks used",
+ "plan.trialOver": "You've used the {n} trial weeks of meal planning. With Pro you can plan as many weeks as you like; the weeks already planned stay.",
+ "pro.benefitPlan": "Meal planning and shopping list, every week"
 }

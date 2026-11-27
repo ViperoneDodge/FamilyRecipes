@@ -591,5 +591,8 @@
  "shop.exportWhich": "W jakim formacie?",
  "shop.excelInfo": "Tydzień i lista zakupów do edycji na komputerze",
  "shop.saved": "Zapisano w telefonie: {name}",
- "shop.notSaved": "Plik nie został zapisany. Nadal możesz go udostępnić."
+ "shop.notSaved": "Plik nie został zapisany. Nadal możesz go udostępnić.",
+ "plan.trial": "Darmowy okres próbny: wykorzystano {n} z {max} tygodni",
+ "plan.trialOver": "Wykorzystano {n} próbne tygodnie planowania. Z Pro zaplanujesz dowolnie wiele tygodni; już zaplanowane zostają.",
+ "pro.benefitPlan": "Planowanie posiłków i lista zakupów, co tydzień"
 }

@@ -591,5 +591,8 @@
  "shop.exportWhich": "Hangi biçimde?",
  "shop.excelInfo": "Bilgisayarda düzenlemek için hafta ve alışveriş listesi",
  "shop.saved": "Telefona kaydedildi: {name}",
- "shop.notSaved": "Dosya kaydedilmedi. Yine de paylaşabilirsin."
+ "shop.notSaved": "Dosya kaydedilmedi. Yine de paylaşabilirsin.",
+ "plan.trial": "Ücretsiz deneme: {max} haftanın {n} tanesi kullanıldı",
+ "plan.trialOver": "Planlamanın {n} deneme haftasını kullandın. Pro ile istediğin kadar hafta planlarsın; planlanmış haftalar kalır.",
+ "pro.benefitPlan": "Her hafta yemek planlama ve alışveriş listesi"
 }

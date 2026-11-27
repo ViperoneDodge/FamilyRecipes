@@ -591,5 +591,8 @@
  "shop.exportWhich": "U kojem formatu?",
  "shop.excelInfo": "Tjedan i popis za kupnju za uređivanje na računalu",
  "shop.saved": "Spremljeno na mobitel: {name}",
- "shop.notSaved": "Datoteka nije spremljena. Ipak je možeš podijeliti."
+ "shop.notSaved": "Datoteka nije spremljena. Ipak je možeš podijeliti.",
+ "plan.trial": "Besplatna proba: iskorišteno {n} od {max} tjedna",
+ "plan.trialOver": "Iskoristio si {n} probna tjedna planiranja. S Pro planiraš koliko god tjedana želiš; već planirani ostaju.",
+ "pro.benefitPlan": "Planiranje obroka i popis za kupnju, svaki tjedan"
 }
