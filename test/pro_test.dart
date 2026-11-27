@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:familyrecipes/models.dart';
 import 'package:familyrecipes/services/app_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -107,12 +110,14 @@ void main() {
   });
 
   test('codice sviluppatore: sblocca Pro solo con la parola giusta, per questa versione', () async {
+    // Codice di prova (il codice vero non va scritto nel repository).
+    AppState.devCodeHashForTest = sha256.convert(utf8.encode('CODICEDIPROVA')).toString();
     final s = statoFinto();
     expect(s.isPro, isFalse);
     expect(await s.unlockDev('sbagliato'), isFalse);
     expect(await s.unlockDev(''), isFalse);
     expect(s.isPro, isFalse);
-    expect(await s.unlockDev('  puzzolo '), isTrue, reason: 'maiuscole e spazi non contano');
+    expect(await s.unlockDev('  codicediprova '), isTrue, reason: 'maiuscole e spazi non contano');
     expect(s.isPro, isTrue);
     await s.disableDev();
     expect(s.isPro, isFalse);

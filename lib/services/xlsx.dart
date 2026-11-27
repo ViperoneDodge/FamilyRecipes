@@ -27,6 +27,9 @@ class XlsxSheet {
 /// File Excel (.xlsx) essenziali, scritti e letti senza librerie esterne: bastano per il modulo delle
 /// ricette e della settimana (testi e numeri, niente formule).
 class Xlsx {
+  /// Limite per ogni parte del file (foglio, testi condivisi) una volta decompressa.
+  static const int maxPartBytes = 20 * 1024 * 1024;
+
   static String _col(int i) {
     var n = i + 1;
     var s = '';
@@ -152,6 +155,8 @@ class Xlsx {
     }
     String? text(String name) {
       final f = a.findFile(name);
+      // Un foglio "gonfiato" (pochi KB compressi, GB decompressi) non deve riempire la memoria.
+      if (f != null && f.size > maxPartBytes) throw const FormatException('xlsx part too large');
       final b = f?.readBytes();
       return b == null ? null : utf8.decode(b, allowMalformed: true);
     }

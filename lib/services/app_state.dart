@@ -107,8 +107,12 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // sha256 del codice (il codice non è scritto nel sorgente).
-  static const String _devCodeHash = '5ea02dddae77fc806de2318c6b0899b8f3f0752c909c52e44bd4baab5dd7069e';
+  // sha256 del codice (il codice non va scritto da nessuna parte nel repository, test compresi).
+  static String _devCodeHash = '5ea02dddae77fc806de2318c6b0899b8f3f0752c909c52e44bd4baab5dd7069e';
+
+  /// Solo per i test: un'impronta di prova, così il codice vero non compare nei test.
+  @visibleForTesting
+  static set devCodeHashForTest(String h) => _devCodeHash = h;
 
   /// true se il codice è giusto e Pro di sviluppo è ora attivo.
   Future<bool> unlockDev(String code) async {

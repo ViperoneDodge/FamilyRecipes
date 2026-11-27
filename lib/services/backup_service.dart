@@ -56,6 +56,9 @@ class BackupInfo {
 class BackupService {
   static const int keep = 3;
   static const int maxBytes = 60 * 1024 * 1024;
+
+  /// Una foto del backup (le foto dell'app sono JPEG compressi, ben sotto questo limite).
+  static const int maxPhotoBytes = 15 * 1024 * 1024;
   static const String _app = 'FamilyRecipes';
   static const String _kind = 'backup';
 
@@ -189,7 +192,9 @@ class BackupService {
     final input = InputFileStream(path);
     try {
       final f = ZipDecoder().decodeStream(input).findFile('backup.json');
-      return f?.readBytes();
+      // Dimensione dichiarata a decompressione avvenuta: un file "gonfiato" non deve riempire la memoria.
+      if (f == null || f.size > maxBytes) return null;
+      return f.readBytes();
     } catch (_) {
       return null;
     } finally {
@@ -201,7 +206,9 @@ class BackupService {
   static Uint8List? zipPhotoSync(String path, String id) {
     final input = InputFileStream(path);
     try {
-      return ZipDecoder().decodeStream(input).findFile('photos/$id.jpg')?.readBytes();
+      final f = ZipDecoder().decodeStream(input).findFile('photos/$id.jpg');
+      if (f == null || f.size > maxPhotoBytes) return null;
+      return f.readBytes();
     } catch (_) {
       return null;
     } finally {
@@ -231,12 +238,13 @@ class BackupService {
           // Il file è già tutto in memoria (scelto senza percorso): si estraggono anche le foto.
           try {
             final arc = ZipDecoder().decodeBytes(bytes);
-            final json = arc.findFile('backup.json')?.readBytes();
+            final jf = arc.findFile('backup.json');
+            final json = jf == null || jf.size > maxBytes ? null : jf.readBytes();
             final d = json == null ? null : decode(json);
             if (d == null) return (data: null, why: 'zip');
             for (final f in arc.files) {
               final m = RegExp(r'^photos/([A-Za-z0-9_-]{1,64})\.jpg$').firstMatch(f.name);
-              final b = m == null ? null : f.readBytes();
+              final b = m == null || f.size > maxPhotoBytes ? null : f.readBytes();
               if (m != null && b != null) d.photos[m[1]!] = b;
             }
             return (data: d, why: '');
