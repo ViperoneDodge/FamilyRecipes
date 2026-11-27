@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "ตรวจในตู้กับข้าว",
  "shop.eggs": "ไข่",
- "shop.exportPdf": "ส่งออก PDF",
- "shop.exportExcel": "ส่งออก Excel"
+ "shop.export": "ส่งออก",
+ "shop.exportWhich": "รูปแบบใด",
+ "shop.excelInfo": "สัปดาห์และรายการซื้อของ สำหรับแก้ไขบนคอมพิวเตอร์",
+ "shop.saved": "บันทึกลงโทรศัพท์แล้ว: {name}",
+ "shop.notSaved": "ไม่ได้บันทึกไฟล์ แต่ยังแชร์ได้"
 }

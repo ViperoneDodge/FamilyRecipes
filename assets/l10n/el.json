@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Έλεγχος στο ντουλάπι",
  "shop.eggs": "Αυγά",
- "shop.exportPdf": "Εξαγωγή PDF",
- "shop.exportExcel": "Εξαγωγή Excel"
+ "shop.export": "Εξαγωγή",
+ "shop.exportWhich": "Σε ποια μορφή;",
+ "shop.excelInfo": "Εβδομάδα και λίστα αγορών για επεξεργασία στον υπολογιστή",
+ "shop.saved": "Αποθηκεύτηκε στο κινητό: {name}",
+ "shop.notSaved": "Το αρχείο δεν αποθηκεύτηκε. Μπορείς όμως να το κοινοποιήσεις."
 }

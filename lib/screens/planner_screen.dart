@@ -1,10 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../l10n.dart';
@@ -83,14 +83,9 @@ class _PlannerTabState extends State<PlannerTab> {
               label: Text(tr('shop.title')),
             ),
             OutlinedButton.icon(
-              onPressed: () => _sharePdf(context, _start),
-              icon: const Icon(Icons.picture_as_pdf_outlined),
-              label: const Text('PDF'),
-            ),
-            OutlinedButton.icon(
-              onPressed: () => _shareExcel(context, _start),
-              icon: const Icon(Icons.table_chart_outlined),
-              label: const Text('Excel'),
+              onPressed: () => exportWeek(context, _start),
+              icon: const Icon(Icons.ios_share),
+              label: Text(tr('shop.export')),
             ),
             PopupMenuButton<String>(
               tooltip: tr('plan.more'),
@@ -349,12 +344,43 @@ List<ShoppingItem> _shopping(DateTime start) => ShoppingList.build(
       eggsLabel: tr('shop.eggs'),
     );
 
+/// Un solo pulsante "Esporta": poi si sceglie il formato (PDF o Excel).
+Future<void> exportWeek(BuildContext context, DateTime start, {bool includePlan = true}) async {
+  final format = await showModalBottomSheet<String>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Text(tr('shop.exportWhich'), style: const TextStyle(fontFamily: handFont, fontSize: 24)),
+        ),
+        ListTile(
+          leading: const Icon(Icons.picture_as_pdf_outlined),
+          title: const Text('PDF'),
+          subtitle: Text(includePlan ? tr('plan.pdf') : tr('shop.title')),
+          onTap: () => Navigator.pop(ctx, 'pdf'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.table_chart_outlined),
+          title: const Text('Excel'),
+          subtitle: Text(tr('shop.excelInfo')),
+          onTap: () => Navigator.pop(ctx, 'xlsx'),
+        ),
+        const SizedBox(height: 8),
+      ]),
+    ),
+  );
+  if (!context.mounted || format == null) return;
+  format == 'pdf' ? await _sharePdf(context, start, includePlan: includePlan) : await _shareExcel(context, start);
+}
+
+const String _xlsxMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
 Future<void> _sharePdf(BuildContext context, DateTime start, {bool includePlan = true}) async {
   showSnack(context, tr('pdf.creating'));
   try {
-    final title = weekTitle(start);
     final bytes = await PdfExport.buildWeek(
-      title: title,
+      title: weekTitle(start),
       start: start,
       meals: appState.plan.meals,
       plan: appState.plan,
@@ -362,7 +388,9 @@ Future<void> _sharePdf(BuildContext context, DateTime start, {bool includePlan =
       shopping: _shopping(start),
       includePlan: includePlan,
     );
-    await Printing.sharePdf(bytes: bytes, filename: PdfExport.fileName(includePlan ? tr('plan.title') : tr('shop.title')));
+    if (!context.mounted) return;
+    await saveThenOfferShare(context, bytes,
+        PdfExport.fileName(includePlan ? tr('plan.title') : tr('shop.title')), 'application/pdf', weekTitle(start));
   } catch (e) {
     if (context.mounted) showSnack(context, tr('pdf.error', {'error': e}));
   }
@@ -371,14 +399,34 @@ Future<void> _sharePdf(BuildContext context, DateTime start, {bool includePlan =
 Future<void> _shareExcel(BuildContext context, DateTime start) async {
   try {
     final bytes = ExcelForm.exportWeek(_weekEntries(start), appState.recipeById, comma: _comma);
-    final f = File('${(await getTemporaryDirectory()).path}/FamilyRecipes-${planDay(start)}.xlsx');
-    await f.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.share(ShareParams(files: [
-      XFile(f.path, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-    ], text: weekTitle(start)));
+    await saveThenOfferShare(context, bytes, 'FamilyRecipes-${planDay(start)}.xlsx', _xlsxMime, weekTitle(start));
   } catch (_) {
     if (context.mounted) showSnack(context, tr('export.failed'));
   }
+}
+
+/// Prima salva il file sul telefono (si sceglie dove), poi offre di condividerlo. Se il salvataggio
+/// non è disponibile o viene annullato, si può comunque condividere.
+Future<void> saveThenOfferShare(
+    BuildContext context, Uint8List bytes, String fileName, String mime, String text) async {
+  Future<void> share() async {
+    final f = File('${(await getTemporaryDirectory()).path}/$fileName');
+    await f.writeAsBytes(bytes, flush: true);
+    await SharePlus.instance.share(ShareParams(files: [XFile(f.path, mimeType: mime)], text: text));
+  }
+
+  String? saved;
+  try {
+    saved = await FilePicker.saveFile(fileName: fileName, bytes: bytes);
+  } catch (_) {}
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(
+      duration: const Duration(seconds: 8),
+      content: Text(saved != null ? tr('shop.saved', {'name': fileName}) : tr('shop.notSaved')),
+      action: SnackBarAction(label: tr('backup.share'), onPressed: () => share()),
+    ));
 }
 
 /// Lista della spesa della settimana: ingredienti sommati, da spuntare mentre si compra.
@@ -407,23 +455,11 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
             : SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
-                  child: Row(children: [
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => _sharePdf(context, widget.start, includePlan: false),
-                        icon: const Icon(Icons.picture_as_pdf_outlined),
-                        label: FittedBox(child: Text(tr('shop.exportPdf'))),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton.tonalIcon(
-                        onPressed: () => _shareExcel(context, widget.start),
-                        icon: const Icon(Icons.table_chart_outlined),
-                        label: FittedBox(child: Text(tr('shop.exportExcel'))),
-                      ),
-                    ),
-                  ]),
+                  child: FilledButton.icon(
+                    onPressed: () => exportWeek(context, widget.start, includePlan: false),
+                    icon: const Icon(Icons.ios_share),
+                    label: Text(tr('shop.export')),
+                  ),
                 ),
               ),
         body: NotebookPage(

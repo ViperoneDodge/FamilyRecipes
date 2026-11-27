@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Провери в килера",
  "shop.eggs": "Яйца",
- "shop.exportPdf": "Експорт в PDF",
- "shop.exportExcel": "Експорт в Excel"
+ "shop.export": "Експорт",
+ "shop.exportWhich": "В какъв формат?",
+ "shop.excelInfo": "Седмица и списък за пазаруване за редакция на компютър",
+ "shop.saved": "Запазено на телефона: {name}",
+ "shop.notSaved": "Файлът не е запазен. Все пак можеш да го споделиш."
 }

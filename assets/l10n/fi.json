@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Tarkista ruokakomerosta",
  "shop.eggs": "Kananmunat",
- "shop.exportPdf": "Vie PDF",
- "shop.exportExcel": "Vie Excel"
+ "shop.export": "Vie",
+ "shop.exportWhich": "Missä muodossa?",
+ "shop.excelInfo": "Viikko ja ostoslista muokattavaksi tietokoneella",
+ "shop.saved": "Tallennettu puhelimeen: {name}",
+ "shop.notSaved": "Tiedostoa ei tallennettu. Voit silti jakaa sen."
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Sjekk i spiskammerset",
  "shop.eggs": "Egg",
- "shop.exportPdf": "Eksporter PDF",
- "shop.exportExcel": "Eksporter Excel"
+ "shop.export": "Eksporter",
+ "shop.exportWhich": "Hvilket format?",
+ "shop.excelInfo": "Uke og handleliste, til redigering på datamaskinen",
+ "shop.saved": "Lagret på telefonen: {name}",
+ "shop.notSaved": "Filen ble ikke lagret. Du kan likevel dele den."
 }

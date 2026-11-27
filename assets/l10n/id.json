@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Periksa di dapur",
  "shop.eggs": "Telur",
- "shop.exportPdf": "Ekspor PDF",
- "shop.exportExcel": "Ekspor Excel"
+ "shop.export": "Ekspor",
+ "shop.exportWhich": "Format apa?",
+ "shop.excelInfo": "Minggu dan daftar belanja, untuk diedit di komputer",
+ "shop.saved": "Disimpan di ponsel: {name}",
+ "shop.notSaved": "File tidak disimpan. Kamu tetap bisa membagikannya."
 }

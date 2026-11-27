@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Kontrolli sahvrist",
  "shop.eggs": "Munad",
- "shop.exportPdf": "Ekspordi PDF",
- "shop.exportExcel": "Ekspordi Excel"
+ "shop.export": "Ekspordi",
+ "shop.exportWhich": "Millises vormingus?",
+ "shop.excelInfo": "Nädal ja ostunimekiri arvutis muutmiseks",
+ "shop.saved": "Salvestatud telefoni: {name}",
+ "shop.notSaved": "Faili ei salvestatud. Saad seda siiski jagada."
 }

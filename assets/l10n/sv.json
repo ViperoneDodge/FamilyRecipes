@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Kolla i skafferiet",
  "shop.eggs": "Ägg",
- "shop.exportPdf": "Exportera PDF",
- "shop.exportExcel": "Exportera Excel"
+ "shop.export": "Exportera",
+ "shop.exportWhich": "Vilket format?",
+ "shop.excelInfo": "Vecka och inköpslista, att redigera på datorn",
+ "shop.saved": "Sparad på telefonen: {name}",
+ "shop.notSaved": "Filen sparades inte. Du kan ändå dela den."
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Iċċekkja fil-kantina",
  "shop.eggs": "Bajd",
- "shop.exportPdf": "Esporta PDF",
- "shop.exportExcel": "Esporta Excel"
+ "shop.export": "Esporta",
+ "shop.exportWhich": "F'liema format?",
+ "shop.excelInfo": "Il-ġimgħa u l-lista tax-xiri, biex teditja fuq il-kompjuter",
+ "shop.saved": "Salvat fuq il-mowbajl: {name}",
+ "shop.notSaved": "Il-fajl ma ġiex salvat. Xorta tista' taqsmu."
 }

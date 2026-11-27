@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Kiểm tra trong tủ bếp",
  "shop.eggs": "Trứng",
- "shop.exportPdf": "Xuất PDF",
- "shop.exportExcel": "Xuất Excel"
+ "shop.export": "Xuất",
+ "shop.exportWhich": "Định dạng nào?",
+ "shop.excelInfo": "Tuần và danh sách mua sắm, để sửa trên máy tính",
+ "shop.saved": "Đã lưu vào điện thoại: {name}",
+ "shop.notSaved": "Tệp chưa được lưu. Bạn vẫn có thể chia sẻ."
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "De verificat în cămară",
  "shop.eggs": "Ouă",
- "shop.exportPdf": "Exportă PDF",
- "shop.exportExcel": "Exportă Excel"
+ "shop.export": "Exportă",
+ "shop.exportWhich": "În ce format?",
+ "shop.excelInfo": "Săptămâna și lista de cumpărături, de editat pe calculator",
+ "shop.saved": "Salvat pe telefon: {name}",
+ "shop.notSaved": "Fișierul nu a fost salvat. Îl poți totuși partaja."
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Athuga í búrinu",
  "shop.eggs": "Egg",
- "shop.exportPdf": "Flytja út PDF",
- "shop.exportExcel": "Flytja út Excel"
+ "shop.export": "Flytja út",
+ "shop.exportWhich": "Hvaða snið?",
+ "shop.excelInfo": "Vika og innkaupalisti, til að breyta í tölvu",
+ "shop.saved": "Vistað í símanum: {name}",
+ "shop.notSaved": "Skráin var ekki vistuð. Þú getur samt deilt henni."
 }

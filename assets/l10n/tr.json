@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Kilerde kontrol et",
  "shop.eggs": "Yumurta",
- "shop.exportPdf": "PDF olarak aktar",
- "shop.exportExcel": "Excel olarak aktar"
+ "shop.export": "Dışa aktar",
+ "shop.exportWhich": "Hangi biçimde?",
+ "shop.excelInfo": "Bilgisayarda düzenlemek için hafta ve alışveriş listesi",
+ "shop.saved": "Telefona kaydedildi: {name}",
+ "shop.notSaved": "Dosya kaydedilmedi. Yine de paylaşabilirsin."
 }

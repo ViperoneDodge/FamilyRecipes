@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Ellenőrizd a kamrában",
  "shop.eggs": "Tojás",
- "shop.exportPdf": "PDF exportálása",
- "shop.exportExcel": "Excel exportálása"
+ "shop.export": "Exportálás",
+ "shop.exportWhich": "Milyen formátumban?",
+ "shop.excelInfo": "Hét és bevásárlólista, számítógépen szerkeszthető",
+ "shop.saved": "Mentve a telefonra: {name}",
+ "shop.notSaved": "A fájl nincs mentve. Azért megoszthatod."
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "팬트리에서 확인",
  "shop.eggs": "달걀",
- "shop.exportPdf": "PDF 내보내기",
- "shop.exportExcel": "Excel 내보내기"
+ "shop.export": "내보내기",
+ "shop.exportWhich": "어떤 형식으로?",
+ "shop.excelInfo": "컴퓨터에서 편집할 주간 식단과 장보기 목록",
+ "shop.saved": "휴대폰에 저장됨: {name}",
+ "shop.notSaved": "파일이 저장되지 않았습니다. 그래도 공유할 수 있습니다."
 }

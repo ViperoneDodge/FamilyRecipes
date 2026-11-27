@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Im Vorrat prüfen",
  "shop.eggs": "Eier",
- "shop.exportPdf": "PDF exportieren",
- "shop.exportExcel": "Excel exportieren"
+ "shop.export": "Exportieren",
+ "shop.exportWhich": "In welchem Format?",
+ "shop.excelInfo": "Woche und Einkaufsliste, am Computer bearbeitbar",
+ "shop.saved": "Auf dem Handy gespeichert: {name}",
+ "shop.notSaved": "Datei nicht gespeichert. Du kannst sie trotzdem teilen."
 }

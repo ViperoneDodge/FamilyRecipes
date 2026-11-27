@@ -241,6 +241,9 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
 - **Esportazione in vista**: pulsanti PDF ed Excel nella Pianificazione e in basso nella lista della spesa.
 
 ## Prossima release
+- **Esporta (fatto, in attesa di rilascio)**: nella Pianificazione e nella lista della spesa un solo pulsante
+  «Esporta» che chiede il formato (PDF o Excel). Il file prima si salva sul telefono (si sceglie dove), poi un
+  avviso offre «Condividi»; se il salvataggio viene annullato si può comunque condividere.
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per
   i siti di ricette protetti, versione iPad.

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Controleren in de voorraadkast",
  "shop.eggs": "Eieren",
- "shop.exportPdf": "PDF exporteren",
- "shop.exportExcel": "Excel exporteren"
+ "shop.export": "Exporteren",
+ "shop.exportWhich": "In welk formaat?",
+ "shop.excelInfo": "Week en boodschappenlijst, te bewerken op de computer",
+ "shop.saved": "Opgeslagen op de telefoon: {name}",
+ "shop.notSaved": "Bestand niet opgeslagen. Je kunt het wel delen."
 }

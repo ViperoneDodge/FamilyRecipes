@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "食品庫で確認",
  "shop.eggs": "卵",
- "shop.exportPdf": "PDF を書き出す",
- "shop.exportExcel": "Excel を書き出す"
+ "shop.export": "書き出す",
+ "shop.exportWhich": "形式は？",
+ "shop.excelInfo": "週の献立と買い物リスト（パソコンで編集用）",
+ "shop.saved": "端末に保存しました：{name}",
+ "shop.notSaved": "保存されませんでした。共有はできます。"
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Zkontrolovat ve spíži",
  "shop.eggs": "Vejce",
- "shop.exportPdf": "Exportovat PDF",
- "shop.exportExcel": "Exportovat Excel"
+ "shop.export": "Exportovat",
+ "shop.exportWhich": "V jakém formátu?",
+ "shop.excelInfo": "Týden a nákupní seznam k úpravě na počítači",
+ "shop.saved": "Uloženo v telefonu: {name}",
+ "shop.notSaved": "Soubor nebyl uložen. Přesto ho můžeš sdílet."
 }

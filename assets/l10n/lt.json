@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Patikrink sandėliuke",
  "shop.eggs": "Kiaušiniai",
- "shop.exportPdf": "Eksportuoti PDF",
- "shop.exportExcel": "Eksportuoti Excel"
+ "shop.export": "Eksportuoti",
+ "shop.exportWhich": "Kokiu formatu?",
+ "shop.excelInfo": "Savaitė ir pirkinių sąrašas redaguoti kompiuteryje",
+ "shop.saved": "Išsaugota telefone: {name}",
+ "shop.notSaved": "Failas neišsaugotas. Vis tiek gali juo pasidalyti."
 }

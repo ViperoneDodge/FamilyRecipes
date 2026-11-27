@@ -587,6 +587,9 @@
  "xls.exampleStep2": "When the potatoes are soft add the pasta and cook, stirring.",
  "shop.pantry": "Check in the pantry",
  "shop.eggs": "Eggs",
- "shop.exportPdf": "Export PDF",
- "shop.exportExcel": "Export Excel"
+ "shop.export": "Export",
+ "shop.exportWhich": "Which format?",
+ "shop.excelInfo": "Week and shopping list, to edit on your computer",
+ "shop.saved": "Saved on the phone: {name}",
+ "shop.notSaved": "File not saved. You can still share it."
 }

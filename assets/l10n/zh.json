@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "检查储藏柜",
  "shop.eggs": "鸡蛋",
- "shop.exportPdf": "导出 PDF",
- "shop.exportExcel": "导出 Excel"
+ "shop.export": "导出",
+ "shop.exportWhich": "选择格式",
+ "shop.excelInfo": "本周计划和购物清单，可在电脑上编辑",
+ "shop.saved": "已保存到手机：{name}",
+ "shop.notSaved": "文件未保存。你仍然可以分享。"
 }

@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Provjeri u smočnici",
  "shop.eggs": "Jaja",
- "shop.exportPdf": "Izvezi PDF",
- "shop.exportExcel": "Izvezi Excel"
+ "shop.export": "Izvezi",
+ "shop.exportWhich": "U kojem formatu?",
+ "shop.excelInfo": "Tjedan i popis za kupnju za uređivanje na računalu",
+ "shop.saved": "Spremljeno na mobitel: {name}",
+ "shop.notSaved": "Datoteka nije spremljena. Ipak je možeš podijeliti."
 }

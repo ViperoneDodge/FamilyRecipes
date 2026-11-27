@@ -587,6 +587,9 @@
  "plan.weekOf": "{from} – {to}",
  "shop.pantry": "Pārbaudi pieliekamajā",
  "shop.eggs": "Olas",
- "shop.exportPdf": "Eksportēt PDF",
- "shop.exportExcel": "Eksportēt Excel"
+ "shop.export": "Eksportēt",
+ "shop.exportWhich": "Kādā formātā?",
+ "shop.excelInfo": "Nedēļa un iepirkumu saraksts rediģēšanai datorā",
+ "shop.saved": "Saglabāts tālrunī: {name}",
+ "shop.notSaved": "Fails nav saglabāts. Tomēr vari to kopīgot."
 }
