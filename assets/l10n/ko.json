@@ -598,5 +598,12 @@
  "login.deviceName": "이 휴대폰",
  "login.deviceInfo": "가입 없이 바로 사용하세요. 레시피는 이 휴대폰에만 저장됩니다. 언제든지 온라인 계정으로 바꿀 수 있습니다.",
  "login.deviceStart": "이 휴대폰에서 시작",
- "login.legacy": "사용자 이름 계정이 이미 있나요? 로그인"
+ "login.legacy": "사용자 이름 계정이 이미 있나요? 로그인",
+ "pro.devTitle": "개발자 코드",
+ "pro.devHint": "코드 입력",
+ "pro.devUnlocked": "Pro 잠금 해제됨(개발)",
+ "pro.devWrong": "잘못된 코드입니다",
+ "pro.devDisable": "개발자 Pro 끄기",
+ "pro.devDisabled": "개발자 Pro가 꺼졌습니다",
+ "pro.activeDev": "개발자 코드로 Pro 잠금 해제됨"
 }

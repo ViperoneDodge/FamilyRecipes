@@ -598,5 +598,12 @@
  "login.deviceName": "Šiame telefone",
  "login.deviceInfo": "Naudok programėlę iš karto, be registracijos: receptai lieka tik šiame telefone. Bet kada gali pereiti prie internetinės paskyros.",
  "login.deviceStart": "Pradėti šiame telefone",
- "login.legacy": "Jau turi paskyrą su naudotojo vardu? Prisijunk"
+ "login.legacy": "Jau turi paskyrą su naudotojo vardu? Prisijunk",
+ "pro.devTitle": "Kūrėjo kodas",
+ "pro.devHint": "Įveskite kodą",
+ "pro.devUnlocked": "Pro atrakinta (kūrimas)",
+ "pro.devWrong": "Neteisingas kodas",
+ "pro.devDisable": "Išjungti kūrėjo Pro",
+ "pro.devDisabled": "Kūrėjo Pro išjungta",
+ "pro.activeDev": "Pro atrakinta kūrėjo kodu"
 }

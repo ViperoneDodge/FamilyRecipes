@@ -598,5 +598,12 @@
  "login.deviceName": "Di ponsel ini",
  "login.deviceInfo": "Pakai aplikasi langsung, tanpa daftar: resep hanya tersimpan di ponsel ini. Kamu bisa beralih ke akun online kapan saja.",
  "login.deviceStart": "Mulai di ponsel ini",
- "login.legacy": "Sudah punya akun dengan nama pengguna? Masuk"
+ "login.legacy": "Sudah punya akun dengan nama pengguna? Masuk",
+ "pro.devTitle": "Kode pengembang",
+ "pro.devHint": "Masukkan kode",
+ "pro.devUnlocked": "Pro dibuka (pengembangan)",
+ "pro.devWrong": "Kode tidak valid",
+ "pro.devDisable": "Nonaktifkan Pro pengembangan",
+ "pro.devDisabled": "Pro pengembangan dinonaktifkan",
+ "pro.activeDev": "Pro dibuka dengan kode pengembang"
 }

@@ -598,5 +598,12 @@
  "login.deviceName": "この端末",
  "login.deviceInfo": "登録なしですぐに使えます。レシピはこの端末にだけ保存されます。いつでもオンラインアカウントに切り替えられます。",
  "login.deviceStart": "この端末で始める",
- "login.legacy": "ユーザー名のアカウントをお持ちですか？ログイン"
+ "login.legacy": "ユーザー名のアカウントをお持ちですか？ログイン",
+ "pro.devTitle": "開発者コード",
+ "pro.devHint": "コードを入力",
+ "pro.devUnlocked": "Pro を解除しました（開発）",
+ "pro.devWrong": "無効なコードです",
+ "pro.devDisable": "開発者 Pro をオフにする",
+ "pro.devDisabled": "開発者 Pro をオフにしました",
+ "pro.activeDev": "開発者コードで Pro を解除しました"
 }

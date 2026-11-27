@@ -598,5 +598,12 @@
  "login.deviceName": "Fuq dan il-mowbajl",
  "login.deviceInfo": "Uża l-app minnufih, mingħajr reġistrazzjoni: ir-riċetti jibqgħu biss fuq dan il-mowbajl. Tista' tgħaddi għal kont online meta trid.",
  "login.deviceStart": "Ibda fuq dan il-mowbajl",
- "login.legacy": "Diġà għandek kont b'isem tal-utent? Idħol"
+ "login.legacy": "Diġà għandek kont b'isem tal-utent? Idħol",
+ "pro.devTitle": "Kodiċi tal-iżviluppatur",
+ "pro.devHint": "Daħħal il-kodiċi",
+ "pro.devUnlocked": "Pro miftuħ (żvilupp)",
+ "pro.devWrong": "Kodiċi mhux validu",
+ "pro.devDisable": "Itfi l-Pro tal-iżvilupp",
+ "pro.devDisabled": "Pro tal-iżvilupp mitfi",
+ "pro.activeDev": "Pro miftuħ bil-kodiċi tal-iżviluppatur"
 }

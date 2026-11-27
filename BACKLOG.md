@@ -241,6 +241,10 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
 - **Esportazione in vista**: pulsanti PDF ed Excel nella Pianificazione e in basso nella lista della spesa.
 
 ## Prossima release
+- **Codice sviluppatore (fatto, in attesa di rilascio)**: come in MyFleetManager, tenendo premuto 5 secondi
+  «Colore del ricettario» (Impostazioni → Aspetto) compare il campo del codice; con la parola d'ordine si
+  sblocca Pro. Solo Android (regole dell'App Store), vale per la versione in cui è inserito; nel sorgente c'è
+  solo l'impronta sha256 del codice.
 - **Prova della pianificazione (fatto, in attesa di rilascio)**: senza Pro si possono riempire 2 settimane
   qualsiasi (lista della spesa ed esportazione comprese); dalla terza, invito a Pro. Svuotare una settimana non
   restituisce la prova; le settimane già usate restano modificabili.

@@ -598,5 +598,12 @@
  "login.deviceName": "Op deze telefoon",
  "login.deviceInfo": "Gebruik de app meteen, zonder registratie: de recepten blijven alleen op deze telefoon. Je kunt altijd overstappen op een online account.",
  "login.deviceStart": "Beginnen op deze telefoon",
- "login.legacy": "Heb je al een account met gebruikersnaam? Inloggen"
+ "login.legacy": "Heb je al een account met gebruikersnaam? Inloggen",
+ "pro.devTitle": "Ontwikkelaarscode",
+ "pro.devHint": "Voer de code in",
+ "pro.devUnlocked": "Pro ontgrendeld (ontwikkeling)",
+ "pro.devWrong": "Ongeldige code",
+ "pro.devDisable": "Ontwikkelaars-Pro uitschakelen",
+ "pro.devDisabled": "Ontwikkelaars-Pro uitgeschakeld",
+ "pro.activeDev": "Pro ontgrendeld met de ontwikkelaarscode"
 }

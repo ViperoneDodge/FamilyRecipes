@@ -598,5 +598,12 @@
  "login.deviceName": "Auf diesem Handy",
  "login.deviceInfo": "Nutze die App sofort ohne Registrierung: die Rezepte bleiben nur auf diesem Handy. Du kannst jederzeit zu einem Online-Konto wechseln.",
  "login.deviceStart": "Auf diesem Handy starten",
- "login.legacy": "Du hast schon ein Konto mit Benutzernamen? Anmelden"
+ "login.legacy": "Du hast schon ein Konto mit Benutzernamen? Anmelden",
+ "pro.devTitle": "Entwicklercode",
+ "pro.devHint": "Code eingeben",
+ "pro.devUnlocked": "Pro freigeschaltet (Entwicklung)",
+ "pro.devWrong": "Ungültiger Code",
+ "pro.devDisable": "Entwickler-Pro deaktivieren",
+ "pro.devDisabled": "Entwickler-Pro deaktiviert",
+ "pro.activeDev": "Pro mit dem Entwicklercode freigeschaltet"
 }

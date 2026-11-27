@@ -598,5 +598,12 @@
  "login.deviceName": "Í þessum síma",
  "login.deviceInfo": "Notaðu appið strax án skráningar: uppskriftirnar eru aðeins í þessum síma. Þú getur skipt yfir í netreikning hvenær sem er.",
  "login.deviceStart": "Byrja í þessum síma",
- "login.legacy": "Ertu þegar með reikning með notandanafni? Skráðu þig inn"
+ "login.legacy": "Ertu þegar með reikning með notandanafni? Skráðu þig inn",
+ "pro.devTitle": "Þróunarkóði",
+ "pro.devHint": "Sláðu inn kóðann",
+ "pro.devUnlocked": "Pro opnað (þróun)",
+ "pro.devWrong": "Ógildur kóði",
+ "pro.devDisable": "Slökkva á þróunar-Pro",
+ "pro.devDisabled": "Slökkt á þróunar-Pro",
+ "pro.activeDev": "Pro opnað með þróunarkóða"
 }

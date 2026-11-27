@@ -105,4 +105,16 @@ void main() {
     s.purchasedPro = true;
     expect(s.canPlanWeek(w3), isTrue);
   });
+
+  test('codice sviluppatore: sblocca Pro solo con la parola giusta, per questa versione', () async {
+    final s = statoFinto();
+    expect(s.isPro, isFalse);
+    expect(await s.unlockDev('sbagliato'), isFalse);
+    expect(await s.unlockDev(''), isFalse);
+    expect(s.isPro, isFalse);
+    expect(await s.unlockDev('  puzzolo '), isTrue, reason: 'maiuscole e spazi non contano');
+    expect(s.isPro, isTrue);
+    await s.disableDev();
+    expect(s.isPro, isFalse);
+  });
 }

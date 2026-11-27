@@ -598,5 +598,12 @@
  "login.deviceName": "Na ovom mobitelu",
  "login.deviceInfo": "Koristi aplikaciju odmah, bez registracije: recepti ostaju samo na ovom mobitelu. Na online račun možeš prijeći kad god želiš.",
  "login.deviceStart": "Započni na ovom mobitelu",
- "login.legacy": "Već imaš račun s korisničkim imenom? Prijavi se"
+ "login.legacy": "Već imaš račun s korisničkim imenom? Prijavi se",
+ "pro.devTitle": "Razvojni kod",
+ "pro.devHint": "Unesi kod",
+ "pro.devUnlocked": "Pro otključan (razvoj)",
+ "pro.devWrong": "Neispravan kod",
+ "pro.devDisable": "Isključi razvojni Pro",
+ "pro.devDisabled": "Razvojni Pro isključen",
+ "pro.activeDev": "Pro otključan razvojnim kodom"
 }

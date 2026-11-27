@@ -598,5 +598,12 @@
  "login.deviceName": "本机",
  "login.deviceInfo": "无需注册即可使用：食谱只保存在这部手机上。你随时可以切换到在线账户。",
  "login.deviceStart": "在本机开始使用",
- "login.legacy": "已有用户名账户？登录"
+ "login.legacy": "已有用户名账户？登录",
+ "pro.devTitle": "开发者代码",
+ "pro.devHint": "输入代码",
+ "pro.devUnlocked": "Pro 已解锁（开发）",
+ "pro.devWrong": "代码无效",
+ "pro.devDisable": "关闭开发者 Pro",
+ "pro.devDisabled": "开发者 Pro 已关闭",
+ "pro.activeDev": "已通过开发者代码解锁 Pro"
 }

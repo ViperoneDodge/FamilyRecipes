@@ -598,5 +598,12 @@
  "login.deviceName": "Ezen a telefonon",
  "login.deviceInfo": "Használd az alkalmazást azonnal, regisztráció nélkül: a receptek csak ezen a telefonon maradnak. Bármikor válthatsz online fiókra.",
  "login.deviceStart": "Kezdés ezen a telefonon",
- "login.legacy": "Van már felhasználónevas fiókod? Jelentkezz be"
+ "login.legacy": "Van már felhasználónevas fiókod? Jelentkezz be",
+ "pro.devTitle": "Fejlesztői kód",
+ "pro.devHint": "Add meg a kódot",
+ "pro.devUnlocked": "Pro feloldva (fejlesztés)",
+ "pro.devWrong": "Érvénytelen kód",
+ "pro.devDisable": "Fejlesztői Pro kikapcsolása",
+ "pro.devDisabled": "Fejlesztői Pro kikapcsolva",
+ "pro.activeDev": "Pro feloldva fejlesztői kóddal"
 }

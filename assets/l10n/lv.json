@@ -598,5 +598,12 @@
  "login.deviceName": "Šajā tālrunī",
  "login.deviceInfo": "Lieto lietotni uzreiz, bez reģistrācijas: receptes paliek tikai šajā tālrunī. Uz tiešsaistes kontu vari pāriet jebkurā laikā.",
  "login.deviceStart": "Sākt šajā tālrunī",
- "login.legacy": "Jau ir konts ar lietotājvārdu? Pieteikties"
+ "login.legacy": "Jau ir konts ar lietotājvārdu? Pieteikties",
+ "pro.devTitle": "Izstrādātāja kods",
+ "pro.devHint": "Ievadi kodu",
+ "pro.devUnlocked": "Pro atbloķēts (izstrāde)",
+ "pro.devWrong": "Nederīgs kods",
+ "pro.devDisable": "Izslēgt izstrādātāja Pro",
+ "pro.devDisabled": "Izstrādātāja Pro izslēgts",
+ "pro.activeDev": "Pro atbloķēts ar izstrādātāja kodu"
 }

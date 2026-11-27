@@ -598,5 +598,12 @@
  "login.deviceName": "V tomto telefonu",
  "login.deviceInfo": "Používej aplikaci hned, bez registrace: recepty zůstanou jen v tomto telefonu. Na online účet můžeš přejít kdykoli.",
  "login.deviceStart": "Začít v tomto telefonu",
- "login.legacy": "Už máš účet s uživatelským jménem? Přihlas se"
+ "login.legacy": "Už máš účet s uživatelským jménem? Přihlas se",
+ "pro.devTitle": "Vývojářský kód",
+ "pro.devHint": "Zadejte kód",
+ "pro.devUnlocked": "Pro odemčeno (vývoj)",
+ "pro.devWrong": "Neplatný kód",
+ "pro.devDisable": "Vypnout vývojářské Pro",
+ "pro.devDisabled": "Vývojářské Pro vypnuto",
+ "pro.activeDev": "Pro odemčeno vývojářským kódem"
 }

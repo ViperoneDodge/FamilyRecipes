@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:crypto/crypto.dart';
 
 import 'package:flutter/foundation.dart';
 
 import '../l10n.dart';
 import '../models.dart';
 import '../theme.dart';
+import '../version.dart';
 import 'auth_service.dart';
 import 'backup_service.dart';
 import 'group_watch.dart';
@@ -87,7 +91,43 @@ class AppState extends ChangeNotifier {
   /// Acquistata su questo telefono (o ripristinata dallo store).
   bool purchasedPro = false;
 
-  bool get isPro => purchasedPro || isAdmin;
+  bool get isPro => purchasedPro || (devPro && devCodeAllowed) || isAdmin;
+
+  /// Pro sbloccato con il codice sviluppatore (come in MyFleetManager): solo su Android (l'App Store non
+  /// ammette sblocchi nascosti di funzioni a pagamento) e solo per la versione dell'app in cui è stato
+  /// inserito; con un aggiornamento va reinserito.
+  bool devPro = false;
+  String? devProVersion;
+
+  static bool get devCodeAllowed {
+    try {
+      return !Platform.isIOS;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  // sha256 del codice (il codice non è scritto nel sorgente).
+  static const String _devCodeHash = '5ea02dddae77fc806de2318c6b0899b8f3f0752c909c52e44bd4baab5dd7069e';
+
+  /// true se il codice è giusto e Pro di sviluppo è ora attivo.
+  Future<bool> unlockDev(String code) async {
+    final c = code.trim().toUpperCase();
+    if (c.isEmpty || !devCodeAllowed) return false;
+    if (sha256.convert(utf8.encode(c)).toString() != _devCodeHash) return false;
+    devPro = true;
+    devProVersion = appVersion;
+    notifyListeners();
+    await _writeSettings();
+    return true;
+  }
+
+  Future<void> disableDev() async {
+    devPro = false;
+    devProVersion = null;
+    notifyListeners();
+    await _writeSettings();
+  }
 
   /// Versione gratuita: solo queste categorie, al massimo [freeLimit] ricette ciascuna in ogni ricettario.
   static const Set<RecipeCategory> freeCategories = {
@@ -222,6 +262,14 @@ class AppState extends ChangeNotifier {
     favGroups = ids(settings?['favGroups']);
     startOnFavorites = settings?['start'] == 'plan'; // pagina iniziale: la pianificazione
     purchasedPro = settings?['pro'] == true;
+    devPro = settings?['devPro'] == true;
+    final dv = settings?['devProVersion'];
+    devProVersion = dv is String ? dv : null;
+    if (devPro && (devProVersion != appVersion || !devCodeAllowed)) {
+      // Nuova versione dell'app: il codice sviluppatore va reinserito.
+      devPro = false;
+      devProVersion = null;
+    }
     photos.downloader = (book, id) => isCloud ? sync.downloadPhoto(book, id) : Future.value(null);
     notifyListeners();
     try {
@@ -538,6 +586,8 @@ class AppState extends ChangeNotifier {
         'favGroups': favGroups.toList(),
         if (startOnFavorites) 'start': 'plan',
         if (purchasedPro) 'pro': true,
+        if (devPro) 'devPro': true,
+        if (devPro && devProVersion != null) 'devProVersion': devProVersion,
       });
 
   // ---- Preferiti ----

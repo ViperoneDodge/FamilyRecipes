@@ -140,7 +140,8 @@ class ProScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
                 const SizedBox(height: 20),
                 if (appState.isPro)
-                  Text(tr('pro.activeThanks'), textAlign: TextAlign.center)
+                  Text(appState.devPro && !appState.purchasedPro ? tr('pro.activeDev') : tr('pro.activeThanks'),
+                      textAlign: TextAlign.center)
                 else ...[
                   FilledButton.icon(
                     onPressed: pro.busy || product == null

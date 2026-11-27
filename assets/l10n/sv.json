@@ -598,5 +598,12 @@
  "login.deviceName": "På den här telefonen",
  "login.deviceInfo": "Använd appen direkt utan att registrera dig: recepten stannar bara på den här telefonen. Du kan byta till ett onlinekonto när du vill.",
  "login.deviceStart": "Börja på den här telefonen",
- "login.legacy": "Har du redan ett konto med användarnamn? Logga in"
+ "login.legacy": "Har du redan ett konto med användarnamn? Logga in",
+ "pro.devTitle": "Utvecklarkod",
+ "pro.devHint": "Ange koden",
+ "pro.devUnlocked": "Pro upplåst (utveckling)",
+ "pro.devWrong": "Ogiltig kod",
+ "pro.devDisable": "Stäng av utvecklar-Pro",
+ "pro.devDisabled": "Utvecklar-Pro avstängd",
+ "pro.activeDev": "Pro upplåst med utvecklarkoden"
 }

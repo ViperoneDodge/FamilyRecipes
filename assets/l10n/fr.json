@@ -598,5 +598,12 @@
  "login.deviceName": "Sur ce téléphone",
  "login.deviceInfo": "Utilise l'app tout de suite, sans inscription : les recettes restent seulement sur ce téléphone. Tu peux passer à un compte en ligne quand tu veux.",
  "login.deviceStart": "Commencer sur ce téléphone",
- "login.legacy": "Tu as déjà un compte avec un nom d'utilisateur ? Connecte-toi"
+ "login.legacy": "Tu as déjà un compte avec un nom d'utilisateur ? Connecte-toi",
+ "pro.devTitle": "Code développeur",
+ "pro.devHint": "Saisissez le code",
+ "pro.devUnlocked": "Version Pro débloquée (développement)",
+ "pro.devWrong": "Code non valide",
+ "pro.devDisable": "Désactiver la Pro de développement",
+ "pro.devDisabled": "Pro de développement désactivée",
+ "pro.activeDev": "Pro débloquée avec le code développeur"
 }

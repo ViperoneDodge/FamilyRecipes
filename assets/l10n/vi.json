@@ -598,5 +598,12 @@
  "login.deviceName": "Trên điện thoại này",
  "login.deviceInfo": "Dùng ứng dụng ngay, không cần đăng ký: công thức chỉ lưu trên điện thoại này. Bạn có thể chuyển sang tài khoản trực tuyến bất cứ lúc nào.",
  "login.deviceStart": "Bắt đầu trên điện thoại này",
- "login.legacy": "Đã có tài khoản với tên người dùng? Đăng nhập"
+ "login.legacy": "Đã có tài khoản với tên người dùng? Đăng nhập",
+ "pro.devTitle": "Mã nhà phát triển",
+ "pro.devHint": "Nhập mã",
+ "pro.devUnlocked": "Đã mở khóa Pro (phát triển)",
+ "pro.devWrong": "Mã không hợp lệ",
+ "pro.devDisable": "Tắt Pro phát triển",
+ "pro.devDisabled": "Đã tắt Pro phát triển",
+ "pro.activeDev": "Đã mở khóa Pro bằng mã nhà phát triển"
 }

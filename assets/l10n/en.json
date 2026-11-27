@@ -598,5 +598,12 @@
  "login.deviceName": "On this phone",
  "login.deviceInfo": "Use the app right away, without signing up: recipes stay on this phone only. You can switch to an online account whenever you like.",
  "login.deviceStart": "Start on this phone",
- "login.legacy": "Already have an account with a username? Sign in"
+ "login.legacy": "Already have an account with a username? Sign in",
+ "pro.devTitle": "Developer code",
+ "pro.devHint": "Enter the code",
+ "pro.devUnlocked": "Pro unlocked (development)",
+ "pro.devWrong": "Invalid code",
+ "pro.devDisable": "Disable development Pro",
+ "pro.devDisabled": "Development Pro disabled",
+ "pro.activeDev": "Pro unlocked with the developer code"
 }

@@ -598,5 +598,12 @@
  "login.deviceName": "Tässä puhelimessa",
  "login.deviceInfo": "Käytä sovellusta heti ilman rekisteröitymistä: reseptit pysyvät vain tässä puhelimessa. Voit siirtyä verkkotiliin milloin vain.",
  "login.deviceStart": "Aloita tässä puhelimessa",
- "login.legacy": "Onko sinulla jo käyttäjänimellä tehty tili? Kirjaudu"
+ "login.legacy": "Onko sinulla jo käyttäjänimellä tehty tili? Kirjaudu",
+ "pro.devTitle": "Kehittäjäkoodi",
+ "pro.devHint": "Anna koodi",
+ "pro.devUnlocked": "Pro avattu (kehitys)",
+ "pro.devWrong": "Virheellinen koodi",
+ "pro.devDisable": "Poista kehittäjä-Pro käytöstä",
+ "pro.devDisabled": "Kehittäjä-Pro poistettu käytöstä",
+ "pro.activeDev": "Pro avattu kehittäjäkoodilla"
 }

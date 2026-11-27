@@ -598,5 +598,12 @@
  "login.deviceName": "Selles telefonis",
  "login.deviceInfo": "Kasuta rakendust kohe, ilma registreerimata: retseptid jäävad ainult sellesse telefoni. Veebikontole saad üle minna millal tahes.",
  "login.deviceStart": "Alusta selles telefonis",
- "login.legacy": "Sul on juba kasutajanimega konto? Logi sisse"
+ "login.legacy": "Sul on juba kasutajanimega konto? Logi sisse",
+ "pro.devTitle": "Arendaja kood",
+ "pro.devHint": "Sisesta kood",
+ "pro.devUnlocked": "Pro avatud (arendus)",
+ "pro.devWrong": "Vigane kood",
+ "pro.devDisable": "Lülita arendaja-Pro välja",
+ "pro.devDisabled": "Arendaja-Pro välja lülitatud",
+ "pro.activeDev": "Pro avatud arendaja koodiga"
 }

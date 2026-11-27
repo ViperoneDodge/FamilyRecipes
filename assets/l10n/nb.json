@@ -598,5 +598,12 @@
  "login.deviceName": "På denne telefonen",
  "login.deviceInfo": "Bruk appen med en gang uten å registrere deg: oppskriftene blir bare på denne telefonen. Du kan bytte til en nettkonto når du vil.",
  "login.deviceStart": "Start på denne telefonen",
- "login.legacy": "Har du allerede en konto med brukernavn? Logg inn"
+ "login.legacy": "Har du allerede en konto med brukernavn? Logg inn",
+ "pro.devTitle": "Utviklerkode",
+ "pro.devHint": "Skriv inn koden",
+ "pro.devUnlocked": "Pro låst opp (utvikling)",
+ "pro.devWrong": "Ugyldig kode",
+ "pro.devDisable": "Slå av utvikler-Pro",
+ "pro.devDisabled": "Utvikler-Pro slått av",
+ "pro.activeDev": "Pro låst opp med utviklerkoden"
 }

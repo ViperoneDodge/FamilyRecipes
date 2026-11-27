@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../l10n.dart';
 import '../main.dart';
+import '../services/app_state.dart';
 import '../services/support_service.dart';
 import '../services/sync_service.dart' show cloudErrorMessage;
 import '../theme.dart';
@@ -391,7 +394,9 @@ class SettingsScreen extends StatelessWidget {
           onSelectionChanged: (sel) => save(mode: sel.first),
         ),
       ),
-      _label(tr('theme.cover'), top: 8),
+      // Tenendo premuto 5 secondi su «Colore del ricettario» compare il campo del codice sviluppatore.
+      _SecretLabel(child: _label(tr('theme.cover'), top: 8)),
+      const _DevCodeField(),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Wrap(
@@ -599,6 +604,130 @@ class _NotifyStatusState extends State<_NotifyStatus> with WidgetsBindingObserve
     return ListTile(
       leading: Icon(Icons.notifications_active, color: Colors.green.shade700),
       title: Text(tr('settings.allowed')),
+    );
+  }
+}
+
+final ValueNotifier<bool> _devFieldVisible = ValueNotifier(false);
+
+/// Etichetta che, tenuta premuta 5 secondi, mostra il campo del codice sviluppatore (solo Android).
+class _SecretLabel extends StatefulWidget {
+  final Widget child;
+  const _SecretLabel({required this.child});
+
+  @override
+  State<_SecretLabel> createState() => _SecretLabelState();
+}
+
+class _SecretLabelState extends State<_SecretLabel> {
+  Timer? _t;
+
+  void _start() {
+    if (!AppState.devCodeAllowed) return;
+    _t?.cancel();
+    _t = Timer(const Duration(seconds: 5), () {
+      HapticFeedback.heavyImpact();
+      _devFieldVisible.value = true;
+    });
+  }
+
+  void _stop() {
+    _t?.cancel();
+    _t = null;
+  }
+
+  @override
+  void dispose() {
+    _stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerDown: (_) => _start(),
+        onPointerUp: (_) => _stop(),
+        onPointerCancel: (_) => _stop(),
+        child: widget.child,
+      );
+}
+
+class _DevCodeField extends StatefulWidget {
+  const _DevCodeField();
+
+  @override
+  State<_DevCodeField> createState() => _DevCodeFieldState();
+}
+
+class _DevCodeFieldState extends State<_DevCodeField> {
+  final _c = TextEditingController();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final ok = await appState.unlockDev(_c.text);
+    if (!mounted) return;
+    if (ok) {
+      _c.clear();
+      FocusScope.of(context).unfocus();
+    }
+    showSnack(context, ok ? tr('pro.devUnlocked') : tr('pro.devWrong'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _devFieldVisible,
+      builder: (context, visible, _) {
+        if (!visible) return const SizedBox.shrink();
+        return Card(
+          margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Row(children: [
+                const Icon(Icons.developer_mode, size: 20),
+                const SizedBox(width: 6),
+                Expanded(child: Text(tr('pro.devTitle'), style: const TextStyle(fontWeight: FontWeight.w600))),
+                IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => _devFieldVisible.value = false),
+              ]),
+              if (appState.devPro) ...[
+                Text(tr('pro.activeDev')),
+                const SizedBox(height: 6),
+                OutlinedButton(
+                  onPressed: () async {
+                    await appState.disableDev();
+                    if (context.mounted) showSnack(context, tr('pro.devDisabled'));
+                  },
+                  child: Text(tr('pro.devDisable')),
+                ),
+              ] else
+                Row(children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _c,
+                      textCapitalization: TextCapitalization.characters,
+                      autocorrect: false,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        hintText: tr('pro.devHint'),
+                      ),
+                      onSubmitted: (_) => _submit(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(onPressed: _submit, child: Text(tr('common.ok'))),
+                ]),
+            ]),
+          ),
+        );
+      },
     );
   }
 }

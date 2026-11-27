@@ -598,5 +598,12 @@
  "login.deviceName": "Pe acest telefon",
  "login.deviceInfo": "Folosește aplicația imediat, fără înregistrare: rețetele rămân doar pe acest telefon. Poți trece la un cont online oricând vrei.",
  "login.deviceStart": "Începe pe acest telefon",
- "login.legacy": "Ai deja un cont cu nume de utilizator? Conectează-te"
+ "login.legacy": "Ai deja un cont cu nume de utilizator? Conectează-te",
+ "pro.devTitle": "Cod de dezvoltator",
+ "pro.devHint": "Introdu codul",
+ "pro.devUnlocked": "Pro deblocat (dezvoltare)",
+ "pro.devWrong": "Cod invalid",
+ "pro.devDisable": "Dezactivează Pro de dezvoltare",
+ "pro.devDisabled": "Pro de dezvoltare dezactivat",
+ "pro.activeDev": "Pro deblocat cu codul de dezvoltator"
 }

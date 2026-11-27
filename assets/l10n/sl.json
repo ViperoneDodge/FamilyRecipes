@@ -598,5 +598,12 @@
  "login.deviceName": "Na tem telefonu",
  "login.deviceInfo": "Uporabljaj aplikacijo takoj, brez registracije: recepti ostanejo samo na tem telefonu. Na spletni račun lahko preklopiš kadar koli.",
  "login.deviceStart": "Začni na tem telefonu",
- "login.legacy": "Že imaš račun z uporabniškim imenom? Prijavi se"
+ "login.legacy": "Že imaš račun z uporabniškim imenom? Prijavi se",
+ "pro.devTitle": "Razvijalska koda",
+ "pro.devHint": "Vnesite kodo",
+ "pro.devUnlocked": "Pro odklenjen (razvoj)",
+ "pro.devWrong": "Neveljavna koda",
+ "pro.devDisable": "Izklopi razvijalski Pro",
+ "pro.devDisabled": "Razvijalski Pro izklopljen",
+ "pro.activeDev": "Pro odklenjen z razvijalsko kodo"
 }

@@ -598,5 +598,12 @@
  "login.deviceName": "Bu telefonda",
  "login.deviceInfo": "Uygulamayı hemen, kayıt olmadan kullan: tarifler yalnızca bu telefonda kalır. İstediğin zaman çevrimiçi hesaba geçebilirsin.",
  "login.deviceStart": "Bu telefonda başla",
- "login.legacy": "Kullanıcı adıyla hesabın var mı? Giriş yap"
+ "login.legacy": "Kullanıcı adıyla hesabın var mı? Giriş yap",
+ "pro.devTitle": "Geliştirici kodu",
+ "pro.devHint": "Kodu gir",
+ "pro.devUnlocked": "Pro açıldı (geliştirme)",
+ "pro.devWrong": "Geçersiz kod",
+ "pro.devDisable": "Geliştirici Pro'yu kapat",
+ "pro.devDisabled": "Geliştirici Pro kapatıldı",
+ "pro.activeDev": "Pro, geliştirici koduyla açıldı"
 }

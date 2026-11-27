@@ -598,5 +598,12 @@
  "login.deviceName": "Na tym telefonie",
  "login.deviceInfo": "Korzystaj z aplikacji od razu, bez rejestracji: przepisy zostają tylko na tym telefonie. W każdej chwili możesz przejść na konto online.",
  "login.deviceStart": "Zacznij na tym telefonie",
- "login.legacy": "Masz już konto z nazwą użytkownika? Zaloguj się"
+ "login.legacy": "Masz już konto z nazwą użytkownika? Zaloguj się",
+ "pro.devTitle": "Kod dewelopera",
+ "pro.devHint": "Wpisz kod",
+ "pro.devUnlocked": "Pro odblokowane (rozwój)",
+ "pro.devWrong": "Nieprawidłowy kod",
+ "pro.devDisable": "Wyłącz Pro deweloperskie",
+ "pro.devDisabled": "Pro deweloperskie wyłączone",
+ "pro.activeDev": "Pro odblokowane kodem dewelopera"
 }

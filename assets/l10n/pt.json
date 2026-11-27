@@ -598,5 +598,12 @@
  "login.deviceName": "Neste telemóvel",
  "login.deviceInfo": "Usa a app já, sem te registares: as receitas ficam só neste telemóvel. Podes passar para uma conta online quando quiseres.",
  "login.deviceStart": "Começar neste telemóvel",
- "login.legacy": "Já tens uma conta com nome de utilizador? Entra"
+ "login.legacy": "Já tens uma conta com nome de utilizador? Entra",
+ "pro.devTitle": "Código de programador",
+ "pro.devHint": "Introduza o código",
+ "pro.devUnlocked": "Pro desbloqueada (desenvolvimento)",
+ "pro.devWrong": "Código inválido",
+ "pro.devDisable": "Desativar Pro de desenvolvimento",
+ "pro.devDisabled": "Pro de desenvolvimento desativada",
+ "pro.activeDev": "Pro desbloqueada com o código de programador"
 }

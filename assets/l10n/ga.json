@@ -598,5 +598,12 @@
  "login.deviceName": "Ar an bhfón seo",
  "login.deviceInfo": "Úsáid an aip láithreach, gan clárú: fanann na hoidis ar an bhfón seo amháin. Is féidir leat aistriú chuig cuntas ar líne aon uair.",
  "login.deviceStart": "Tosaigh ar an bhfón seo",
- "login.legacy": "An bhfuil cuntas agat cheana le hainm úsáideora? Sínigh isteach"
+ "login.legacy": "An bhfuil cuntas agat cheana le hainm úsáideora? Sínigh isteach",
+ "pro.devTitle": "Cód forbróra",
+ "pro.devHint": "Iontráil an cód",
+ "pro.devUnlocked": "Díghlasáladh Pro (forbairt)",
+ "pro.devWrong": "Cód neamhbhailí",
+ "pro.devDisable": "Múch Pro forbartha",
+ "pro.devDisabled": "Múchadh Pro forbartha",
+ "pro.activeDev": "Díghlasáladh Pro le cód an fhorbróra"
 }
