@@ -594,5 +594,9 @@
  "shop.notSaved": "Faili ei salvestatud. Saad seda siiski jagada.",
  "plan.trial": "Tasuta proov: kasutatud {n} nädalat {max}-st",
  "plan.trialOver": "Kasutasid ära planeerimise {n} prooviagu. Pro-ga planeerid nii mitu nädalat, kui soovid; juba planeeritud jäävad alles.",
- "pro.benefitPlan": "Toidukordade planeerimine ja ostunimekiri igal nädalal"
+ "pro.benefitPlan": "Toidukordade planeerimine ja ostunimekiri igal nädalal",
+ "login.deviceName": "Selles telefonis",
+ "login.deviceInfo": "Kasuta rakendust kohe, ilma registreerimata: retseptid jäävad ainult sellesse telefoni. Veebikontole saad üle minna millal tahes.",
+ "login.deviceStart": "Alusta selles telefonis",
+ "login.legacy": "Sul on juba kasutajanimega konto? Logi sisse"
 }

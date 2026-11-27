@@ -594,5 +594,9 @@
  "shop.notSaved": "Níor sábháladh an comhad. Is féidir leat é a roinnt mar sin féin.",
  "plan.trial": "Triail saor in aisce: {n} as {max} seachtain úsáidte",
  "plan.trialOver": "D'úsáid tú {n} seachtain trialach na pleanála. Le Pro pleanálann tú an oiread seachtainí agus is mian leat; fanann na cinn atá pleanáilte cheana.",
- "pro.benefitPlan": "Pleanáil béilí agus liosta siopadóireachta, gach seachtain"
+ "pro.benefitPlan": "Pleanáil béilí agus liosta siopadóireachta, gach seachtain",
+ "login.deviceName": "Ar an bhfón seo",
+ "login.deviceInfo": "Úsáid an aip láithreach, gan clárú: fanann na hoidis ar an bhfón seo amháin. Is féidir leat aistriú chuig cuntas ar líne aon uair.",
+ "login.deviceStart": "Tosaigh ar an bhfón seo",
+ "login.legacy": "An bhfuil cuntas agat cheana le hainm úsáideora? Sínigh isteach"
 }

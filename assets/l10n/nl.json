@@ -594,5 +594,9 @@
  "shop.notSaved": "Bestand niet opgeslagen. Je kunt het wel delen.",
  "plan.trial": "Gratis proef: {n} van {max} weken gebruikt",
  "plan.trialOver": "Je hebt de {n} proefweken van de planning gebruikt. Met Pro plan je zoveel weken als je wilt; al geplande weken blijven.",
- "pro.benefitPlan": "Maaltijdplanning en boodschappenlijst, elke week"
+ "pro.benefitPlan": "Maaltijdplanning en boodschappenlijst, elke week",
+ "login.deviceName": "Op deze telefoon",
+ "login.deviceInfo": "Gebruik de app meteen, zonder registratie: de recepten blijven alleen op deze telefoon. Je kunt altijd overstappen op een online account.",
+ "login.deviceStart": "Beginnen op deze telefoon",
+ "login.legacy": "Heb je al een account met gebruikersnaam? Inloggen"
 }

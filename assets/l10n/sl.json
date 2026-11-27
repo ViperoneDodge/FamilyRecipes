@@ -594,5 +594,9 @@
  "shop.notSaved": "Datoteka ni shranjena. Lahko jo vseeno deliš.",
  "plan.trial": "Brezplačni preizkus: porabljenih {n} od {max} tednov",
  "plan.trialOver": "Porabil si {n} preizkusna tedna načrtovanja. S Pro načrtuješ poljubno tednov; že načrtovani ostanejo.",
- "pro.benefitPlan": "Načrtovanje obrokov in nakupovalni seznam, vsak teden"
+ "pro.benefitPlan": "Načrtovanje obrokov in nakupovalni seznam, vsak teden",
+ "login.deviceName": "Na tem telefonu",
+ "login.deviceInfo": "Uporabljaj aplikacijo takoj, brez registracije: recepti ostanejo samo na tem telefonu. Na spletni račun lahko preklopiš kadar koli.",
+ "login.deviceStart": "Začni na tem telefonu",
+ "login.legacy": "Že imaš račun z uporabniškim imenom? Prijavi se"
 }

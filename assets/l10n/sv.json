@@ -594,5 +594,9 @@
  "shop.notSaved": "Filen sparades inte. Du kan ändå dela den.",
  "plan.trial": "Gratis provperiod: {n} av {max} veckor använda",
  "plan.trialOver": "Du har använt de {n} provveckorna av matplaneringen. Med Pro planerar du hur många veckor du vill; redan planerade veckor finns kvar.",
- "pro.benefitPlan": "Matplanering och inköpslista, varje vecka"
+ "pro.benefitPlan": "Matplanering och inköpslista, varje vecka",
+ "login.deviceName": "På den här telefonen",
+ "login.deviceInfo": "Använd appen direkt utan att registrera dig: recepten stannar bara på den här telefonen. Du kan byta till ett onlinekonto när du vill.",
+ "login.deviceStart": "Börja på den här telefonen",
+ "login.legacy": "Har du redan ett konto med användarnamn? Logga in"
 }

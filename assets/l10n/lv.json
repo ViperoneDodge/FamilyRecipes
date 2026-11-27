@@ -594,5 +594,9 @@
  "shop.notSaved": "Fails nav saglabāts. Tomēr vari to kopīgot.",
  "plan.trial": "Bezmaksas izmēģinājums: izmantotas {n} no {max} nedēļām",
  "plan.trialOver": "Tu izmantoji {n} plānošanas izmēģinājuma nedēļas. Ar Pro plāno tik nedēļu, cik vēlies; jau ieplānotās paliek.",
- "pro.benefitPlan": "Ēdienreižu plānošana un iepirkumu saraksts katru nedēļu"
+ "pro.benefitPlan": "Ēdienreižu plānošana un iepirkumu saraksts katru nedēļu",
+ "login.deviceName": "Šajā tālrunī",
+ "login.deviceInfo": "Lieto lietotni uzreiz, bez reģistrācijas: receptes paliek tikai šajā tālrunī. Uz tiešsaistes kontu vari pāriet jebkurā laikā.",
+ "login.deviceStart": "Sākt šajā tālrunī",
+ "login.legacy": "Jau ir konts ar lietotājvārdu? Pieteikties"
 }

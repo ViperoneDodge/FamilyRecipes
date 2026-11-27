@@ -594,5 +594,9 @@
  "shop.notSaved": "File non salvato. Puoi comunque condividerlo.",
  "plan.trial": "Prova gratuita: {n} settimane usate su {max}",
  "plan.trialOver": "Hai usato le {n} settimane di prova della pianificazione. Con Pro pianifichi tutte le settimane che vuoi; quelle già pianificate restano.",
- "pro.benefitPlan": "Pianificazione dei pasti e lista della spesa, ogni settimana"
+ "pro.benefitPlan": "Pianificazione dei pasti e lista della spesa, ogni settimana",
+ "login.deviceName": "Su questo telefono",
+ "login.deviceInfo": "Usa l'app subito, senza registrarti: le ricette restano solo su questo telefono. Puoi passare a un account online quando vuoi.",
+ "login.deviceStart": "Inizia su questo telefono",
+ "login.legacy": "Hai già un account con nome utente? Accedi"
 }

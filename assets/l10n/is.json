@@ -594,5 +594,9 @@
  "shop.notSaved": "Skráin var ekki vistuð. Þú getur samt deilt henni.",
  "plan.trial": "Ókeypis prufa: {n} af {max} vikum notaðar",
  "plan.trialOver": "Þú hefur notað {n} prufuvikur matarskipulagsins. Með Pro skipuleggur þú eins margar vikur og þú vilt; þær sem eru skipulagðar haldast.",
- "pro.benefitPlan": "Matarskipulag og innkaupalisti, hverja viku"
+ "pro.benefitPlan": "Matarskipulag og innkaupalisti, hverja viku",
+ "login.deviceName": "Í þessum síma",
+ "login.deviceInfo": "Notaðu appið strax án skráningar: uppskriftirnar eru aðeins í þessum síma. Þú getur skipt yfir í netreikning hvenær sem er.",
+ "login.deviceStart": "Byrja í þessum síma",
+ "login.legacy": "Ertu þegar með reikning með notandanafni? Skráðu þig inn"
 }

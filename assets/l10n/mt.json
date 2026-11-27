@@ -594,5 +594,9 @@
  "shop.notSaved": "Il-fajl ma ġiex salvat. Xorta tista' taqsmu.",
  "plan.trial": "Prova b'xejn: użati {n} minn {max} ġimgħat",
  "plan.trialOver": "Użajt il-{n} ġimgħat ta' prova tal-ippjanar. Bi Pro tippjana kemm trid ġimgħat; dawk diġà ppjanati jibqgħu.",
- "pro.benefitPlan": "Ippjanar tal-ikliet u lista tax-xiri, kull ġimgħa"
+ "pro.benefitPlan": "Ippjanar tal-ikliet u lista tax-xiri, kull ġimgħa",
+ "login.deviceName": "Fuq dan il-mowbajl",
+ "login.deviceInfo": "Uża l-app minnufih, mingħajr reġistrazzjoni: ir-riċetti jibqgħu biss fuq dan il-mowbajl. Tista' tgħaddi għal kont online meta trid.",
+ "login.deviceStart": "Ibda fuq dan il-mowbajl",
+ "login.legacy": "Diġà għandek kont b'isem tal-utent? Idħol"
 }

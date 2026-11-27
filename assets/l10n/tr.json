@@ -594,5 +594,9 @@
  "shop.notSaved": "Dosya kaydedilmedi. Yine de paylaşabilirsin.",
  "plan.trial": "Ücretsiz deneme: {max} haftanın {n} tanesi kullanıldı",
  "plan.trialOver": "Planlamanın {n} deneme haftasını kullandın. Pro ile istediğin kadar hafta planlarsın; planlanmış haftalar kalır.",
- "pro.benefitPlan": "Her hafta yemek planlama ve alışveriş listesi"
+ "pro.benefitPlan": "Her hafta yemek planlama ve alışveriş listesi",
+ "login.deviceName": "Bu telefonda",
+ "login.deviceInfo": "Uygulamayı hemen, kayıt olmadan kullan: tarifler yalnızca bu telefonda kalır. İstediğin zaman çevrimiçi hesaba geçebilirsin.",
+ "login.deviceStart": "Bu telefonda başla",
+ "login.legacy": "Kullanıcı adıyla hesabın var mı? Giriş yap"
 }

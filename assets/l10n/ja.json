@@ -594,5 +594,9 @@
  "shop.notSaved": "保存されませんでした。共有はできます。",
  "plan.trial": "無料お試し：{max} 週中 {n} 週使用",
  "plan.trialOver": "献立のお試し {n} 週間を使い切りました。Pro なら何週でも計画できます。作成済みの週は残ります。",
- "pro.benefitPlan": "毎週の献立プランと買い物リスト"
+ "pro.benefitPlan": "毎週の献立プランと買い物リスト",
+ "login.deviceName": "この端末",
+ "login.deviceInfo": "登録なしですぐに使えます。レシピはこの端末にだけ保存されます。いつでもオンラインアカウントに切り替えられます。",
+ "login.deviceStart": "この端末で始める",
+ "login.legacy": "ユーザー名のアカウントをお持ちですか？ログイン"
 }

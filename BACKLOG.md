@@ -241,6 +241,12 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
 - **Esportazione in vista**: pulsanti PDF ed Excel nella Pianificazione e in basso nella lista della spesa.
 
 ## Prossima release
+- **Prova della pianificazione (fatto, in attesa di rilascio)**: senza Pro si possono riempire 2 settimane
+  qualsiasi (lista della spesa ed esportazione comprese); dalla terza, invito a Pro. Svuotare una settimana non
+  restituisce la prova; le settimane già usate restano modificabili.
+- **Solo telefono senza registrazione (fatto, in attesa di rilascio)**: un pulsante «Inizia su questo telefono»
+  al posto di nome utente e password; chi ha già un account solo-telefono può ancora accedere con «Hai già un
+  account con nome utente?». Nuovi account con nome utente e password solo online.
 - **Esporta (fatto, in attesa di rilascio)**: nella Pianificazione e nella lista della spesa un solo pulsante
   «Esporta» che chiede il formato (PDF o Excel). Il file prima si salva sul telefono (si sceglie dove), poi un
   avviso offre «Condividi»; se il salvataggio viene annullato si può comunque condividere.

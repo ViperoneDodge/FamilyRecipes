@@ -594,5 +594,9 @@
  "shop.notSaved": "File tidak disimpan. Kamu tetap bisa membagikannya.",
  "plan.trial": "Uji coba gratis: {n} dari {max} minggu terpakai",
  "plan.trialOver": "Kamu sudah memakai {n} minggu uji coba perencanaan. Dengan Pro kamu bisa merencanakan minggu sebanyak yang kamu mau; minggu yang sudah direncanakan tetap ada.",
- "pro.benefitPlan": "Perencanaan makan dan daftar belanja, setiap minggu"
+ "pro.benefitPlan": "Perencanaan makan dan daftar belanja, setiap minggu",
+ "login.deviceName": "Di ponsel ini",
+ "login.deviceInfo": "Pakai aplikasi langsung, tanpa daftar: resep hanya tersimpan di ponsel ini. Kamu bisa beralih ke akun online kapan saja.",
+ "login.deviceStart": "Mulai di ponsel ini",
+ "login.legacy": "Sudah punya akun dengan nama pengguna? Masuk"
 }

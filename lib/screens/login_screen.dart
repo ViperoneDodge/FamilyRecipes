@@ -19,6 +19,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final _pass = TextEditingController();
   final _pass2 = TextEditingController();
   bool _register = false;
+
+  /// Accesso con nome utente e password (solo per gli account solo-telefono delle versioni precedenti).
+  bool _legacy = false;
+  bool _hasLocal = false;
+
+  @override
+  void initState() {
+    super.initState();
+    appState.auth.hasLocalAccounts().then((v) {
+      if (mounted && v) setState(() => _hasLocal = true);
+    }).catchError((_) {});
+  }
+
   bool _busy = false;
   bool _hide = true;
   late AccountMode _mode = widget.upgrade || appState.auth.cloudAvailable ? AccountMode.cloud : AccountMode.local;
@@ -99,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     final auth = appState.auth;
     if (_mode == AccountMode.local) {
-      _run(() => _register ? auth.registerLocal(u, p) : auth.loginLocal(u, p));
+      _run(() => auth.loginLocal(u, p));
     } else {
       _run(() => _register ? auth.registerCloud(u, p) : auth.loginCloud(u, p));
     }
@@ -195,7 +208,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       label: Text(tr('login.modeLocal'))),
                                 ],
                                 selected: {_mode},
-                                onSelectionChanged: (s) => setState(() => _mode = s.first),
+                                onSelectionChanged: (s) => setState(() {
+                                  _mode = s.first;
+                                  _register = false;
+                                }),
                               ),
                               const SizedBox(height: 8),
                               Text(
@@ -205,53 +221,73 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 16),
                             ],
-                            TextField(
-                              controller: _user,
-                              keyboardType: isLocal ? TextInputType.text : TextInputType.emailAddress,
-                              autocorrect: false,
-                              textInputAction: TextInputAction.next,
-                              decoration: _decoration(isLocal ? tr('login.username') : tr('login.email'),
-                                  isLocal ? Icons.person : Icons.email),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _pass,
-                              obscureText: _hide,
-                              textInputAction: _register ? TextInputAction.next : TextInputAction.done,
-                              onSubmitted: (_) {
-                                if (!_register) _submit();
-                              },
-                              decoration: _decoration(
-                                tr('login.password'),
-                                Icons.lock,
-                                suffix: IconButton(
-                                  icon: Icon(_hide ? Icons.visibility : Icons.visibility_off),
-                                  onPressed: () => setState(() => _hide = !_hide),
-                                ),
+                            if (isLocal && !_legacy) ...[
+                              // Solo telefono: niente registrazione, si entra e basta.
+                              Text(tr('login.deviceInfo'),
+                                  textAlign: TextAlign.center, style: TextStyle(color: scheme.onSurfaceVariant)),
+                              const SizedBox(height: 16),
+                              FilledButton.icon(
+                                onPressed: _busy ? null : () => _run(() async => appState.auth.deviceSession()),
+                                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                                icon: const Icon(Icons.phone_android),
+                                label: Text(tr('login.deviceStart')),
                               ),
-                            ),
-                            if (_register) ...[
+                              if (_hasLocal)
+                                TextButton(
+                                  onPressed: _busy ? null : () => setState(() => _legacy = true),
+                                  child: Text(tr('login.legacy')),
+                                ),
+                            ] else ...[
+                              TextField(
+                                controller: _user,
+                                keyboardType: isLocal ? TextInputType.text : TextInputType.emailAddress,
+                                autocorrect: false,
+                                textInputAction: TextInputAction.next,
+                                decoration: _decoration(isLocal ? tr('login.username') : tr('login.email'),
+                                    isLocal ? Icons.person : Icons.email),
+                              ),
                               const SizedBox(height: 12),
                               TextField(
-                                controller: _pass2,
+                                controller: _pass,
                                 obscureText: _hide,
-                                onSubmitted: (_) => _submit(),
-                                decoration: _decoration(tr('login.password2'), Icons.lock_outline),
+                                textInputAction: _register ? TextInputAction.next : TextInputAction.done,
+                                onSubmitted: (_) {
+                                  if (!_register) _submit();
+                                },
+                                decoration: _decoration(
+                                  tr('login.password'),
+                                  Icons.lock,
+                                  suffix: IconButton(
+                                    icon: Icon(_hide ? Icons.visibility : Icons.visibility_off),
+                                    onPressed: () => setState(() => _hide = !_hide),
+                                  ),
+                                ),
                               ),
+                              if (_register) ...[
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: _pass2,
+                                  obscureText: _hide,
+                                  onSubmitted: (_) => _submit(),
+                                  decoration: _decoration(tr('login.password2'), Icons.lock_outline),
+                                ),
+                              ],
+                              const SizedBox(height: 20),
+                              FilledButton(
+                                onPressed: _busy ? null : _submit,
+                                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                                child: _busy
+                                    ? const SizedBox(
+                                        height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                                    : Text(_register ? tr('login.create') : tr('login.signIn')),
+                              ),
+                              // Nuovi account con nome utente e password solo online.
+                              if (!isLocal)
+                                TextButton(
+                                  onPressed: _busy ? null : () => setState(() => _register = !_register),
+                                  child: Text(_register ? tr('login.haveAccount') : tr('login.noAccount')),
+                                ),
                             ],
-                            const SizedBox(height: 20),
-                            FilledButton(
-                              onPressed: _busy ? null : _submit,
-                              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                              child: _busy
-                                  ? const SizedBox(
-                                      height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                                  : Text(_register ? tr('login.create') : tr('login.signIn')),
-                            ),
-                            TextButton(
-                              onPressed: _busy ? null : () => setState(() => _register = !_register),
-                              child: Text(_register ? tr('login.haveAccount') : tr('login.noAccount')),
-                            ),
                             if (!isLocal && !_register)
                               TextButton(
                                 onPressed: _busy ? null : _forgot,

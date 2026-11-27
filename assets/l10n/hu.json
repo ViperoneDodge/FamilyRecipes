@@ -594,5 +594,9 @@
  "shop.notSaved": "A fájl nincs mentve. Azért megoszthatod.",
  "plan.trial": "Ingyenes próba: {max} hétből {n} felhasználva",
  "plan.trialOver": "Felhasználtad a tervezés {n} próbahetét. Pro-val annyi hetet tervezel, amennyit szeretnél; a már megtervezettek megmaradnak.",
- "pro.benefitPlan": "Étkezéstervezés és bevásárlólista minden héten"
+ "pro.benefitPlan": "Étkezéstervezés és bevásárlólista minden héten",
+ "login.deviceName": "Ezen a telefonon",
+ "login.deviceInfo": "Használd az alkalmazást azonnal, regisztráció nélkül: a receptek csak ezen a telefonon maradnak. Bármikor válthatsz online fiókra.",
+ "login.deviceStart": "Kezdés ezen a telefonon",
+ "login.legacy": "Van már felhasználónevas fiókod? Jelentkezz be"
 }

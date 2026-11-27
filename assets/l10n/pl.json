@@ -594,5 +594,9 @@
  "shop.notSaved": "Plik nie został zapisany. Nadal możesz go udostępnić.",
  "plan.trial": "Darmowy okres próbny: wykorzystano {n} z {max} tygodni",
  "plan.trialOver": "Wykorzystano {n} próbne tygodnie planowania. Z Pro zaplanujesz dowolnie wiele tygodni; już zaplanowane zostają.",
- "pro.benefitPlan": "Planowanie posiłków i lista zakupów, co tydzień"
+ "pro.benefitPlan": "Planowanie posiłków i lista zakupów, co tydzień",
+ "login.deviceName": "Na tym telefonie",
+ "login.deviceInfo": "Korzystaj z aplikacji od razu, bez rejestracji: przepisy zostają tylko na tym telefonie. W każdej chwili możesz przejść na konto online.",
+ "login.deviceStart": "Zacznij na tym telefonie",
+ "login.legacy": "Masz już konto z nazwą użytkownika? Zaloguj się"
 }

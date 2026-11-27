@@ -594,5 +594,9 @@
  "shop.notSaved": "Fișierul nu a fost salvat. Îl poți totuși partaja.",
  "plan.trial": "Încercare gratuită: {n} din {max} săptămâni folosite",
  "plan.trialOver": "Ai folosit cele {n} săptămâni de încercare ale planificării. Cu Pro planifici câte săptămâni vrei; cele deja planificate rămân.",
- "pro.benefitPlan": "Planificarea meselor și lista de cumpărături, în fiecare săptămână"
+ "pro.benefitPlan": "Planificarea meselor și lista de cumpărături, în fiecare săptămână",
+ "login.deviceName": "Pe acest telefon",
+ "login.deviceInfo": "Folosește aplicația imediat, fără înregistrare: rețetele rămân doar pe acest telefon. Poți trece la un cont online oricând vrei.",
+ "login.deviceStart": "Începe pe acest telefon",
+ "login.legacy": "Ai deja un cont cu nume de utilizator? Conectează-te"
 }

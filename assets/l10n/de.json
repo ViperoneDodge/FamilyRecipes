@@ -594,5 +594,9 @@
  "shop.notSaved": "Datei nicht gespeichert. Du kannst sie trotzdem teilen.",
  "plan.trial": "Gratis-Test: {n} von {max} Wochen genutzt",
  "plan.trialOver": "Du hast die {n} Testwochen der Essensplanung genutzt. Mit Pro planst du beliebig viele Wochen; bereits geplante bleiben.",
- "pro.benefitPlan": "Essensplanung und Einkaufsliste, jede Woche"
+ "pro.benefitPlan": "Essensplanung und Einkaufsliste, jede Woche",
+ "login.deviceName": "Auf diesem Handy",
+ "login.deviceInfo": "Nutze die App sofort ohne Registrierung: die Rezepte bleiben nur auf diesem Handy. Du kannst jederzeit zu einem Online-Konto wechseln.",
+ "login.deviceStart": "Auf diesem Handy starten",
+ "login.legacy": "Du hast schon ein Konto mit Benutzernamen? Anmelden"
 }

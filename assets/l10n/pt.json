@@ -594,5 +594,9 @@
  "shop.notSaved": "Ficheiro não guardado. Podes partilhá-lo na mesma.",
  "plan.trial": "Teste gratuito: {n} de {max} semanas usadas",
  "plan.trialOver": "Usaste as {n} semanas de teste do planeamento. Com Pro planeias todas as semanas que quiseres; as já planeadas mantêm-se.",
- "pro.benefitPlan": "Planeamento de refeições e lista de compras, todas as semanas"
+ "pro.benefitPlan": "Planeamento de refeições e lista de compras, todas as semanas",
+ "login.deviceName": "Neste telemóvel",
+ "login.deviceInfo": "Usa a app já, sem te registares: as receitas ficam só neste telemóvel. Podes passar para uma conta online quando quiseres.",
+ "login.deviceStart": "Começar neste telemóvel",
+ "login.legacy": "Já tens uma conta com nome de utilizador? Entra"
 }

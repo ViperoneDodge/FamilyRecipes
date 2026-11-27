@@ -594,5 +594,9 @@
  "shop.notSaved": "文件未保存。你仍然可以分享。",
  "plan.trial": "免费试用：已用 {n}/{max} 周",
  "plan.trialOver": "你已用完 {n} 周的膳食计划试用。升级 Pro 可规划任意多周；已规划的周会保留。",
- "pro.benefitPlan": "每周膳食计划和购物清单"
+ "pro.benefitPlan": "每周膳食计划和购物清单",
+ "login.deviceName": "本机",
+ "login.deviceInfo": "无需注册即可使用：食谱只保存在这部手机上。你随时可以切换到在线账户。",
+ "login.deviceStart": "在本机开始使用",
+ "login.legacy": "已有用户名账户？登录"
 }

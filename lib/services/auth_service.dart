@@ -33,6 +33,15 @@ class AuthService {
 
   String _normUser(String u) => u.trim().toLowerCase();
 
+  /// Account solo su questo telefono senza nome utente né password (dalla 1.11.2): sempre lo stesso,
+  /// così le ricette restano dove sono anche dopo un'uscita.
+  static const String deviceKey = 'device';
+
+  Session deviceSession() => Session(mode: AccountMode.local, key: deviceKey, displayName: tr('login.deviceName'));
+
+  /// Ci sono account con nome utente e password creati con le versioni precedenti.
+  Future<bool> hasLocalAccounts() async => (await store.readAccounts()).isNotEmpty;
+
   Future<Session> registerLocal(String username, String password) async {
     final u = _normUser(username);
     if (u.length < 3) throw AuthException(tr('auth.userShort'));

@@ -594,5 +594,9 @@
  "shop.notSaved": "Soubor nebyl uložen. Přesto ho můžeš sdílet.",
  "plan.trial": "Zkušební verze: využito {n} z {max} týdnů",
  "plan.trialOver": "Využil jsi {n} zkušební týdny plánování. S Pro naplánuješ libovolně týdnů; už naplánované zůstanou.",
- "pro.benefitPlan": "Plánování jídel a nákupní seznam, každý týden"
+ "pro.benefitPlan": "Plánování jídel a nákupní seznam, každý týden",
+ "login.deviceName": "V tomto telefonu",
+ "login.deviceInfo": "Používej aplikaci hned, bez registrace: recepty zůstanou jen v tomto telefonu. Na online účet můžeš přejít kdykoli.",
+ "login.deviceStart": "Začít v tomto telefonu",
+ "login.legacy": "Už máš účet s uživatelským jménem? Přihlas se"
 }

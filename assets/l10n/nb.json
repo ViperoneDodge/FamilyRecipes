@@ -594,5 +594,9 @@
  "shop.notSaved": "Filen ble ikke lagret. Du kan likevel dele den.",
  "plan.trial": "Gratis prøve: {n} av {max} uker brukt",
  "plan.trialOver": "Du har brukt de {n} prøveukene av måltidsplanen. Med Pro planlegger du så mange uker du vil; de som allerede er planlagt blir værende.",
- "pro.benefitPlan": "Måltidsplan og handleliste, hver uke"
+ "pro.benefitPlan": "Måltidsplan og handleliste, hver uke",
+ "login.deviceName": "På denne telefonen",
+ "login.deviceInfo": "Bruk appen med en gang uten å registrere deg: oppskriftene blir bare på denne telefonen. Du kan bytte til en nettkonto når du vil.",
+ "login.deviceStart": "Start på denne telefonen",
+ "login.legacy": "Har du allerede en konto med brukernavn? Logg inn"
 }

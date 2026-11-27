@@ -594,5 +594,9 @@
  "shop.notSaved": "Tiedostoa ei tallennettu. Voit silti jakaa sen.",
  "plan.trial": "Ilmainen kokeilu: {n}/{max} viikkoa käytetty",
  "plan.trialOver": "Olet käyttänyt ateriasuunnittelun {n} kokeiluviikkoa. Pro-versiolla suunnittelet niin monta viikkoa kuin haluat; jo suunnitellut säilyvät.",
- "pro.benefitPlan": "Ateriasuunnittelu ja ostoslista joka viikko"
+ "pro.benefitPlan": "Ateriasuunnittelu ja ostoslista joka viikko",
+ "login.deviceName": "Tässä puhelimessa",
+ "login.deviceInfo": "Käytä sovellusta heti ilman rekisteröitymistä: reseptit pysyvät vain tässä puhelimessa. Voit siirtyä verkkotiliin milloin vain.",
+ "login.deviceStart": "Aloita tässä puhelimessa",
+ "login.legacy": "Onko sinulla jo käyttäjänimellä tehty tili? Kirjaudu"
 }
