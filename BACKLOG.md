@@ -258,6 +258,14 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
   difficoltà, costo, tempi, autore, introduzione e consigli; poi gli ingredienti; poi i passaggi (riga «N.»).
   Per aggiungere ricette si copia un foglio. Ultimo foglio «Valori» con i valori ammessi.
 
+## Versione 1.11.3 (in preparazione)
+- **Repository privato**: le pagine pubbliche (`docs/`: privacy, inviti ai gruppi) passano da GitHub Pages a
+  **Firebase Hosting** (`https://familyrecipes-46e1a.web.app`), come MyFleetManager. Workflow `sito.yml` (a ogni
+  modifica di `docs/`) e `firestore-rules.yml` (pubblica le regole, a mano). Serve il Secret
+  `FIREBASE_SERVICE_ACCOUNT`. I QR già condivisi con l'indirizzo GitHub restano validi.
+- Test del codice sviluppatore con un codice di prova; limiti alla dimensione decompressa di zip e xlsx.
+- Da fare prima del rilascio: nuovo codice sviluppatore.
+
 ## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per

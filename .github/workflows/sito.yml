@@ -1,0 +1,27 @@
+name: Pubblica il sito
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', 'firebase.json', '.github/workflows/build-web.yml']
+  workflow_dispatch:
+
+jobs:
+  sito:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Il repository è privato: le pagine pubbliche (privacy, inviti ai gruppi) stanno su Firebase Hosting
+      # (https://familyrecipes-46e1a.web.app), come in MyFleetManager. Serve il Secret FIREBASE_SERVICE_ACCOUNT.
+      - name: Pubblica le pagine di docs su Firebase Hosting
+        if: ${{ env.FIREBASE_SA != '' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: familyrecipes-46e1a
+          channelId: live
+          firebaseToolsVersion: 15.34.0

@@ -13,7 +13,11 @@ import '../l10n.dart';
 import 'common.dart';
 
 const String _qrPrefix = 'familyrecipes:join:';
-const String _joinUrl = 'https://viperonedodge.github.io/FamilyRecipes/join.html';
+const String _joinUrl = 'https://familyrecipes-46e1a.web.app/join.html';
+
+/// Siti che servono la pagina degli inviti: Firebase Hosting e, per i QR condivisi prima della 1.11.3,
+/// la vecchia pagina su GitHub (ora il repository è privato, ma il codice nel link resta valido).
+const Set<String> _joinHosts = {'familyrecipes-46e1a.web.app', 'familyrecipes-46e1a.firebaseapp.com', 'viperonedodge.github.io'};
 
 String groupQrData(String code) => '$_joinUrl?code=$code';
 
@@ -22,7 +26,7 @@ String? codeFromQr(String? raw) {
   var t = raw.trim();
   final uri = Uri.tryParse(t);
   if (uri != null && uri.hasScheme && uri.host.isNotEmpty) {
-    if (!uri.host.endsWith('github.io') || !uri.path.endsWith('/join.html')) return null;
+    if (!_joinHosts.contains(uri.host.toLowerCase()) || !uri.path.endsWith('/join.html')) return null;
     t = uri.queryParameters['code'] ?? '';
   }
   if (t.toLowerCase().startsWith(_qrPrefix)) t = t.substring(_qrPrefix.length);

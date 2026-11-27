@@ -107,9 +107,9 @@ leggibili (le proprie) ma non modificabili.
 
 ## 3. Testi delle schede
 
-**URL informativa privacy**: <https://viperonedodge.github.io/FamilyRecipes/privacy.html>
-**URL cancellazione account (Google Play)**: <https://viperonedodge.github.io/FamilyRecipes/privacy.html#delete>
-**URL assistenza (App Store)**: <https://viperonedodge.github.io/FamilyRecipes/privacy.html>
+**URL informativa privacy**: <https://familyrecipes-46e1a.web.app/privacy.html>
+**URL cancellazione account (Google Play)**: <https://familyrecipes-46e1a.web.app/privacy.html#delete>
+**URL assistenza (App Store)**: <https://familyrecipes-46e1a.web.app/privacy.html>
 **Email di contatto**: appmyfleetmanager@gmail.com
 **Categoria**: Cibi e bevande / Food & Drink · **Prezzo**: gratuita · **Pubblicità**: no
 

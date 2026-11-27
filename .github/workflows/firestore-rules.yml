@@ -1,0 +1,25 @@
+name: Pubblica le regole Firestore
+
+on:
+  workflow_dispatch:
+
+jobs:
+  regole:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pubblica firestore.rules
+        env:
+          FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$FIREBASE_SA" ]; then echo "Secret FIREBASE_SERVICE_ACCOUNT mancante"; exit 1; fi
+          KEY="$RUNNER_TEMP/sa.json"
+          printf '%s' "$FIREBASE_SA" > "$KEY"
+          export GOOGLE_APPLICATION_CREDENTIALS="$KEY"
+          npx --yes firebase-tools@15.34.0 deploy --only firestore:rules --project familyrecipes-46e1a --non-interactive
+          rm -f "$KEY"

@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 class SupportService {
   static const String email = 'appmyfleetmanager@gmail.com';
 
-  static const String privacyUrl = 'https://viperonedodge.github.io/FamilyRecipes/privacy.html';
+  static const String privacyUrl = 'https://familyrecipes-46e1a.web.app/privacy.html';
 
   static Future<String> deviceDescription() async {
     try {

@@ -21,6 +21,10 @@ void main() {
       expect(codeFromQr('familyrecipes:join:AB23CD45EF'), 'AB23CD45EF');
       expect(codeFromQr('FAMILYRECIPES:JOIN:ab23cd45ef'), 'AB23CD45EF');
       expect(codeFromQr('https://viperonedodge.github.io/FamilyRecipes/join.html?code=AB23CD45EF'), 'AB23CD45EF');
+      // Dalla 1.11.3 le pagine pubbliche sono su Firebase Hosting (repository privato).
+      expect(codeFromQr('https://familyrecipes-46e1a.web.app/join.html?code=AB23CD45EF'), 'AB23CD45EF');
+      expect(codeFromQr('https://familyrecipes-46e1a.firebaseapp.com/join.html?code=AB23CD45EF'), 'AB23CD45EF');
+      expect(codeFromQr('https://altrosito.github.io/join.html?code=AB23CD45EF'), isNull);
     });
 
     test('QR di altri siti, di altre app, vuoti o assurdi: nessun codice', () {
