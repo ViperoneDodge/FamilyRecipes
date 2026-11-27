@@ -563,7 +563,7 @@
  "xls.exportInfo": "Công thức, nguyên liệu và các bước trong tệp .xlsx để sửa và nhập lại",
  "xls.template": "Mẫu Excel để điền",
  "xls.templateInfo": "Tệp .xlsx trống có ví dụ: điền trên máy tính rồi nhập vào",
- "xls.templateShare": "Mẫu FamilyRecipes: điền các trang Công thức, Nguyên liệu và Bước, rồi nhập vào ứng dụng.",
+ "xls.templateShare": "Mẫu FamilyRecipes: mỗi công thức một trang. Sao chép trang mẫu để thêm công thức, rồi nhập tệp vào ứng dụng.",
  "xls.title": "Tiêu đề",
  "xls.intro": "Giới thiệu",
  "xls.author": "Tác giả",

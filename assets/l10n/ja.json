@@ -563,7 +563,7 @@
  "xls.exportInfo": "レシピ・材料・手順を .xlsx ファイルに。編集して再読み込みできます",
  "xls.template": "記入用 Excel フォーム",
  "xls.templateInfo": "例入りの空の .xlsx ファイル：パソコンで記入して読み込みます",
- "xls.templateShare": "FamilyRecipes フォーム：レシピ・材料・手順のシートに記入して、アプリに読み込んでください。",
+ "xls.templateShare": "FamilyRecipes フォーム：レシピごとに 1 シート。見本のシートをコピーして追加し、ファイルをアプリに読み込んでください。",
  "xls.title": "タイトル",
  "xls.intro": "はじめに",
  "xls.author": "作者",

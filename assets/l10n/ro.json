@@ -563,7 +563,7 @@
  "xls.exportInfo": "Rețete, ingrediente și pași într-un fișier .xlsx de editat și reimportat",
  "xls.template": "Formular Excel de completat",
  "xls.templateInfo": "Fișier .xlsx gol cu un exemplu: completează-l pe calculator și importă-l",
- "xls.templateShare": "Formular FamilyRecipes: completează foile Rețete, Ingrediente și Pași, apoi importă-l în aplicație.",
+ "xls.templateShare": "Formular FamilyRecipes: o foaie pentru fiecare rețetă. Copiază foaia de exemplu ca să adaugi altele, apoi importă fișierul în aplicație.",
  "xls.title": "Titlu",
  "xls.intro": "Introducere",
  "xls.author": "Autor",

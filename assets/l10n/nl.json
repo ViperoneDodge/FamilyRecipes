@@ -563,7 +563,7 @@
  "xls.exportInfo": "Recepten, ingrediënten en stappen in een .xlsx-bestand om te bewerken en opnieuw te importeren",
  "xls.template": "Excel-formulier om in te vullen",
  "xls.templateInfo": "Leeg .xlsx-bestand met een voorbeeld: vul het in op de computer en importeer het",
- "xls.templateShare": "FamilyRecipes-formulier: vul de bladen Recepten, Ingrediënten en Stappen in en importeer het daarna in de app.",
+ "xls.templateShare": "FamilyRecipes-formulier: één blad per recept. Kopieer het voorbeeldblad voor meer recepten en importeer het bestand daarna in de app.",
  "xls.title": "Titel",
  "xls.intro": "Inleiding",
  "xls.author": "Auteur",

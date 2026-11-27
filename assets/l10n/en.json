@@ -565,7 +565,7 @@
  "xls.exportInfo": "Recipes, ingredients and steps in an .xlsx file to edit and import again",
  "xls.template": "Excel form to fill in",
  "xls.templateInfo": "Blank .xlsx file with an example: fill it in on your computer and import it",
- "xls.templateShare": "FamilyRecipes form: fill in the Recipes, Ingredients and Steps sheets, then import it into the app.",
+ "xls.templateShare": "FamilyRecipes form: one sheet per recipe. Copy the example sheet to add more, then import the file into the app.",
  "xls.title": "Title",
  "xls.intro": "Introduction",
  "xls.author": "Author",

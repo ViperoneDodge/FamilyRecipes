@@ -563,7 +563,7 @@
  "xls.exportInfo": "Retseptid, koostisosad ja sammud .xlsx-failis muutmiseks ja uuesti importimiseks",
  "xls.template": "Täidetav Exceli vorm",
  "xls.templateInfo": "Tühi .xlsx-fail näitega: täida see arvutis ja impordi",
- "xls.templateShare": "FamilyRecipes vorm: täida lehed Retseptid, Koostisosad ja Sammud, seejärel impordi see rakendusse.",
+ "xls.templateShare": "FamilyRecipes vorm: üks leht retsepti kohta. Kopeeri näidisleht, et lisada uusi, ja impordi siis fail rakendusse.",
  "xls.title": "Pealkiri",
  "xls.intro": "Sissejuhatus",
  "xls.author": "Autor",

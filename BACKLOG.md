@@ -240,20 +240,25 @@ Correzioni dei 22 bug trovati dal tester (test in `test/regressioni_*_test.dart`
   Dosi a peso convertite con un uovo medio senza guscio: intero 50 g, tuorlo 18 g, albume 32 g (per eccesso).
 - **Esportazione in vista**: pulsanti PDF ed Excel nella Pianificazione e in basso nella lista della spesa.
 
-## Prossima release
-- **Codice sviluppatore (fatto, in attesa di rilascio)**: come in MyFleetManager, tenendo premuto 5 secondi
+## Versione 1.11.2
+- **Codice sviluppatore**: come in MyFleetManager, tenendo premuto 5 secondi
   «Colore del ricettario» (Impostazioni → Aspetto) compare il campo del codice; con la parola d'ordine si
   sblocca Pro. Solo Android (regole dell'App Store), vale per la versione in cui è inserito; nel sorgente c'è
   solo l'impronta sha256 del codice.
-- **Prova della pianificazione (fatto, in attesa di rilascio)**: senza Pro si possono riempire 2 settimane
+- **Prova della pianificazione**: senza Pro si possono riempire 2 settimane
   qualsiasi (lista della spesa ed esportazione comprese); dalla terza, invito a Pro. Svuotare una settimana non
   restituisce la prova; le settimane già usate restano modificabili.
-- **Solo telefono senza registrazione (fatto, in attesa di rilascio)**: un pulsante «Inizia su questo telefono»
+- **Solo telefono senza registrazione**: un pulsante «Inizia su questo telefono»
   al posto di nome utente e password; chi ha già un account solo-telefono può ancora accedere con «Hai già un
   account con nome utente?». Nuovi account con nome utente e password solo online.
-- **Esporta (fatto, in attesa di rilascio)**: nella Pianificazione e nella lista della spesa un solo pulsante
+- **Esporta**: nella Pianificazione e nella lista della spesa un solo pulsante
   «Esporta» che chiede il formato (PDF o Excel). Il file prima si salva sul telefono (si sceglie dove), poi un
   avviso offre «Condividi»; se il salvataggio viene annullato si può comunque condividere.
+- **Modulo Excel delle ricette**: un foglio per ricetta (nome = titolo) con in alto titolo, categoria, porzioni,
+  difficoltà, costo, tempi, autore, introduzione e consigli; poi gli ingredienti; poi i passaggi (riga «N.»).
+  Per aggiungere ricette si copia un foglio. Ultimo foglio «Valori» con i valori ammessi.
+
+## Prossima release
 
 - [ ] iPhone: avvisi dei gruppi ad app chiusa (servizio push su Firebase), Condividi da Safari, piano B per
   i siti di ricette protetti, versione iPad.

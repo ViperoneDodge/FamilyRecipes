@@ -563,7 +563,7 @@
  "xls.exportInfo": "Recepty, suroviny a kroky v souboru .xlsx k úpravě a opětovnému importu",
  "xls.template": "Excelový formulář k vyplnění",
  "xls.templateInfo": "Prázdný soubor .xlsx s příkladem: vyplň ho na počítači a importuj",
- "xls.templateShare": "Formulář FamilyRecipes: vyplň listy Recepty, Suroviny a Kroky a pak ho importuj do aplikace.",
+ "xls.templateShare": "Formulář FamilyRecipes: jeden list na recept. Zkopíruj ukázkový list a přidej další, pak soubor importuj do aplikace.",
  "xls.title": "Název",
  "xls.intro": "Úvod",
  "xls.author": "Autor",

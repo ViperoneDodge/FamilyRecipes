@@ -68,6 +68,50 @@ void main() {
     final none = ExcelForm.importWeek(bytes, []);
     expect(none.missing, 2);
   });
+
+  test('un foglio per ricetta: dati comuni in alto, poi ingredienti, poi passaggi', () {
+    final a = Recipe(
+      title: 'Tiramisù: della nonna / versione [estiva]',
+      category: RecipeCategory.dolci,
+      servings: 6,
+      ingredients: [Ingredient(name: 'Mascarpone', amount: '500 g'), Ingredient(name: 'Uova', amount: '4')],
+      steps: [RecipeStep(text: 'Monta i tuorli'), RecipeStep(text: 'Aggiungi il mascarpone')],
+    );
+    final b = Recipe(title: 'Tiramisù: della nonna / versione [estiva]', category: RecipeCategory.dolci);
+    final book = Xlsx.read(ExcelForm.export([a, b]));
+    expect(book.length, 3, reason: '2 ricette + Valori');
+    final names = book.keys.toList();
+    expect(names[0], isNot(contains(':')));
+    expect(names[1], endsWith('(2)'));
+    final rows = book.values.first;
+    expect(rows[0][1], a.title);
+    expect(rows[1][1], 'Dolci');
+    expect(rows[2][1], '6');
+    expect(rows[12], ['Mascarpone', '500 g']);
+    expect(rows[13], ['Uova', '4']);
+    expect(rows[15][0], 'N.');
+    expect(rows[16], ['1', 'Monta i tuorli']);
+    // Ricetta aggiunta "a mano" copiando un foglio e aggiungendo righe: si legge lo stesso.
+    final back = ExcelForm.importRecipes(ExcelForm.export([a]));
+    expect(back.single.recipe.steps.map((s) => s.text), ['Monta i tuorli', 'Aggiungi il mascarpone']);
+  });
+
+  test('foglio ricetta compilato a mano: righe vuote, passaggi senza numero, altri fogli ignorati', () {
+    final bytes = Xlsx.write([
+      const XlsxSheet('Leggimi', [['Istruzioni'], ['…']]),
+      XlsxSheet('Lasagne', [
+        ['Titolo', 'Lasagne'], ['Categoria', 'primi'], ['Porzioni', '8'], [], [], ['Preparazione', '40 min'],
+        ['Cottura', '45'], [], ['Introduzione', 'Della domenica'], [],
+        [], ['Ingrediente', 'Quantità'], ['Sfoglia', '500 g'], [], ['Ragù', '1 l'],
+        [], ['N.', 'Testo'], ['', 'Prepara il ragù'], ['', ''], ['3', 'Inforna'], ['2', 'Componi gli strati'],
+      ]),
+    ]);
+    final r = ExcelForm.importRecipes(bytes).single.recipe;
+    expect([r.title, r.category, r.servings, r.prepMinutes, r.cookMinutes, r.intro],
+        ['Lasagne', RecipeCategory.primi, 8, 40, 45, 'Della domenica']);
+    expect(r.ingredients.map((i) => i.name), ['Sfoglia', 'Ragù']);
+    expect(r.steps.map((s) => s.text), ['Componi gli strati', 'Inforna', 'Prepara il ragù']);
+  });
 }
 
 // ignore: non_constant_identifier_names

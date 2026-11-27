@@ -563,7 +563,7 @@
  "xls.exportInfo": "Resep, bahan, dan langkah dalam file .xlsx untuk diedit dan diimpor lagi",
  "xls.template": "Formulir Excel untuk diisi",
  "xls.templateInfo": "File .xlsx kosong dengan contoh: isi di komputer lalu impor",
- "xls.templateShare": "Formulir FamilyRecipes: isi lembar Resep, Bahan, dan Langkah, lalu impor ke aplikasi.",
+ "xls.templateShare": "Formulir FamilyRecipes: satu lembar per resep. Salin lembar contoh untuk menambah resep, lalu impor file ke aplikasi.",
  "xls.title": "Judul",
  "xls.intro": "Pengantar",
  "xls.author": "Penulis",

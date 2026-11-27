@@ -563,7 +563,7 @@
  "xls.exportInfo": "Receptes, sastāvdaļas un soļi .xlsx failā rediģēšanai un atkārtotai importēšanai",
  "xls.template": "Aizpildāma Excel veidlapa",
  "xls.templateInfo": "Tukšs .xlsx fails ar piemēru: aizpildi to datorā un importē",
- "xls.templateShare": "FamilyRecipes veidlapa: aizpildi lapas Receptes, Sastāvdaļas un Soļi, tad importē to lietotnē.",
+ "xls.templateShare": "FamilyRecipes veidlapa: viena lapa katrai receptei. Nokopē parauga lapu, lai pievienotu vēl, tad importē failu lietotnē.",
  "xls.title": "Nosaukums",
  "xls.intro": "Ievads",
  "xls.author": "Autors",

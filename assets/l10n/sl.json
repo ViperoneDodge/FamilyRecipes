@@ -563,7 +563,7 @@
  "xls.exportInfo": "Recepti, sestavine in koraki v datoteki .xlsx za urejanje in ponovni uvoz",
  "xls.template": "Obrazec Excel za izpolnjevanje",
  "xls.templateInfo": "Prazna datoteka .xlsx s primerom: izpolni jo na računalniku in jo uvozi",
- "xls.templateShare": "Obrazec FamilyRecipes: izpolni liste Recepti, Sestavine in Koraki, nato ga uvozi v aplikacijo.",
+ "xls.templateShare": "Obrazec FamilyRecipes: en list na recept. Kopiraj vzorčni list za nove recepte, nato datoteko uvozi v aplikacijo.",
  "xls.title": "Naslov",
  "xls.intro": "Uvod",
  "xls.author": "Avtor",

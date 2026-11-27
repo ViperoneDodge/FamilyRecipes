@@ -563,7 +563,7 @@
  "xls.exportInfo": "Riċetti, ingredjenti u passi f'fajl .xlsx biex teditja u terġa' timporta",
  "xls.template": "Formola Excel biex timla",
  "xls.templateInfo": "Fajl .xlsx vojt b'eżempju: imlieh fuq il-kompjuter u importah",
- "xls.templateShare": "Formola FamilyRecipes: imla l-folji Riċetti, Ingredjenti u Passi, imbagħad importaha fl-app.",
+ "xls.templateShare": "Formola FamilyRecipes: folja waħda għal kull riċetta. Ikkopja l-folja tal-eżempju biex iżżid oħrajn, imbagħad importa l-fajl fl-app.",
  "xls.title": "Titlu",
  "xls.intro": "Introduzzjoni",
  "xls.author": "Awtur",

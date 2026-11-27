@@ -11,7 +11,17 @@ class XlsxSheet {
   final List<List<Object?>> rows;
   final List<double> widths;
 
-  const XlsxSheet(this.name, this.rows, {this.widths = const []});
+  /// Prima riga come intestazione (grassetto e bloccata in alto).
+  final bool freezeHeader;
+
+  /// Altre righe in grassetto (intestazioni di sezione).
+  final Set<int> boldRows;
+
+  /// Prima colonna in grassetto (etichette).
+  final bool boldFirstColumn;
+
+  const XlsxSheet(this.name, this.rows,
+      {this.widths = const [], this.freezeHeader = true, this.boldRows = const {}, this.boldFirstColumn = false});
 }
 
 /// File Excel (.xlsx) essenziali, scritti e letti senza librerie esterne: bastano per il modulo delle
@@ -49,8 +59,10 @@ class Xlsx {
     final b = StringBuffer()
       ..write('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
       ..write('<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">')
-      ..write('<sheetViews><sheetView workbookViewId="0">'
-          '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>');
+      ..write(s.freezeHeader
+          ? '<sheetViews><sheetView workbookViewId="0">'
+              '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+          : '<sheetViews><sheetView workbookViewId="0"/></sheetViews>');
     if (s.widths.isNotEmpty) {
       b.write('<cols>');
       for (var i = 0; i < s.widths.length; i++) {
@@ -66,7 +78,8 @@ class Xlsx {
         final v = row[c];
         if (v == null || (v is String && v.isEmpty)) continue;
         final ref = '${_col(c)}${r + 1}';
-        final style = r == 0 ? ' s="1"' : ' s="2"';
+        final bold = (r == 0 && s.freezeHeader) || s.boldRows.contains(r);
+        final style = bold ? ' s="1"' : (c == 0 && s.boldFirstColumn ? ' s="3"' : ' s="2"');
         if (v is num && v.isFinite) {
           b.write('<c r="$ref"$style><v>$v</v></c>');
         } else {
@@ -112,9 +125,10 @@ class Xlsx {
         '<fill><patternFill patternType="solid"><fgColor rgb="FFF4E4C1"/><bgColor indexed="64"/></patternFill></fill></fills>'
         '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
         '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-        '<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+        '<cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
         '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>'
         '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+        '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top"/></xf>'
         '</cellXfs></styleSheet>');
     for (var i = 0; i < sheets.length; i++) {
       add('xl/worksheets/sheet${i + 1}.xml', _sheetXml(sheets[i]));

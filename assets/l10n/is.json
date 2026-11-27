@@ -563,7 +563,7 @@
  "xls.exportInfo": "Uppskriftir, hráefni og skref í .xlsx-skrá til að breyta og flytja inn aftur",
  "xls.template": "Excel-eyðublað til að fylla út",
  "xls.templateInfo": "Tóm .xlsx-skrá með dæmi: fylltu hana út í tölvunni og fluttu hana inn",
- "xls.templateShare": "FamilyRecipes-eyðublað: fylltu út blöðin Uppskriftir, Hráefni og Skref og fluttu það svo inn í appið.",
+ "xls.templateShare": "FamilyRecipes-eyðublað: eitt blað fyrir hverja uppskrift. Afritaðu dæmablaðið til að bæta við fleiri og fluttu svo skrána inn í appið.",
  "xls.title": "Titill",
  "xls.intro": "Inngangur",
  "xls.author": "Höfundur",

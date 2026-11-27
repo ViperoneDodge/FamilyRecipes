@@ -563,7 +563,7 @@
  "xls.exportInfo": "Przepisy, składniki i kroki w pliku .xlsx do edycji i ponownego importu",
  "xls.template": "Formularz Excel do wypełnienia",
  "xls.templateInfo": "Pusty plik .xlsx z przykładem: wypełnij go na komputerze i zaimportuj",
- "xls.templateShare": "Formularz FamilyRecipes: wypełnij arkusze Przepisy, Składniki i Kroki, a potem zaimportuj go do aplikacji.",
+ "xls.templateShare": "Formularz FamilyRecipes: jeden arkusz na przepis. Skopiuj arkusz przykładowy, aby dodać kolejne, a potem zaimportuj plik do aplikacji.",
  "xls.title": "Tytuł",
  "xls.intro": "Wstęp",
  "xls.author": "Autor",

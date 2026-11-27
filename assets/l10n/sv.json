@@ -563,7 +563,7 @@
  "xls.exportInfo": "Recept, ingredienser och steg i en .xlsx-fil att redigera och importera igen",
  "xls.template": "Excel-formulär att fylla i",
  "xls.templateInfo": "Tom .xlsx-fil med ett exempel: fyll i den på datorn och importera den",
- "xls.templateShare": "FamilyRecipes-formulär: fyll i bladen Recept, Ingredienser och Steg och importera det sedan i appen.",
+ "xls.templateShare": "FamilyRecipes-formulär: ett blad per recept. Kopiera exempelbladet för att lägga till fler och importera sedan filen i appen.",
  "xls.title": "Titel",
  "xls.intro": "Inledning",
  "xls.author": "Författare",

@@ -563,7 +563,7 @@
  "xls.exportInfo": "Receptai, produktai ir žingsniai .xlsx faile redaguoti ir vėl importuoti",
  "xls.template": "Pildoma Excel forma",
  "xls.templateInfo": "Tuščias .xlsx failas su pavyzdžiu: užpildyk jį kompiuteryje ir importuok",
- "xls.templateShare": "FamilyRecipes forma: užpildyk lapus Receptai, Produktai ir Žingsniai, tada importuok į programėlę.",
+ "xls.templateShare": "FamilyRecipes forma: vienas lapas vienam receptui. Nukopijuok pavyzdžio lapą, kad pridėtum daugiau, tada importuok failą į programėlę.",
  "xls.title": "Pavadinimas",
  "xls.intro": "Įžanga",
  "xls.author": "Autorius",

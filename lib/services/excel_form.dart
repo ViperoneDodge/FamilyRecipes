@@ -10,60 +10,85 @@ import 'xlsx.dart';
 /// Modulo Excel delle ricette e della settimana, da compilare al computer e importare (o esportare per
 /// modificarlo e reimportarlo).
 ///
-/// Fogli, sempre in quest'ordine (l'importazione li riconosce dalla posizione, non dal nome, che è tradotto):
-/// 1. Ricette: ID · Titolo · Categoria · Introduzione · Difficoltà · Costo · Preparazione (min) · Cottura (min)
-///    · Porzioni · Consigli · Autore
-/// 2. Ingredienti: ID ricetta · Titolo ricetta · Ingrediente · Quantità
-/// 3. Passaggi: ID ricetta · Titolo ricetta · N. · Testo
-/// 4. Settimana: Giorno (AAAA-MM-GG) · Pasto · Ricetta · Porzioni
-/// 5. Valori: le categorie, difficoltà, costi e pasti ammessi.
+/// Ricette: **un foglio per ricetta** (il nome del foglio è il titolo), sempre con questa forma:
+/// - righe 1–10, in colonna B: Titolo, Categoria, Porzioni, Difficoltà, Costo, Preparazione (min),
+///   Cottura (min), Autore, Introduzione, Consigli (in colonna A le etichette);
+/// - riga 12: intestazione degli ingredienti (Ingrediente · Quantità), poi un ingrediente per riga;
+/// - una riga con «N.» in colonna A: intestazione dei passaggi, poi un passaggio per riga (N. · Testo).
+/// Per aggiungere una ricetta basta copiare un foglio. L'ultimo foglio («Valori») elenca categorie,
+/// difficoltà, costi e pasti ammessi.
+///
+/// Settimana (file della Pianificazione): Giorno (AAAA-MM-GG) · Pasto · Ricetta · Porzioni.
 class ExcelForm {
-  static List<String> get _recipeHeader => [
-        'ID',
+  /// Etichette delle righe 1–10 di ogni foglio ricetta.
+  static List<String> get _fieldLabels => [
         tr('xls.title'),
         tr('recipe.category'),
-        tr('xls.intro'),
+        tr('recipe.servings'),
         tr('recipe.difficulty'),
         tr('recipe.cost'),
         '${tr('recipe.prep')} (min)',
         '${tr('recipe.cook')} (min)',
-        tr('recipe.servings'),
-        tr('recipe.tips'),
         tr('xls.author'),
+        tr('xls.intro'),
+        tr('recipe.tips'),
       ];
 
-  static List<XlsxSheet> _recipeSheets(List<Recipe> recipes) {
-    final live = [for (final r in recipes) if (!r.deleted) r];
-    String id(int i) => 'R${(i + 1).toString().padLeft(3, '0')}';
-    return [
-      XlsxSheet(tr('xls.sheetRecipes'), [
-        _recipeHeader,
-        for (var i = 0; i < live.length; i++)
-          [
-            id(i),
-            live[i].title,
-            categoryLabel(live[i].category),
-            live[i].intro,
-            difficultyLabel(live[i].difficulty),
-            costLabel(live[i].cost),
-            live[i].prepMinutes,
-            live[i].cookMinutes,
-            live[i].servings,
-            live[i].tips,
-            live[i].createdByName,
-          ],
-      ], widths: const [8, 30, 16, 40, 14, 12, 14, 14, 10, 40, 18]),
-      XlsxSheet(tr('xls.sheetIngredients'), [
-        ['ID', tr('xls.recipeTitle'), tr('xls.ingredient'), tr('xls.amount')],
-        for (var i = 0; i < live.length; i++)
-          for (final g in live[i].ingredients) [id(i), live[i].title, g.name, g.amount],
-      ], widths: const [8, 30, 30, 16]),
-      XlsxSheet(tr('xls.sheetSteps'), [
-        ['ID', tr('xls.recipeTitle'), 'N.', tr('xls.stepText')],
-        for (var i = 0; i < live.length; i++)
-          for (var n = 0; n < live[i].steps.length; n++) [id(i), live[i].title, n + 1, live[i].steps[n].text],
-      ], widths: const [8, 30, 6, 80]),
+  /// Riga (0 = prima) dell'intestazione degli ingredienti.
+  static const int _ingHeaderRow = 11;
+
+  /// Marcatore della riga d'intestazione dei passaggi (colonna A), uguale in tutte le lingue.
+  static const String _stepsMark = 'N.';
+
+  static String _sheetName(String title, Set<String> used) {
+    var base = title.replaceAll(RegExp(r'[:\\/?*\[\]]'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (base.isEmpty) base = tr('xls.recipeTitle');
+    if (base.length > 25) base = base.substring(0, 25).trim(); // con " (99)" resta entro i 31 caratteri di Excel
+    var name = base;
+    var i = 2;
+    while (used.contains(name.toLowerCase())) {
+      name = '$base ($i)';
+      i++;
+    }
+    used.add(name.toLowerCase());
+    return name;
+  }
+
+  static XlsxSheet _recipeSheet(Recipe r, Set<String> used) {
+    final labels = _fieldLabels;
+    final values = <Object?>[
+      r.title,
+      categoryLabel(r.category),
+      r.servings,
+      difficultyLabel(r.difficulty),
+      costLabel(r.cost),
+      r.prepMinutes,
+      r.cookMinutes,
+      r.createdByName,
+      r.intro,
+      r.tips,
     ];
+    return XlsxSheet(
+      _sheetName(r.displayTitle, used),
+      [
+        for (var i = 0; i < labels.length; i++) [labels[i], values[i]],
+        [],
+        [tr('xls.ingredient'), tr('xls.amount')],
+        for (final g in r.ingredients) [g.name, g.amount],
+        [],
+        [_stepsMark, tr('xls.stepText')],
+        for (var n = 0; n < r.steps.length; n++) [n + 1, r.steps[n].text],
+      ],
+      widths: const [26, 70],
+      boldRows: {_ingHeaderRow, _ingHeaderRow + 2 + r.ingredients.length},
+      boldFirstColumn: true,
+      freezeHeader: false,
+    );
+  }
+
+  static List<XlsxSheet> _recipeSheets(List<Recipe> recipes) {
+    final used = <String>{tr('xls.sheetValues').toLowerCase()};
+    return [for (final r in recipes) if (!r.deleted) _recipeSheet(r, used)];
   }
 
   static XlsxSheet _planSheet(List<({String day, Meal meal, PlanEntry entry})> plan, Recipe? Function(String) byId) =>
@@ -95,7 +120,7 @@ class ExcelForm {
   }) =>
       Xlsx.write([
         ..._recipeSheets(recipes),
-        _planSheet(plan, byId ?? (_) => null),
+        if (plan.isNotEmpty) _planSheet(plan, byId ?? (_) => null),
         _valuesSheet(),
       ]);
 
@@ -135,11 +160,6 @@ class ExcelForm {
 
   // ---- Importazione ----
 
-  static List<List<String>> _sheet(Map<String, List<List<String>>> book, int i) {
-    final l = book.values.toList();
-    return i < l.length ? l[i] : const [];
-  }
-
   static String _cell(List<String> row, int i) => i < row.length ? row[i].trim() : '';
 
   static int _num(String s) {
@@ -164,55 +184,52 @@ class ExcelForm {
     return null;
   }
 
-  /// Ricette del modulo. Gli ingredienti e i passaggi si collegano alla ricetta con l'ID o, se manca, con
-  /// il titolo. Lancia [FormatException] se il file non è un .xlsx o non ha il foglio delle ricette.
+  /// Ricette del modulo: un foglio per ricetta (vedi sopra); gli altri fogli si saltano. Lancia
+  /// [FormatException] se il file non è un .xlsx o non contiene ricette.
   static List<ImportedRecipe> importRecipes(Uint8List bytes) {
     final book = Xlsx.read(bytes);
-    final rows = _sheet(book, 0);
-    if (rows.isEmpty) throw const FormatException('no recipes sheet');
-    final byKey = <String, Recipe>{};
-    final out = <Recipe>[];
-    String key(String id, String title) => id.isNotEmpty ? 'id:${id.toLowerCase()}' : 't:${foldForSearch(title)}';
-    for (final row in rows.skip(1)) {
-      final title = _cell(row, 1);
-      if (title.isEmpty) continue;
-      final servings = _num(_cell(row, 8));
-      final r = Recipe(
-        title: title,
-        category: _category(_cell(row, 2)) ?? RecipeWords.guessCategory(title),
-        intro: _cell(row, 3),
-        difficulty: _match(_cell(row, 4), Difficulty.values, difficultyLabel) ??
-            RecipeWords.difficulty(_cell(row, 4)) ??
-            Difficulty.easy,
-        cost: _match(_cell(row, 5), Cost.values, costLabel) ?? RecipeWords.cost(_cell(row, 5)) ?? Cost.low,
-        prepMinutes: _num(_cell(row, 6)),
-        cookMinutes: _num(_cell(row, 7)),
-        servings: servings == 0 ? 4 : servings.clamp(1, 99),
-        tips: _cell(row, 9),
-      )..createdByName = _cell(row, 10);
-      out.add(r);
-      byKey.putIfAbsent(key(_cell(row, 0), title), () => r);
-      byKey.putIfAbsent(key('', title), () => r);
+    final out = <ImportedRecipe>[];
+    for (final rows in book.values) {
+      final r = _readRecipeSheet(rows);
+      if (r != null) out.add(ImportedRecipe(r, null));
     }
-    Recipe? find(List<String> row) => byKey[key(_cell(row, 0), _cell(row, 1))] ?? byKey[key('', _cell(row, 1))];
-    for (final row in _sheet(book, 1).skip(1)) {
-      final r = find(row);
-      final name = _cell(row, 2);
-      if (r != null && (name.isNotEmpty || _cell(row, 3).isNotEmpty)) {
-        r.ingredients.add(Ingredient(name: name, amount: _cell(row, 3)));
-      }
+    if (out.isEmpty) throw const FormatException('no recipes');
+    return out;
+  }
+
+  static Recipe? _readRecipeSheet(List<List<String>> rows) {
+    // Un foglio ricetta ha la riga «N.» dei passaggi e il titolo in B1.
+    final stepsRow = rows.indexWhere((r) => _cell(r, 0) == _stepsMark);
+    if (stepsRow < 0 || rows.isEmpty) return null;
+    String field(int i) => i < rows.length ? _cell(rows[i], 1) : '';
+    final title = field(0);
+    if (title.isEmpty) return null;
+    final servings = _num(field(2));
+    final r = Recipe(
+      title: title,
+      category: _category(field(1)) ?? RecipeWords.guessCategory(title),
+      servings: servings == 0 ? 4 : servings.clamp(1, 99),
+      difficulty: _match(field(3), Difficulty.values, difficultyLabel) ?? RecipeWords.difficulty(field(3)) ?? Difficulty.easy,
+      cost: _match(field(4), Cost.values, costLabel) ?? RecipeWords.cost(field(4)) ?? Cost.low,
+      prepMinutes: _num(field(5)),
+      cookMinutes: _num(field(6)),
+      intro: field(8),
+      tips: field(9),
+    )..createdByName = field(7);
+    for (var i = _ingHeaderRow + 1; i < stepsRow && i < rows.length; i++) {
+      final name = _cell(rows[i], 0), amount = _cell(rows[i], 1);
+      if (name.isNotEmpty || amount.isNotEmpty) r.ingredients.add(Ingredient(name: name, amount: amount));
     }
-    final steps = <Recipe, List<(int, String)>>{};
-    for (final row in _sheet(book, 2).skip(1)) {
-      final r = find(row);
-      final text = _cell(row, 3);
-      if (r != null && text.isNotEmpty) (steps[r] ??= []).add((_num(_cell(row, 2)), text));
+    final steps = <(int, int, String)>[];
+    for (var i = stepsRow + 1; i < rows.length; i++) {
+      final text = _cell(rows[i], 1).isNotEmpty ? _cell(rows[i], 1) : _cell(rows[i], 0);
+      if (text.isEmpty || RegExp(r'^\d+$').hasMatch(text)) continue;
+      final n = int.tryParse(_cell(rows[i], 0));
+      steps.add((n ?? 100000 + i, i, text));
     }
-    steps.forEach((r, l) {
-      l.sort((a, b) => a.$1.compareTo(b.$1));
-      r.steps = [for (final s in l) RecipeStep(text: s.$2)];
-    });
-    return [for (final r in out) ImportedRecipe(r, null)];
+    steps.sort((a, b) => a.$1 != b.$1 ? a.$1.compareTo(b.$1) : a.$2.compareTo(b.$2));
+    r.steps = [for (final s in steps) RecipeStep(text: s.$3)];
+    return r;
   }
 
   /// Voci della settimana del modulo: le ricette si cercano per titolo tra [recipes]; quelle che non si
@@ -220,9 +237,11 @@ class ExcelForm {
   static ({List<({String day, Meal meal, PlanEntry entry})> entries, int missing}) importWeek(
       Uint8List bytes, List<Recipe> recipes) {
     final book = Xlsx.read(bytes);
-    // Il foglio della settimana è il quarto nel modulo completo, il primo in quello della settimana.
-    var rows = _sheet(book, 3);
-    if (rows.isEmpty || _cell(rows.first, 0) == 'ID') rows = _sheet(book, 0);
+    // Il foglio della settimana: quello con una data nella prima colonna (dalla seconda riga).
+    final rows = book.values.firstWhere(
+      (rows) => rows.skip(1).any((r) => _day(_cell(r, 0)) != null),
+      orElse: () => const [],
+    );
     final byTitle = <String, Recipe>{for (final r in recipes.reversed) if (!r.deleted) foldForSearch(r.title.trim()): r};
     final out = <({String day, Meal meal, PlanEntry entry})>[];
     var missing = 0;

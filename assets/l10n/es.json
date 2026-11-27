@@ -563,7 +563,7 @@
  "xls.exportInfo": "Recetas, ingredientes y pasos en un archivo .xlsx para editar y volver a importar",
  "xls.template": "Formulario Excel para rellenar",
  "xls.templateInfo": "Archivo .xlsx vacío con un ejemplo: rellénalo en el ordenador e impórtalo",
- "xls.templateShare": "Formulario de FamilyRecipes: rellena las hojas Recetas, Ingredientes y Pasos y luego impórtalo en la app.",
+ "xls.templateShare": "Formulario de FamilyRecipes: una hoja por receta. Copia la hoja de ejemplo para añadir más y luego importa el archivo en la app.",
  "xls.title": "Título",
  "xls.intro": "Introducción",
  "xls.author": "Autor",

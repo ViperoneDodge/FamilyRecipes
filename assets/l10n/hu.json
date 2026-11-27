@@ -563,7 +563,7 @@
  "xls.exportInfo": "Receptek, hozzávalók és lépések .xlsx fájlban szerkesztéshez és újraimportáláshoz",
  "xls.template": "Kitölthető Excel-űrlap",
  "xls.templateInfo": "Üres .xlsx fájl példával: töltsd ki a számítógépen és importáld",
- "xls.templateShare": "FamilyRecipes-űrlap: töltsd ki a Receptek, Hozzávalók és Lépések lapokat, majd importáld az alkalmazásba.",
+ "xls.templateShare": "FamilyRecipes-űrlap: receptenként egy munkalap. Másold a mintalapot újabb receptekhez, majd importáld a fájlt az alkalmazásba.",
  "xls.title": "Cím",
  "xls.intro": "Bevezető",
  "xls.author": "Szerző",

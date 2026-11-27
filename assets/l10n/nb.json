@@ -563,7 +563,7 @@
  "xls.exportInfo": "Oppskrifter, ingredienser og trinn i en .xlsx-fil som kan redigeres og importeres igjen",
  "xls.template": "Excel-skjema til utfylling",
  "xls.templateInfo": "Tom .xlsx-fil med et eksempel: fyll den ut på datamaskinen og importer den",
- "xls.templateShare": "FamilyRecipes-skjema: fyll ut arkene Oppskrifter, Ingredienser og Trinn, og importer det deretter i appen.",
+ "xls.templateShare": "FamilyRecipes-skjema: ett ark per oppskrift. Kopier eksempelarket for å legge til flere, og importer deretter filen i appen.",
  "xls.title": "Tittel",
  "xls.intro": "Innledning",
  "xls.author": "Forfatter",

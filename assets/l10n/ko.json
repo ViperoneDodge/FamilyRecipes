@@ -563,7 +563,7 @@
  "xls.exportInfo": "레시피, 재료, 단계를 .xlsx 파일로 내보내 수정 후 다시 가져올 수 있습니다",
  "xls.template": "작성용 Excel 양식",
  "xls.templateInfo": "예시가 들어 있는 빈 .xlsx 파일: 컴퓨터에서 작성해 가져오세요",
- "xls.templateShare": "FamilyRecipes 양식: 레시피, 재료, 단계 시트를 작성한 뒤 앱으로 가져오세요.",
+ "xls.templateShare": "FamilyRecipes 양식: 레시피마다 시트 하나. 예시 시트를 복사해 추가한 뒤 파일을 앱으로 가져오세요.",
  "xls.title": "제목",
  "xls.intro": "소개",
  "xls.author": "작성자",

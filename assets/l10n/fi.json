@@ -563,7 +563,7 @@
  "xls.exportInfo": "Reseptit, ainekset ja vaiheet .xlsx-tiedostossa muokattavaksi ja uudelleen tuotavaksi",
  "xls.template": "Täytettävä Excel-lomake",
  "xls.templateInfo": "Tyhjä .xlsx-tiedosto esimerkillä: täytä se tietokoneella ja tuo se",
- "xls.templateShare": "FamilyRecipes-lomake: täytä välilehdet Reseptit, Ainekset ja Vaiheet ja tuo se sitten sovellukseen.",
+ "xls.templateShare": "FamilyRecipes-lomake: yksi välilehti reseptiä kohden. Kopioi esimerkkivälilehti lisätäksesi reseptejä ja tuo tiedosto sitten sovellukseen.",
  "xls.title": "Otsikko",
  "xls.intro": "Johdanto",
  "xls.author": "Tekijä",

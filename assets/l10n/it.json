@@ -565,7 +565,7 @@
  "xls.exportInfo": "Ricette, ingredienti e passaggi in un file .xlsx da modificare e reimportare",
  "xls.template": "Modulo Excel da compilare",
  "xls.templateInfo": "File .xlsx vuoto con un esempio: compilalo al computer e importalo",
- "xls.templateShare": "Modulo FamilyRecipes: compila i fogli Ricette, Ingredienti e Passaggi, poi importalo nell'app.",
+ "xls.templateShare": "Modulo FamilyRecipes: un foglio per ricetta. Copia il foglio d'esempio per aggiungerne altre, poi importa il file nell'app.",
  "xls.title": "Titolo",
  "xls.intro": "Introduzione",
  "xls.author": "Autore",

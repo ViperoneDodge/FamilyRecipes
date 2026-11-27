@@ -563,7 +563,7 @@
  "xls.exportInfo": "Opskrifter, ingredienser og trin i en .xlsx-fil, der kan redigeres og importeres igen",
  "xls.template": "Excel-skema til udfyldning",
  "xls.templateInfo": "Tom .xlsx-fil med et eksempel: udfyld den på computeren og importér den",
- "xls.templateShare": "FamilyRecipes-skema: udfyld arkene Opskrifter, Ingredienser og Trin, og importér det derefter i appen.",
+ "xls.templateShare": "FamilyRecipes-skema: ét ark pr. opskrift. Kopiér eksempelarket for at tilføje flere, og importér derefter filen i appen.",
  "xls.title": "Titel",
  "xls.intro": "Indledning",
  "xls.author": "Forfatter",

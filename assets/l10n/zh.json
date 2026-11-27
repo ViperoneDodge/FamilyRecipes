@@ -563,7 +563,7 @@
  "xls.exportInfo": "将食谱、食材和步骤导出为 .xlsx 文件，可编辑后再导入",
  "xls.template": "可填写的 Excel 表单",
  "xls.templateInfo": "带示例的空白 .xlsx 文件：在电脑上填写后导入",
- "xls.templateShare": "FamilyRecipes 表单：填写“食谱”“食材”“步骤”工作表，然后导入应用。",
+ "xls.templateShare": "FamilyRecipes 表单：每个食谱一个工作表。复制示例工作表即可添加更多，然后将文件导入应用。",
  "xls.title": "标题",
  "xls.intro": "简介",
  "xls.author": "作者",

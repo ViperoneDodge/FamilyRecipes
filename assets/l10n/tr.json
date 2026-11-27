@@ -563,7 +563,7 @@
  "xls.exportInfo": "Düzenleyip yeniden içe aktarmak için .xlsx dosyasında tarifler, malzemeler ve adımlar",
  "xls.template": "Doldurulacak Excel formu",
  "xls.templateInfo": "Örnekli boş .xlsx dosyası: bilgisayarda doldur ve içe aktar",
- "xls.templateShare": "FamilyRecipes formu: Tarifler, Malzemeler ve Adımlar sayfalarını doldur, sonra uygulamaya aktar.",
+ "xls.templateShare": "FamilyRecipes formu: her tarif için bir sayfa. Daha fazla eklemek için örnek sayfayı kopyala, sonra dosyayı uygulamaya aktar.",
  "xls.title": "Başlık",
  "xls.intro": "Giriş",
  "xls.author": "Yazar",
