@@ -3,7 +3,7 @@ name: Pubblica il sito
 on:
   push:
     branches: [main]
-    paths: ['docs/**', 'firebase.json', '.github/workflows/build-web.yml']
+    paths: ['docs/**', 'firebase.json', '.github/workflows/sito.yml']
   workflow_dispatch:
 
 jobs:
